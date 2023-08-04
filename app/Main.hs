@@ -30,10 +30,10 @@ options :: Parser Options
 options = Options
     <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "path to graph data")
     <*> switch (long "reverse" <> short 'r' <> help "reverse edges")
-    <*> hsubparser (
-        command "deps" (info depsCmd (progDesc "Show all direct inbound dependencies to a module"))
-         <> command "all" (info allDepsCmd (progDesc "Show all dependencies to a module"))
-         <> command "why" (info whyCmd (progDesc "Show why a module depends on another module")))
+    <*> hsubparser (fold [
+        command "deps" (info depsCmd (progDesc "Show all direct inbound dependencies to a module")),
+        command "all" (info allDepsCmd (progDesc "Show all dependencies to a module")),
+        command "why" (info whyCmd (progDesc "Show why a module depends on another module"))])
 
     where
         depsCmd = DirectDepsOn <$> argument str (metavar "module")
