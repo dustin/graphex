@@ -44,9 +44,9 @@ main :: IO ()
 main = do
     Options{..} <- customExecParser (prefs showHelpOnError) opts
     graph <- bool id reverseEdges optReverse <$> getInput optGraph
-    traverse_ TIO.putStrLn . sort $ case optCommand of
+    traverse_ TIO.putStrLn $ case optCommand of
         Why from to    -> why graph from to
-        DirectDepsOn m -> directDepsOn graph m
-        AllDepsOn m    -> allDepsOn graph m
+        DirectDepsOn m -> sort $ directDepsOn graph m
+        AllDepsOn m    -> sort $ allDepsOn graph m
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
