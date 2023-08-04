@@ -48,16 +48,12 @@ directDepsOn = flip (Map.findWithDefault [])
 allDepsOn :: Input -> Text -> [Text]
 allDepsOn m k = Set.toList . Set.delete k . go mempty . Set.singleton $ k
     where
-        nf x = Set.fromList $ Map.findWithDefault [] x m
-
         go s (flip Set.difference s -> todo)
             | Set.null todo = s
-            | otherwise = go (s <> todo) (Set.unions $ Set.map nf todo)
+            | otherwise = go (s <> todo) (Set.unions $ Set.map (Set.fromList . directDepsOn m) todo)
 
 -- | Find an example path between two modules.
 --
 -- This is a short path, but the important part is that it represents how connectivy works.
 why :: Input -> Text -> Text -> [Text]
-why m from to = maybe [] snd $ aStar nf (const (const 1)) (const (1::Int)) (== to) from
-    where
-        nf x = Map.findWithDefault [] x m
+why m from to = maybe [] snd $ aStar (directDepsOn m) (const (const 1)) (const (1::Int)) (== to) from
