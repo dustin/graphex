@@ -1,0 +1,6 @@
+.stack-work/
+graphex.cabal
+*~
+graph.json
+.stack-work
+.direnv

@@ -24,6 +24,9 @@ dependencies:
 - containers
 - aeson
 - optparse-applicative
+- text
+- bytestring
+- search-algorithms
 
 library:
   source-dirs: src
@@ -34,6 +37,10 @@ default-extensions:
   - OverloadedStrings
   - RecordWildCards
   - NamedFieldPuns
+  - DerivingStrategies
+  - DeriveAnyClass
+  - DeriveGeneric
+  - ViewPatterns
 
 executables:
   graphex:
