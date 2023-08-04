@@ -31,7 +31,7 @@ data Edge = Edge {
     deriving stock (Show, Generic)
     deriving anyclass FromJSON
 
-data Node = Node { label :: Text }
+newtype Node = Node { label :: Text }
     deriving stock (Show, Generic)
     deriving anyclass FromJSON
 
