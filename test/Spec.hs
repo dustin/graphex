@@ -33,9 +33,7 @@ instance Arbitrary Graph where
         -- We build a graph of acyclic connections, ensuring that all keys are present
         Graph . (Map.fromList [(k, []) | k <- somekeys] <>) <$> foldM next mempty somekeys
         where
-            next m k = do
-                targets <- sublistOf (Map.keys m)
-                pure $ Map.insert k targets m
+            next m k = flip (Map.insert k) m <$> sublistOf (Map.keys m)
 
     shrink = genericShrink
 
