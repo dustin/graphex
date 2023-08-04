@@ -38,7 +38,7 @@ getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
-reverseEdges m = Map.map (const []) m <> Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs m, v <- vs ]
+reverseEdges m = Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs m, v <- (k:vs) ]
 
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Input -> Text -> [Text]

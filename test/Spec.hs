@@ -52,8 +52,14 @@ instance Arbitrary GraphWithKey where
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
     shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
 
-prop_reverseEdgesId :: Graph -> Bool
-prop_reverseEdgesId (Graph g) = reverseEdges (reverseEdges g) == g
+prop_reverseEdgesId :: GraphWithKey -> Bool
+prop_reverseEdgesId (GraphWithKey k (Graph g)) = all (\k' -> k `elem` directDepsOn rg k') directs
+    where
+        directs = directDepsOn g k
+        rg = reverseEdges g
+
+prop_reversedDep :: Graph -> Bool
+prop_reversedDep (Graph g) = all (\(k, vs) -> all (`elem` Map.findWithDefault [] k (reverseEdges g)) vs) (Map.assocs g)
 
 prop_reachableIsFindable :: GraphWithKey -> Bool
 prop_reachableIsFindable (GraphWithKey k (Graph g)) = not . any (null . why g k) $ allDepsOn g k
@@ -73,6 +79,7 @@ prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubs
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
+    testProperty "reversed dep is still dep" prop_reversedDep,
     testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,

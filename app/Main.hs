@@ -2,6 +2,7 @@ module Main where
 
 import           Data.Bool           (bool)
 import           Data.Foldable
+import           Data.List           (sort)
 import           Data.Text           (Text)
 import qualified Data.Text.IO        as TIO
 import           Options.Applicative (Parser, argument, command,
@@ -39,14 +40,13 @@ options = Options
         allDepsCmd = AllDepsOn <$> argument str (metavar "module")
         whyCmd = Why <$> argument str (metavar "module from") <*> argument str (metavar "module to")
 
-
 main :: IO ()
 main = do
     Options{..} <- customExecParser (prefs showHelpOnError) opts
-    i <- (bool id reverseEdges optReverse) <$> getInput optGraph
-    traverse_ TIO.putStrLn $ case optCommand of
-        Why from to    -> why i from to
-        DirectDepsOn m -> directDepsOn i m
-        AllDepsOn m    -> allDepsOn i m
+    graph <- bool id reverseEdges optReverse <$> getInput optGraph
+    traverse_ TIO.putStrLn . sort $ case optCommand of
+        Why from to    -> why graph from to
+        DirectDepsOn m -> directDepsOn graph m
+        AllDepsOn m    -> allDepsOn graph m
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
