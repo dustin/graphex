@@ -1,10 +1,82 @@
+import           Control.Monad         (foldM)
+import           Data.Map              (Map)
+import qualified Data.Map.Strict       as Map
+import qualified Data.Set              as Set
+import           Data.Text             (Text)
+import           GHC.Generics          (Generic)
+
 import           Test.Tasty
 import           Test.Tasty.HUnit
 import           Test.Tasty.QuickCheck as QC
 
+import           Graphex
+
+newtype Graph = Graph (Map Text [Text])
+    deriving stock (Show, Eq, Generic)
+
+-- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
+someStrings :: [Text]
+someStrings =
+    ["x", "y", "z", "foo", "bar", "baz", "qux", "hello", "world",
+     "alpha", "beta", "gamma", "delta", "list", "value", "result",
+     "input", "output", "function", "variable"]
+
+-- This orphan primarily exists to deny shrinking.
+instance Arbitrary Text where
+    arbitrary = QC.elements someStrings
+    shrink = shrinkNothing
+
+instance Arbitrary Graph where
+    arbitrary = do
+        -- We begin with some subset of keys in arbitrary order
+        somekeys <- shuffle =<< sublistOf someStrings
+        -- We build a graph of acyclic connections, ensuring that all keys are present
+        Graph . (Map.fromList [(k, []) | k <- somekeys] <>) <$> foldM next mempty somekeys
+        where
+            next m k = do
+                targets <- sublistOf (Map.keys m)
+                pure $ Map.insert k targets m
+
+    shrink = genericShrink
+
+-- A DAG that we know contains the given node.
+data GraphWithKey = GraphWithKey Text Graph
+    deriving stock (Show, Eq, Generic)
+
+instance Arbitrary GraphWithKey where
+    arbitrary = do
+        Graph g <- arbitrary
+        k <- QC.elements (Map.keys g)
+        pure $ GraphWithKey k (Graph g)
+
+    -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
+    shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
+
+prop_reverseEdgesId :: Graph -> Bool
+prop_reverseEdgesId (Graph g) = reverseEdges (reverseEdges g) == g
+
+prop_reachableIsFindable :: GraphWithKey -> Bool
+prop_reachableIsFindable (GraphWithKey k (Graph g)) = not . any (null . why g k) $ allDepsOn g k
+
+prop_notSelfDep :: GraphWithKey -> Bool
+prop_notSelfDep (GraphWithKey k (Graph g)) = k `notElem` allDepsOn g k
+
+prop_notSelfDepDirect :: GraphWithKey -> Bool
+prop_notSelfDepDirect (GraphWithKey k (Graph g)) = k `notElem` directDepsOn g k
+
+prop_allDepsContainsSelfDeps :: GraphWithKey -> Bool
+prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubsetOf` allDeps
+    where
+        directDeps = Set.fromList $ directDepsOn g k
+        allDeps = Set.fromList $ allDepsOn g k
+
 tests :: [TestTree]
 tests = [
-    testProperty "a test property" (\x -> (x::Int) == id x)
+    testProperty "double edge reverse is id" prop_reverseEdgesId,
+    testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
+    testProperty "all deps doesn't include self" prop_notSelfDep,
+    testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
+    testProperty "direct deps contains all deps" prop_allDepsContainsSelfDeps
     ]
 
 main :: IO ()

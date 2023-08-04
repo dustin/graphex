@@ -38,7 +38,7 @@ getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
-reverseEdges m = Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs m, v <- vs ]
+reverseEdges m = Map.map (const []) m <> Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs m, v <- vs ]
 
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Input -> Text -> [Text]
@@ -46,7 +46,7 @@ directDepsOn m = flip (Map.findWithDefault []) m
 
 -- Flood fill to find all transitive dependencies on a starting module.
 allDepsOn :: Input -> Text -> [Text]
-allDepsOn m = Set.toList . go mempty . Set.singleton
+allDepsOn m k = Set.toList . Set.delete k . go mempty . Set.singleton $ k
     where
         nf x = Set.fromList $ Map.findWithDefault [] x m
 
