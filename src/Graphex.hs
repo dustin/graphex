@@ -35,20 +35,20 @@ data Node = Node { label :: Text }
     deriving stock (Show, Generic)
     deriving anyclass FromJSON
 
+-- There's probably no reason I shouldn't just map this to a `Map Text [Text]`.
+-- I could theoretically use IntMap here as a minor improvement, but gonna need bigger
+-- graphs before that matters, at which point the Text expansion will matter again.
 type Input = Input' (Map Int [Int]) (Int -> Text, Text -> Maybe Int)
 
 getInput :: FilePath -> IO Input
 getInput fn = either fail (pure . bimap pedge pnode) . eitherDecode =<< BL.readFile fn
     where
-        pedge :: [Edge] -> Map Int [Int]
         pedge = Map.fromListWith (<>) . fmap (\Edge{..} -> (tread from, [tread to]))
-
-        pnode :: Map Text Node -> (Int -> Text, Text -> Maybe Int)
         pnode = flipAndReverse . Map.foldMapWithKey (\k v -> Map.singleton (tread k) (label v))
         flipAndReverse m = ((m Map.!), flip Map.lookup (Map.fromList . fmap swap $ Map.assocs m))
-
         tread = read . T.unpack
 
+-- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
 reverseEdges i@Input{..} = i{ edges = Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs edges, v <- vs ] }
 
@@ -58,10 +58,11 @@ nameOf Input{..} = fst nodes
 named :: Input -> Text -> Maybe Int
 named Input{..} = snd nodes
 
+-- | Find the direct list of things that are referencing this module.
 directDepsOn :: Input -> Text -> [Text]
 directDepsOn i@Input{..} = fmap (nameOf i) . maybe [] (flip (Map.findWithDefault []) edges) . named i
 
--- Flood fill to find all transitive dependencies from a starting module.
+-- Flood fill to find all transitive dependencies on a starting module.
 allDepsOn :: Input -> Text -> [Text]
 allDepsOn i@Input{..} = fmap (nameOf i) . maybe [] (Set.toList . go mempty . Set.singleton) . named i
     where
@@ -71,13 +72,15 @@ allDepsOn i@Input{..} = fmap (nameOf i) . maybe [] (Set.toList . go mempty . Set
             | Set.null todo = s
             | otherwise = go (s <> todo) (Set.unions $ Set.map nf todo)
 
--- Find an example path between two modules.
+-- | Find an example path between two modules.
+--
+-- This is a short path, but the important part is that it represents how connectivy works.
 why :: Input -> Text -> Text -> [Text]
 why i@Input{..} from to = fromMaybe [] $ do
     from' <- named i from
     to' <- named i to
-    (_, resolved) <- aStar nf (const (const 1)) (const (1::Int)) (== to') from'
-    pure $ fmap (nameOf i) resolved
+    resolved <- snd <$> aStar nf (const (const 1)) (const (1::Int)) (== to') from'
+    pure $ nameOf i <$> resolved
 
     where
         nf x = Map.findWithDefault [] x edges
