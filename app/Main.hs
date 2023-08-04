@@ -1,5 +1,6 @@
 module Main where
 
+import           Data.Bool           (bool)
 import           Data.Foldable
 import           Data.Text           (Text)
 import qualified Data.Text.IO        as TIO
@@ -7,8 +8,8 @@ import           Options.Applicative (Parser, argument, command,
                                       customExecParser, fullDesc, help, helper,
                                       hsubparser, info, long, metavar, prefs,
                                       progDesc, short, showDefault,
-                                      showHelpOnError, str, strOption, value,
-                                      (<**>))
+                                      showHelpOnError, str, strOption, switch,
+                                      value, (<**>))
 
 import           Graphex
 
@@ -20,12 +21,14 @@ data Command
 
 data Options = Options {
     optGraph   :: FilePath,
+    optReverse :: Bool,
     optCommand :: Command
     } deriving stock Show
 
 options :: Parser Options
 options = Options
     <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "path to graph data")
+    <*> switch (long "reverse" <> short 'r' <> help "reverse edges")
     <*> hsubparser (
         command "deps" (info depsCmd (progDesc "Show all direct inbound dependencies to a module"))
          <> command "all" (info allDepsCmd (progDesc "Show all dependencies to a module"))
@@ -40,7 +43,7 @@ options = Options
 main :: IO ()
 main = do
     Options{..} <- customExecParser (prefs showHelpOnError) opts
-    i <- getInput optGraph
+    i <- (bool id reverseEdges optReverse) <$> getInput optGraph
     traverse_ TIO.putStrLn $ case optCommand of
         Why from to    -> why i from to
         DirectDepsOn m -> directDepsOn i m

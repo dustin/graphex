@@ -1,4 +1,4 @@
-module Graphex (Input, getInput, directDepsOn, allDepsOn, why) where
+module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why) where
 
 import           Algorithm.Search
 import           Data.Aeson
@@ -49,6 +49,8 @@ getInput fn = either fail (pure . bimap pedge pnode) . eitherDecode =<< BL.readF
 
         tread = read . T.unpack
 
+reverseEdges :: Input -> Input
+reverseEdges i@Input{..} = i{ edges = Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs edges, v <- vs ] }
 
 nameOf :: Input -> Int -> Text
 nameOf Input{..} = fst nodes
