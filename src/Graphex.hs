@@ -33,9 +33,9 @@ type Input = Map Text [Text]
 getInput :: FilePath -> IO Input
 getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
     where
-        resolve DepFile{..} = Map.fromListWith (<>) [ (names Map.! from, [names Map.! to]) | Edge{..} <- edges]
+        resolve DepFile{..} = Map.fromListWith (<>) [ (name from, [name to]) | Edge{..} <- edges]
             where
-                names = coerce nodes :: Map Text Text
+                name = (coerce nodes Map.!) :: Text -> Text
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
