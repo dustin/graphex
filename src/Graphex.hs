@@ -3,6 +3,7 @@ module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why) whe
 import           Algorithm.Search
 import           Data.Aeson
 import qualified Data.ByteString.Lazy as BL
+import           Data.Coerce
 import           Data.Map             (Map)
 import qualified Data.Map.Strict      as Map
 import           Data.Set             as Set
@@ -20,7 +21,7 @@ newtype Node = Node { label :: Text }
     deriving stock (Show, Generic)
     deriving anyclass FromJSON
 
-data DepFile e n = DepFile {
+data DepFile = DepFile {
     edges :: [Edge],
     nodes :: Map Text Node
     }
@@ -34,7 +35,7 @@ getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
     where
         resolve DepFile{..} = Map.fromListWith (<>) [ (names Map.! from, [names Map.! to]) | Edge{..} <- edges]
             where
-                names = fmap label nodes
+                names = coerce nodes :: Map Text Text
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
