@@ -67,7 +67,7 @@ why m from to = maybe [] snd $ dijkstra (directDepsOn m) (const (const (1::Int))
 rankings :: Input -> Map Text Int
 rankings m = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDepsOn m k)) (Map.keys m)
 
--- | Restrict a graph to only the paths that reference a given module.
+-- | Restrict a graph to only the modules that reference a given module.
 restrictTo :: Input -> Text -> Input
 restrictTo g k = flip Map.mapMaybeWithKey g $ \k' v -> if k' == k then Just v else nonNullSet (Set.intersection keep v)
     where
