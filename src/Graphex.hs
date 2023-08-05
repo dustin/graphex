@@ -1,6 +1,6 @@
 module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export) where
 
-import           Algorithm.Search            (aStar)
+import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
 import           Data.Aeson                  (FromJSON, ToJSON, eitherDecode)
 import qualified Data.ByteString.Lazy        as BL
@@ -61,7 +61,7 @@ allDepsOn m k = Set.delete k . go mempty . Set.singleton $ k
 --
 -- This is a short path, but the important part is that it represents how connectivy works.
 why :: Input -> Text -> Text -> [Text]
-why m from to = maybe [] snd $ aStar (directDepsOn m) (const (const 1)) (const (1::Int)) (== to) from
+why m from to = maybe [] snd $ dijkstra (directDepsOn m) (const (const (1::Int))) (== to) from
 
 -- | Count the number of transitive dependencies for each module.
 rankings :: Input -> Map Text Int
