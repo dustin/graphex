@@ -72,7 +72,7 @@ restrictTo :: Input -> Text -> Input
 restrictTo g k = flip Map.mapMaybeWithKey g $ \k' v -> if k' == k then Just v else nonNullSet (Set.intersection keep v)
     where
         keep = allDepsOn g k
-        nonNullSet (Set.intersection keep -> v) = if Set.null v then Nothing else Just v
+        nonNullSet v = if Set.null v then Nothing else Just v
 
 -- | Convert a graph back to our dependency file format.
 export :: Input -> DepFile
