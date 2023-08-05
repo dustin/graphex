@@ -1,15 +1,17 @@
-module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo) where
+module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export) where
 
 import           Algorithm.Search            (aStar)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
-import           Data.Aeson                  (FromJSON, eitherDecode)
+import           Data.Aeson                  (FromJSON, ToJSON, eitherDecode)
 import qualified Data.ByteString.Lazy        as BL
 import           Data.Coerce                 (coerce)
+import           Data.Foldable               (fold, toList)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
+import qualified Data.Text                   as T
 import           GHC.Generics                (Generic)
 
 data Edge = Edge {
@@ -17,18 +19,18 @@ data Edge = Edge {
     to   :: Text
     }
     deriving stock (Show, Generic)
-    deriving anyclass FromJSON
+    deriving anyclass (FromJSON, ToJSON)
 
 newtype Node = Node { label :: Text }
     deriving stock (Show, Generic)
-    deriving anyclass FromJSON
+    deriving anyclass (FromJSON, ToJSON)
 
 data DepFile = DepFile {
     edges :: [Edge],
     nodes :: Map Text Node
     }
     deriving stock (Show, Generic)
-    deriving anyclass FromJSON
+    deriving anyclass (FromJSON, ToJSON)
 
 type Input = Map Text (Set Text)
 
@@ -71,3 +73,13 @@ restrictTo g k = flip Map.mapMaybeWithKey g $ \k' v -> if k' == k then Just v el
     where
         keep = allDepsOn g k
         nonNullSet (Set.intersection keep -> v) = if Set.null v then Nothing else Just v
+
+-- | Convert a graph back to our dependency file format.
+export :: Input -> DepFile
+export g = DepFile {
+    edges = [ Edge { from = newKey k, to = newKey v } | (k, vs) <- Map.assocs g, v <- Set.toList vs ],
+    nodes = Map.fromList [ (newKey k, Node k) | k <- Map.keys g ]
+    }
+    where
+        allk = fold g <> Map.keysSet g
+        newKey f = (Map.! f) . Map.fromList $ zip (toList allk) (T.pack . show <$> [0 :: Int ..])

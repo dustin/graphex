@@ -1,4 +1,5 @@
 import           Control.Monad         (foldM)
+import           Data.Foldable         (fold)
 import           Data.Map              (Map)
 import qualified Data.Map.Strict       as Map
 import           Data.Set              (Set)
@@ -44,7 +45,7 @@ data GraphWithKey = GraphWithKey Text Graph
 
 instance Arbitrary GraphWithKey where
     arbitrary = do
-        Graph g <- arbitrary
+        Graph g <- arbitrary `suchThat` (\(Graph m) -> (not . Map.null) m)
         k <- QC.elements (Map.keys g)
         pure $ GraphWithKey k (Graph g)
 
