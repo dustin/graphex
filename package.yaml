@@ -28,6 +28,8 @@ dependencies:
 - bytestring
 - search-algorithms
 - parallel
+- Cabal
+- ghc-lib-parser
 
 library:
   source-dirs: src
