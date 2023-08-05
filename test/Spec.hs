@@ -78,6 +78,9 @@ prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubs
 prop_ranking :: GraphWithKey -> Bool
 prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == (rankings g) Map.! k
 
+prop_restrictedInputHasSameDeps :: GraphWithKey -> Bool
+prop_restrictedInputHasSameDeps (GraphWithKey k (Graph g)) = allDepsOn g k == allDepsOn (restrictTo g k) k
+
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
@@ -86,7 +89,8 @@ tests = [
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "direct deps contains all deps" prop_allDepsContainsSelfDeps,
-    testProperty "ranking is the same size as all deps" prop_ranking
+    testProperty "ranking is the same size as all deps" prop_ranking,
+    testProperty "restricted input has the same deps as the original" prop_restrictedInputHasSameDeps
     ]
 
 main :: IO ()

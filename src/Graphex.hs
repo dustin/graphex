@@ -1,4 +1,4 @@
-module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings) where
+module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo) where
 
 import           Algorithm.Search            (aStar)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
@@ -64,3 +64,10 @@ why m from to = maybe [] snd $ aStar (directDepsOn m) (const (const 1)) (const (
 -- | Count the number of transitive dependencies for each module.
 rankings :: Input -> Map Text Int
 rankings m = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDepsOn m k)) (Map.keys m)
+
+-- | Restrict a graph to only the paths that reference a given module.
+restrictTo :: Input -> Text -> Input
+restrictTo g k = flip Map.mapMaybeWithKey g $ \k' v -> if k' == k then Just v else nonNullSet (Set.intersection keep v)
+    where
+        keep = allDepsOn g k
+        nonNullSet (Set.intersection keep -> v) = if Set.null v then Nothing else Just v
