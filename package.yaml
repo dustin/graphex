@@ -47,6 +47,7 @@ default-extensions:
   - ViewPatterns
   - TupleSections
   - BangPatterns
+  - ImportQualifiedPost
 
 executables:
   graphex:
