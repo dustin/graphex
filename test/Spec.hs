@@ -74,6 +74,9 @@ prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubs
         directDeps = Set.fromList $ directDepsOn g k
         allDeps = Set.fromList $ allDepsOn g k
 
+prop_ranking :: GraphWithKey -> Bool
+prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == (rankings g) Map.! k
+
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
@@ -81,7 +84,8 @@ tests = [
     testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
-    testProperty "direct deps contains all deps" prop_allDepsContainsSelfDeps
+    testProperty "direct deps contains all deps" prop_allDepsContainsSelfDeps,
+    testProperty "ranking is the same size as all deps" prop_ranking
     ]
 
 main :: IO ()

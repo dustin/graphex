@@ -27,6 +27,7 @@ dependencies:
 - text
 - bytestring
 - search-algorithms
+- parallel
 
 library:
   source-dirs: src
@@ -41,6 +42,8 @@ default-extensions:
   - DeriveAnyClass
   - DeriveGeneric
   - ViewPatterns
+  - TupleSections
+  - BangPatterns
 
 executables:
   graphex:

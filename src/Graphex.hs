@@ -1,14 +1,15 @@
-module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why) where
+module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings) where
 
 import           Algorithm.Search
+import           Control.Parallel.Strategies (parMap, rdeepseq)
 import           Data.Aeson
-import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy        as BL
 import           Data.Coerce
-import           Data.Map             (Map)
-import qualified Data.Map.Strict      as Map
-import           Data.Set             as Set
-import           Data.Text            (Text)
-import           GHC.Generics         (Generic)
+import           Data.Map                    (Map)
+import qualified Data.Map.Strict             as Map
+import           Data.Set                    as Set
+import           Data.Text                   (Text)
+import           GHC.Generics                (Generic)
 
 data Edge = Edge {
     from :: Text,
@@ -49,7 +50,7 @@ directDepsOn = flip (Map.findWithDefault [])
 allDepsOn :: Input -> Text -> [Text]
 allDepsOn m k = Set.toList . Set.delete k . go mempty . Set.singleton $ k
     where
-        go s (flip Set.difference s -> todo)
+        go !s (flip Set.difference s -> todo)
             | Set.null todo = s
             | otherwise = go (s <> todo) (Set.unions $ Set.map (Set.fromList . directDepsOn m) todo)
 
@@ -58,3 +59,7 @@ allDepsOn m k = Set.toList . Set.delete k . go mempty . Set.singleton $ k
 -- This is a short path, but the important part is that it represents how connectivy works.
 why :: Input -> Text -> Text -> [Text]
 why m from to = maybe [] snd $ aStar (directDepsOn m) (const (const 1)) (const (1::Int)) (== to) from
+
+-- | Count the number of transitive dependencies for each module.
+rankings :: Input -> Map Text Int
+rankings m = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDepsOn m k)) (Map.keys m)

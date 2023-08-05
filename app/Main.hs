@@ -2,8 +2,11 @@ module Main where
 
 import           Data.Bool           (bool)
 import           Data.Foldable
-import           Data.List           (sort)
+import           Data.List           (sort, sortOn)
+import qualified Data.Map.Strict     as Map
+import           Data.Ord            (Down (..))
 import           Data.Text           (Text)
+import qualified Data.Text           as T
 import qualified Data.Text.IO        as TIO
 import           Options.Applicative (Parser, argument, command,
                                       customExecParser, fullDesc, help, helper,
@@ -18,6 +21,7 @@ data Command
     = DirectDepsOn Text
     | AllDepsOn Text
     | Why Text Text
+    | Rankings
     deriving stock Show
 
 data Options = Options {
@@ -33,7 +37,9 @@ options = Options
     <*> hsubparser (fold [
         command "deps" (info depsCmd (progDesc "Show all direct inbound dependencies to a module")),
         command "all" (info allDepsCmd (progDesc "Show all dependencies to a module")),
-        command "why" (info whyCmd (progDesc "Show why a module depends on another module"))])
+        command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
+        command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules"))
+        ])
 
     where
         depsCmd = DirectDepsOn <$> argument str (metavar "module")
@@ -48,5 +54,6 @@ main = do
         Why from to    -> why graph from to
         DirectDepsOn m -> sort $ directDepsOn graph m
         AllDepsOn m    -> sort $ allDepsOn graph m
+        Rankings       -> fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
