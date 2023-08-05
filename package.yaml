@@ -44,6 +44,7 @@ default-extensions:
   - DerivingStrategies
   - DeriveAnyClass
   - DeriveGeneric
+  - GeneralizedNewtypeDeriving
   - ViewPatterns
   - TupleSections
   - BangPatterns
