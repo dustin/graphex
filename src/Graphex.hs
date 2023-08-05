@@ -1,13 +1,13 @@
 module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings) where
 
-import           Algorithm.Search
+import           Algorithm.Search            (aStar)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
-import           Data.Aeson
+import           Data.Aeson                  (FromJSON, eitherDecode)
 import qualified Data.ByteString.Lazy        as BL
-import           Data.Coerce
+import           Data.Coerce                 (coerce)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
-import           Data.Set                    as Set
+import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 import           GHC.Generics                (Generic)
 
