@@ -7,6 +7,7 @@ import qualified Data.ByteString.Lazy        as BL
 import           Data.Coerce                 (coerce)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
+import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 import           GHC.Generics                (Generic)
@@ -29,30 +30,30 @@ data DepFile = DepFile {
     deriving stock (Show, Generic)
     deriving anyclass FromJSON
 
-type Input = Map Text [Text]
+type Input = Map Text (Set Text)
 
 getInput :: FilePath -> IO Input
 getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
     where
-        resolve DepFile{..} = Map.fromListWith (<>) [ (name from, [name to]) | Edge{..} <- edges]
+        resolve DepFile{..} = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
             where
                 name = (coerce nodes Map.!) :: Text -> Text
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
-reverseEdges m = Map.fromListWith (<>) [ (v, [k]) | (k, vs) <- Map.assocs m, v <- k:vs ]
+reverseEdges m = Map.fromListWith (<>) [ (v, Set.singleton k) | (k, vs) <- Map.assocs m, v <- k:Set.toList vs ]
 
 -- | Find the direct list of things that are referencing this module.
-directDepsOn :: Input -> Text -> [Text]
-directDepsOn = flip (Map.findWithDefault [])
+directDepsOn :: Input -> Text -> Set Text
+directDepsOn = flip (Map.findWithDefault mempty)
 
 -- Flood fill to find all transitive dependencies on a starting module.
-allDepsOn :: Input -> Text -> [Text]
-allDepsOn m k = Set.toList . Set.delete k . go mempty . Set.singleton $ k
+allDepsOn :: Input -> Text -> Set Text
+allDepsOn m k = Set.delete k . go mempty . Set.singleton $ k
     where
         go !s (flip Set.difference s -> todo)
             | Set.null todo = s
-            | otherwise = go (s <> todo) (Set.unions $ Set.map (Set.fromList . directDepsOn m) todo)
+            | otherwise = go (s <> todo) (Set.unions $ Set.map (directDepsOn m) todo)
 
 -- | Find an example path between two modules.
 --

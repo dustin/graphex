@@ -2,18 +2,15 @@ module Main where
 
 import           Data.Bool           (bool)
 import           Data.Foldable
-import           Data.List           (sort, sortOn)
+import           Data.List           (sortOn)
 import qualified Data.Map.Strict     as Map
 import           Data.Ord            (Down (..))
 import           Data.Text           (Text)
 import qualified Data.Text           as T
 import qualified Data.Text.IO        as TIO
-import           Options.Applicative (Parser, argument, command,
-                                      customExecParser, fullDesc, help, helper,
-                                      hsubparser, info, long, metavar, prefs,
-                                      progDesc, short, showDefault,
-                                      showHelpOnError, str, strOption, switch,
-                                      value, (<**>))
+import           Options.Applicative (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
+                                      info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, str,
+                                      strOption, switch, value, (<**>))
 
 import           Graphex
 
@@ -52,8 +49,8 @@ main = do
     graph <- bool id reverseEdges optReverse <$> getInput optGraph
     traverse_ TIO.putStrLn $ case optCommand of
         Why from to    -> why graph from to
-        DirectDepsOn m -> sort $ directDepsOn graph m
-        AllDepsOn m    -> sort $ allDepsOn graph m
+        DirectDepsOn m -> toList $ directDepsOn graph m
+        AllDepsOn m    -> toList $ allDepsOn graph m
         Rankings       -> fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

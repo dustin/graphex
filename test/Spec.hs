@@ -1,6 +1,7 @@
 import           Control.Monad         (foldM)
 import           Data.Map              (Map)
 import qualified Data.Map.Strict       as Map
+import           Data.Set              (Set)
 import qualified Data.Set              as Set
 import           Data.Text             (Text)
 import           GHC.Generics          (Generic)
@@ -11,7 +12,7 @@ import           Test.Tasty.QuickCheck as QC
 
 import           Graphex
 
-newtype Graph = Graph (Map Text [Text])
+newtype Graph = Graph (Map Text (Set Text))
     deriving stock (Show, Eq, Generic)
 
 -- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
@@ -31,9 +32,9 @@ instance Arbitrary Graph where
         -- We begin with some subset of keys in arbitrary order
         somekeys <- shuffle =<< sublistOf someStrings
         -- We build a graph of acyclic connections, ensuring that all keys are present
-        Graph . (Map.fromList [(k, []) | k <- somekeys] <>) <$> foldM next mempty somekeys
+        Graph . (Map.fromList [(k, mempty) | k <- somekeys] <>) <$> foldM next mempty somekeys
         where
-            next m k = flip (Map.insert k) m <$> sublistOf (Map.keys m)
+            next m k = flip (Map.insert k) m . Set.fromList <$> sublistOf (Map.keys m)
 
     shrink = genericShrink
 
@@ -57,7 +58,7 @@ prop_reverseEdgesId (GraphWithKey k (Graph g)) = all (\k' -> k `elem` directDeps
         rg = reverseEdges g
 
 prop_reversedDep :: Graph -> Bool
-prop_reversedDep (Graph g) = all (\(k, vs) -> all (`elem` Map.findWithDefault [] k (reverseEdges g)) vs) (Map.assocs g)
+prop_reversedDep (Graph g) = all (\(k, vs) -> all (`elem` Map.findWithDefault mempty k (reverseEdges g)) vs) (Map.assocs g)
 
 prop_reachableIsFindable :: GraphWithKey -> Bool
 prop_reachableIsFindable (GraphWithKey k (Graph g)) = not . any (null . why g k) $ allDepsOn g k
@@ -71,8 +72,8 @@ prop_notSelfDepDirect (GraphWithKey k (Graph g)) = k `notElem` directDepsOn g k
 prop_allDepsContainsSelfDeps :: GraphWithKey -> Bool
 prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubsetOf` allDeps
     where
-        directDeps = Set.fromList $ directDepsOn g k
-        allDeps = Set.fromList $ allDepsOn g k
+        directDeps = directDepsOn g k
+        allDeps = allDepsOn g k
 
 prop_ranking :: GraphWithKey -> Bool
 prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == (rankings g) Map.! k
