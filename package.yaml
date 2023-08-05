@@ -30,6 +30,7 @@ dependencies:
 - parallel
 - Cabal
 - ghc-lib-parser
+- filepath
 
 library:
   source-dirs: src

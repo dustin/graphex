@@ -1,19 +1,8 @@
-{ pkgs ? import <nixpkgs> { } }:
-with pkgs;
-mkShell {
-  buildInputs = [
-    stack
-    sqlite-interactive
-    ffmpeg
-    stylish-haskell
-    hlint
-    niv
-    ghcid
-    haskell-language-server
-    haskellPackages.tasty-discover
-  ];
+(import ./default.nix).shellFor {
+  tools = {
+    cabal = "latest";
+    hsc2hs = "latest";
+  };
 
-  shellHook = ''
-    # ...
-  '';
+  withHoogle = false;
 }
