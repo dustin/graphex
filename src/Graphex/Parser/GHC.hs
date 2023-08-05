@@ -1,6 +1,5 @@
-module Graphex.Parser.GHC (module Graphex.Parser.GHC, module GHC) where
+module Graphex.Parser.GHC where
 
-import GHC.Parser qualified as GHC
 import GHC.Parser.Lexer qualified as GHC
 import GHC.Parser.Errors.Types qualified as GHC
 import GHC.Data.StringBuffer qualified as GHC
@@ -14,15 +13,17 @@ import System.IO (stdout)
 -------------------------------------------------
 
 -- | We unwrap GHC.ParseResult into something nicer to work with
-data PR a = PSuccess a | PFailed PFailure
+data PR a = PSuccess a | PFail PFailure
 
 data PFailure = PFailure
   { errors :: GHC.Messages GHC.PsMessage
   , warnings :: GHC.Messages GHC.PsMessage
   }
 
-runParser :: GHC.StringBuffer -> GHC.P a -> GHC.ParseResult a
-runParser buffer parser = GHC.unP parser parseState
+runParser :: GHC.StringBuffer -> GHC.P a -> PR a
+runParser buffer parser = case GHC.unP parser parseState of
+  GHC.POk _ a -> PSuccess a
+  GHC.PFailed s -> PFail $ uncurry PFailure $ GHC.getPsMessages s
   where
     diagOpts = GHC.DiagOpts
       { diag_warning_flags = mempty
@@ -37,13 +38,11 @@ runParser buffer parser = GHC.unP parser parseState
     location = GHC.mkRealSrcLoc (GHC.mkFastString filename) 1 1
     parseState = GHC.initParserState opts buffer location
 
-runParserString :: String -> GHC.P a -> GHC.ParseResult a
+runParserString :: String -> GHC.P a -> PR a
 runParserString = runParser . GHC.stringToStringBuffer
 
 runParserFile :: FilePath -> GHC.P a -> IO (PR a)
-runParserFile path parser = GHC.hGetStringBuffer path >>= \buf -> case runParser buf parser of
-  GHC.POk _ a -> pure $ PSuccess a
-  GHC.PFailed s -> pure $ PFailed $ uncurry PFailure $ GHC.getPsMessages s
+runParserFile path parser = GHC.hGetStringBuffer path >>= \buf -> pure $ runParser buf parser
 
 printOutputable :: GHC.Outputable a => a -> IO ()
 printOutputable = GHC.printSDocLn GHC.defaultSDocContext (GHC.PageMode True) stdout . GHC.ppr
