@@ -2,15 +2,15 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.Core where
 
+import Data.String (IsString)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
-import qualified Data.Text                   as T
 
 newtype ModuleName = ModuleName { unModuleName :: Text }
-  deriving newtype (Eq, Ord)
+  deriving newtype (Eq, Ord, IsString)
   deriving stock (Show)
 
 data Module = Module

@@ -1,24 +1,31 @@
 {-# language CPP #-}
+{-# language OverloadedStrings #-}
+{-# language OverloadedRecordDot #-}
 
 -- Cribbed from graphmod's 'Graphmod.CabalSupport'
-module Graphex.Cabal (parseCabalFile,Unit(..),UnitName(..)) where
+module Graphex.Cabal (discoverCabalModules) where
 
+import Graphex.Core
+
+import Control.Monad (filterM)
+import Data.String (fromString)
+import Data.List (intersperse)
 import Data.Maybe(maybeToList)
-import System.FilePath((</>))
+import System.FilePath((</>), (<.>))
+import System.Directory (doesFileExist)
 
 -- Interface to cabal.
 import Distribution.Verbosity(silent)
 import Distribution.PackageDescription
-        ( GenericPackageDescription, PackageDescription(..)
-        , Library(..), Executable(..), BuildInfo(..) )
+        ( PackageDescription(..)
+        , Library(..), Executable(..)
+        , BuildInfo(..) )
 import Distribution.PackageDescription.Configuration (flattenPackageDescription)
-import Distribution.ModuleName(ModuleName)
+import Distribution.ModuleName qualified as Cabal
 
 #if MIN_VERSION_Cabal(3,6,0)
 import Distribution.Utils.Path (SymbolicPath, PackageDir, SourceDir, getSymbolicPath)
 #endif
-
-#if MIN_VERSION_Cabal(2,0,0)
 
 #if MIN_VERSION_Cabal(3,8,1)
 import Distribution.Simple.PackageDescription(readGenericPackageDescription)
@@ -26,33 +33,6 @@ import Distribution.Simple.PackageDescription(readGenericPackageDescription)
 import Distribution.PackageDescription.Parsec(readGenericPackageDescription)
 #else
 import Distribution.PackageDescription.Parse(readGenericPackageDescription)
-#endif
-
-import Distribution.Types.UnqualComponentName (UnqualComponentName)
-
-#if MIN_VERSION_Cabal(2,2,0)
-import Distribution.Pretty (prettyShow)
-
-pretty :: UnqualComponentName -> String
-pretty = prettyShow
-#else
-import Distribution.Text (disp)
-import Text.PrettyPrint (render)
-
-pretty :: UnqualComponentName -> String
-pretty = render . disp
-#endif
-
-
-#else
-import Distribution.PackageDescription.Parse(readPackageDescription)
-import Distribution.Verbosity (Verbosity)
-
-readGenericPackageDescription :: Verbosity -> FilePath -> IO GenericPackageDescription
-readGenericPackageDescription = readPackageDescription
-
-pretty :: String -> String
-pretty = id
 #endif
 
 -- Note that this isn't nested under the above #if because we need
@@ -66,40 +46,20 @@ sourceDirToFilePath :: FilePath -> FilePath
 sourceDirToFilePath = id
 #endif
 
-parseCabalFile :: FilePath -> IO [Unit]
-parseCabalFile f = fmap findUnits (readGenericPackageDescription silent f)
+discoverCabalModules :: FilePath -> IO [Module]
+discoverCabalModules cabalFile = do
+  gpd <- readGenericPackageDescription silent cabalFile
+  let PackageDescription{..} = flattenPackageDescription gpd
+  let candidateModules = mconcat
+        [ do
+            Library{..} <- maybeToList library
+            srcDir <- hsSourceDirs libBuildInfo
+            exMod <- exposedModules
+            pure Module
+              { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
+              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
+              }
+        -- TODO: executables
+        ]
 
-
--- | This is our abstraction for something in a cabal file.
-data Unit = Unit
-  { unitName    :: UnitName
-  , unitPaths   :: [FilePath]
-  , unitModules :: [ModuleName]
-  , unitFiles   :: [FilePath]
-  } deriving Show
-
-data UnitName = UnitLibrary | UnitExecutable String
-                deriving Show
-
-
-libUnit :: Library -> Unit
-libUnit lib = Unit { unitName     = UnitLibrary
-                   , unitPaths    = sourceDirToFilePath <$> hsSourceDirs (libBuildInfo lib)
-                   , unitModules  = exposedModules lib
-                                                      -- other modules?
-                   , unitFiles    = []
-                   }
-
-exeUnit :: Executable -> Unit
-exeUnit exe = Unit { unitName    = UnitExecutable (pretty $ exeName exe)
-                   , unitPaths   = sourceDirToFilePath <$> hsSourceDirs (buildInfo exe)
-                   , unitModules = [] -- other modules?
-                   , unitFiles   = case hsSourceDirs (buildInfo exe) of
-                                     [] -> [ modulePath exe ]
-                                     ds -> [ sourceDirToFilePath d </> modulePath exe | d <- ds ]
-                   }
-findUnits :: GenericPackageDescription -> [Unit]
-findUnits g = maybeToList (fmap libUnit (library pkg))  ++
-                           fmap exeUnit (executables pkg)
-  where
-  pkg = flattenPackageDescription g -- we just ignore flags
+  filterM (doesFileExist . (.path)) candidateModules
