@@ -103,7 +103,7 @@ prop_importExport g =
     counterexample ("exported: " <> show exported <> "\nimported: " <> show imported) $
     imported === g
     where
-        exported = export g
+        exported = graphToDep g
         imported = depToGraph exported
 
 tests :: [TestTree]

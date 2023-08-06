@@ -1,4 +1,4 @@
-module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export, depToGraph) where
+module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, graphToDep, depToGraph) where
 
 import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
@@ -34,12 +34,23 @@ data DepFile = DepFile {
 newtype Graph = Graph { unGraph :: Map Text (Set Text) }
     deriving stock (Eq)
 
+-- | Convert a dependency file to a graph.
 depToGraph :: DepFile -> Graph
 depToGraph DepFile{..} = Graph (links <> allNodes)
     where
         links = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
         allNodes = Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
         name = (coerce nodes Map.!) :: Text -> Text
+
+-- | Convert a graph back to our dependency file format.
+graphToDep :: Graph -> DepFile
+graphToDep (Graph m) = DepFile {
+    edges = [ Edge { from = newKey k, to = newKey v } | (k, vs) <- Map.assocs m, v <- Set.toList vs ],
+    nodes = Map.fromList [ (newKey k, Node k) | k <- Map.keys m ]
+    }
+    where
+        allk = fold m <> Map.keysSet m
+        newKey f = (Map.! f) . Map.fromList $ zip (toList allk) (T.pack . show <$> [0 :: Int ..])
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Graph -> Graph
@@ -73,13 +84,3 @@ restrictTo g@(Graph m) k = Graph . flip Map.mapMaybeWithKey m $ \k' v -> if k' =
     where
         keep = allDepsOn g k
         nonNullSet v = if Set.null v then Nothing else Just v
-
--- | Convert a graph back to our dependency file format.
-export :: Graph -> DepFile
-export (Graph m) = DepFile {
-    edges = [ Edge { from = newKey k, to = newKey v } | (k, vs) <- Map.assocs m, v <- Set.toList vs ],
-    nodes = Map.fromList [ (newKey k, Node k) | k <- Map.keys m ]
-    }
-    where
-        allk = fold m <> Map.keysSet m
-        newKey f = (Map.! f) . Map.fromList $ zip (toList allk) (T.pack . show <$> [0 :: Int ..])

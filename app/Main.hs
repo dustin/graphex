@@ -63,6 +63,6 @@ main = do
         DirectDepsOn m -> printStrs $ directDepsOn graph m
         AllDepsOn m    -> printStrs $ allDepsOn graph m
         Rankings       -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
-        Select m       -> BL.putStr $ encode (export (restrictTo graph m))
+        Select m       -> BL.putStr $ encode (graphToDep (restrictTo graph m))
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
