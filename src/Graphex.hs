@@ -1,6 +1,6 @@
-module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export) where
+module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export, depToInput) where
 
-import           Algorithm.Search            (aStar)
+import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
 import           Data.Aeson                  (FromJSON, ToJSON, eitherDecode)
 import qualified Data.ByteString.Lazy        as BL
@@ -34,16 +34,17 @@ data DepFile = DepFile {
 
 type Input = Map Text (Set Text)
 
-getInput :: FilePath -> IO Input
-getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
+depToInput :: DepFile -> Input
+depToInput DepFile{..} = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges] <> Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
     where
-        resolve DepFile{..} = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
-            where
-                name = (coerce nodes Map.!) :: Text -> Text
+        name = (coerce nodes Map.!) :: Text -> Text
+
+getInput :: FilePath -> IO Input
+getInput fn = either fail (pure . depToInput) . eitherDecode =<< BL.readFile fn
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input
-reverseEdges m = Map.fromListWith (<>) [ (v, Set.singleton k) | (k, vs) <- Map.assocs m, v <- k:Set.toList vs ]
+reverseEdges m = Map.fromListWith (<>) [ (v, Set.singleton k) | (k, vs) <- Map.assocs m, v <- Set.toList vs ] <> Map.fromSet (const mempty) (Map.keysSet m)
 
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Input -> Text -> Set Text
@@ -61,18 +62,18 @@ allDepsOn m k = Set.delete k . go mempty . Set.singleton $ k
 --
 -- This is a short path, but the important part is that it represents how connectivy works.
 why :: Input -> Text -> Text -> [Text]
-why m from to = maybe [] snd $ aStar (directDepsOn m) (const (const 1)) (const (1::Int)) (== to) from
+why m from to = maybe [] snd $ dijkstra (directDepsOn m) (const (const (1::Int))) (== to) from
 
 -- | Count the number of transitive dependencies for each module.
 rankings :: Input -> Map Text Int
 rankings m = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDepsOn m k)) (Map.keys m)
 
--- | Restrict a graph to only the paths that reference a given module.
+-- | Restrict a graph to only the modules that reference a given module.
 restrictTo :: Input -> Text -> Input
 restrictTo g k = flip Map.mapMaybeWithKey g $ \k' v -> if k' == k then Just v else nonNullSet (Set.intersection keep v)
     where
         keep = allDepsOn g k
-        nonNullSet (Set.intersection keep -> v) = if Set.null v then Nothing else Just v
+        nonNullSet v = if Set.null v then Nothing else Just v
 
 -- | Convert a graph back to our dependency file format.
 export :: Input -> DepFile
