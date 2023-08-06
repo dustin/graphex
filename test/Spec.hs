@@ -1,3 +1,5 @@
+module Main where
+
 import           Control.Monad         (foldM)
 import           Data.Foldable         (fold)
 import           Data.Map              (Map)
@@ -14,7 +16,11 @@ import           Test.Tasty.QuickCheck as QC
 import           Graphex
 
 newtype Graph = Graph (Map Text (Set Text))
-    deriving stock (Show, Eq, Generic)
+    deriving stock (Eq, Generic)
+
+-- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
+instance Show Graph where
+    show (Graph m) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
 
 -- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
 someStrings :: [Text]
@@ -23,21 +29,22 @@ someStrings =
      "alpha", "beta", "gamma", "delta", "list", "value", "result",
      "input", "output", "function", "variable"]
 
--- This orphan primarily exists to deny shrinking.
-instance Arbitrary Text where
-    arbitrary = QC.elements someStrings
-    shrink = shrinkNothing
-
 instance Arbitrary Graph where
     arbitrary = do
         -- We begin with some subset of keys in arbitrary order
         somekeys <- shuffle =<< sublistOf someStrings
         -- We build a graph of acyclic connections, ensuring that all keys are present
-        Graph . (Map.fromList [(k, mempty) | k <- somekeys] <>) <$> foldM next mempty somekeys
+        Graph . (<> Map.fromList [(k, mempty) | k <- somekeys]) <$> foldM next mempty somekeys
         where
             next m k = flip (Map.insert k) m . Set.fromList <$> sublistOf (Map.keys m)
 
-    shrink = genericShrink
+    -- A custom shrink here needs to make sure
+    shrink (Graph m) = Graph . Map.fromList <$> keySubs (Map.assocs m)
+        where
+            keySubs = fmap clean . shrinkList (const [])
+            clean kvs = (\(k, vs) -> (k, vs `Set.intersection` keys)) <$> kvs
+                where
+                    keys = Set.fromList (fmap fst kvs)
 
 -- A DAG that we know contains the given node.
 data GraphWithKey = GraphWithKey Text Graph
@@ -52,17 +59,27 @@ instance Arbitrary GraphWithKey where
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
     shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
 
-prop_reverseEdgesId :: GraphWithKey -> Bool
-prop_reverseEdgesId (GraphWithKey k (Graph g)) = all (\k' -> k `elem` directDepsOn rg k') directs
+prop_reverseEdgesId :: GraphWithKey -> Property
+prop_reverseEdgesId (GraphWithKey k g@(Graph m)) =
+    counterexample ("fwd: " <> show g <> "\n rev: " <> show (Graph rg)) $
+    m === reverseEdges (reverseEdges m)
     where
-        directs = directDepsOn g k
-        rg = reverseEdges g
+        rg = reverseEdges m
 
-prop_reversedDep :: Graph -> Bool
-prop_reversedDep (Graph g) = all (\(k, vs) -> all (`elem` Map.findWithDefault mempty k (reverseEdges g)) vs) (Map.assocs g)
+prop_reversedDep :: Graph -> Property
+prop_reversedDep g@(Graph m) =
+    counterexample ("fwd: " <> show g <> "\nrev: " <> show (Graph rg)) $
+    all (\(k, vs) -> all (\k' -> k `elem` directDepsOn rg k') vs) (Map.assocs m)
+    where
+        rg = reverseEdges m
 
-prop_reachableIsFindable :: GraphWithKey -> Bool
-prop_reachableIsFindable (GraphWithKey k (Graph g)) = not . any (null . why g k) $ allDepsOn g k
+prop_reachableIsFindable :: GraphWithKey -> Property
+prop_reachableIsFindable gwk@(GraphWithKey k (Graph g)) =
+    cover 50 ((not . null) alld) "connected" $ -- This test isn't useful if there are no dependencies
+    checkCoverage $
+    not . any (null . why g k) $ alld
+    where
+        alld = allDepsOn g k
 
 prop_notSelfDep :: GraphWithKey -> Bool
 prop_notSelfDep (GraphWithKey k (Graph g)) = k `notElem` allDepsOn g k
@@ -77,7 +94,7 @@ prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubs
         allDeps = allDepsOn g k
 
 prop_ranking :: GraphWithKey -> Bool
-prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == (rankings g) Map.! k
+prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == rankings g Map.! k
 
 prop_restrictedInputHasSameDeps :: GraphWithKey -> Bool
 prop_restrictedInputHasSameDeps (GraphWithKey k (Graph g)) = allDepsOn g k == allDepsOn (restrictTo g k) k
