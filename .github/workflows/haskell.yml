@@ -1,0 +1,46 @@
+name: Haskell CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Cache Key
+      id: cache_key
+      run: echo ::set-output name=key::$(md5sum stack.yaml | awk '{print $1}')
+
+    - name: Cache Dependencies
+      id: cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.stack
+        key: ${{ matrix.os }}-${{ steps.cache_key.outputs.key }}
+
+    - name: Build Snapshot
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        stack --no-terminal test --bench --only-snapshot
+
+    - name: Build & Test
+      run: |
+        stack --no-terminal test --bench --no-run-benchmarks
+        stack install
+        cp $HOME/.local/bin/graphex .
+
+    - name: Store Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: graphex-${{ matrix.os }}
+        path: graphex
