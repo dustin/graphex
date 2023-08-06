@@ -81,6 +81,13 @@ prop_reachableIsFindable gwk@(GraphWithKey k (Graph g)) =
     where
         alld = allDepsOn g k
 
+prop_negativePathfinding :: Graph  -> Property
+prop_negativePathfinding (Graph g) = forAll oneGoodKey (null . uncurry (why g))
+    where oneGoodKey = do
+            good <- elements someStrings
+            let bad = "missingnode"
+            elements [ (good, bad), (bad, good) ]
+
 prop_notSelfDep :: GraphWithKey -> Bool
 prop_notSelfDep (GraphWithKey k (Graph g)) = k `notElem` allDepsOn g k
 
@@ -109,6 +116,7 @@ tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
     testProperty "reversed dep is still dep" prop_reversedDep,
     testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
+    testProperty "we can't find a path when there isn't one" prop_negativePathfinding,
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
