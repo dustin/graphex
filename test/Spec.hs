@@ -88,10 +88,7 @@ prop_notSelfDepDirect :: GraphWithKey -> Bool
 prop_notSelfDepDirect (GraphWithKey k (Graph g)) = k `notElem` directDepsOn g k
 
 prop_allDepsContainsSelfDeps :: GraphWithKey -> Bool
-prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDeps `Set.isSubsetOf` allDeps
-    where
-        directDeps = directDepsOn g k
-        allDeps = allDepsOn g k
+prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDepsOn g k `Set.isSubsetOf` allDepsOn g k
 
 prop_ranking :: GraphWithKey -> Bool
 prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == rankings g Map.! k
@@ -114,7 +111,7 @@ tests = [
     testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
-    testProperty "direct deps contains all deps" prop_allDepsContainsSelfDeps,
+    testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
     testProperty "ranking is the same size as all deps" prop_ranking,
     testProperty "restricted input has the same deps as the original" prop_restrictedInputHasSameDeps,
     testProperty "can round trip import/export of graph" prop_importExport
