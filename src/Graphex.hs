@@ -1,4 +1,4 @@
-module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export) where
+module Graphex (Input, getInput, reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, export, depToInput) where
 
 import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
@@ -34,12 +34,13 @@ data DepFile = DepFile {
 
 type Input = Map Text (Set Text)
 
-getInput :: FilePath -> IO Input
-getInput fn = either fail (pure . resolve) . eitherDecode =<< BL.readFile fn
+depToInput :: DepFile -> Input
+depToInput DepFile{..} = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges] <> Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
     where
-        resolve DepFile{..} = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
-            where
-                name = (coerce nodes Map.!) :: Text -> Text
+        name = (coerce nodes Map.!) :: Text -> Text
+
+getInput :: FilePath -> IO Input
+getInput fn = either fail (pure . depToInput) . eitherDecode =<< BL.readFile fn
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Input -> Input

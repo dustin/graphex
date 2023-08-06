@@ -99,6 +99,14 @@ prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == rankings g M
 prop_restrictedInputHasSameDeps :: GraphWithKey -> Bool
 prop_restrictedInputHasSameDeps (GraphWithKey k (Graph g)) = allDepsOn g k == allDepsOn (restrictTo g k) k
 
+prop_importExport :: Graph -> Property
+prop_importExport (Graph g) =
+    counterexample ("exported: " <> show exported <> "\nimported: " <> show imported) $
+    imported === g
+    where
+        exported = export g
+        imported = depToInput exported
+
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
@@ -108,7 +116,8 @@ tests = [
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "direct deps contains all deps" prop_allDepsContainsSelfDeps,
     testProperty "ranking is the same size as all deps" prop_ranking,
-    testProperty "restricted input has the same deps as the original" prop_restrictedInputHasSameDeps
+    testProperty "restricted input has the same deps as the original" prop_restrictedInputHasSameDeps,
+    testProperty "can round trip import/export of graph" prop_importExport
     ]
 
 main :: IO ()
