@@ -51,8 +51,8 @@ options = Options
 printStrs :: Foldable f => f Text -> IO ()
 printStrs = traverse_ TIO.putStrLn
 
-getInput :: FilePath -> IO Input
-getInput fn = either fail (pure . depToInput) . eitherDecode =<< BL.readFile fn
+getInput :: FilePath -> IO Graph
+getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
 
 main :: IO ()
 main = do
