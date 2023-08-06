@@ -1,6 +1,6 @@
 module Main where
 
-import           Data.Aeson           (encode)
+import           Data.Aeson           (eitherDecode, encode)
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import           Data.Foldable
@@ -50,6 +50,9 @@ options = Options
 
 printStrs :: Foldable f => f Text -> IO ()
 printStrs = traverse_ TIO.putStrLn
+
+getInput :: FilePath -> IO Input
+getInput fn = either fail (pure . depToInput) . eitherDecode =<< BL.readFile fn
 
 main :: IO ()
 main = do
