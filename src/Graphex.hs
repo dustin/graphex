@@ -35,8 +35,10 @@ newtype Graph = Graph { unGraph :: Map Text (Set Text) }
     deriving stock (Eq)
 
 depToGraph :: DepFile -> Graph
-depToGraph DepFile{..} = Graph $ Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges] <> Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
+depToGraph DepFile{..} = Graph (links <> allNodes)
     where
+        links = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
+        allNodes = Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
         name = (coerce nodes Map.!) :: Text -> Text
 
 -- | Reverse all the arrows in the graphs.
