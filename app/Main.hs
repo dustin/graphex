@@ -5,20 +5,25 @@ import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import           Data.Foldable
 import           Data.List            (sortOn)
+import           Data.List.NonEmpty   (NonEmpty)
+import qualified Data.List.NonEmpty   as NE
 import qualified Data.Map.Strict      as Map
 import           Data.Ord             (Down (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
-import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
-                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, str,
-                                       strOption, switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command,
+                                       customExecParser, fullDesc, help, helper,
+                                       hsubparser, info, long, metavar, prefs,
+                                       progDesc, short, showDefault,
+                                       showHelpOnError, some, str, strOption,
+                                       switch, value, (<**>))
 
 import           Graphex
 
 data Command
     = DirectDepsOn Text
-    | AllDepsOn Text
+    | AllDepsOn (NonEmpty Text)
     | Why Text Text
     | Rankings
     | Select Text
@@ -44,9 +49,10 @@ options = Options
 
     where
         depsCmd = DirectDepsOn <$> argument str (metavar "module")
-        allDepsCmd = AllDepsOn <$> argument str (metavar "module")
+        allDepsCmd = AllDepsOn <$> some1 (argument str (metavar "module"))
         selectCmd = Select <$> argument str (metavar "module")
         whyCmd = Why <$> argument str (metavar "module from") <*> argument str (metavar "module to")
+        some1 = fmap NE.fromList . some
 
 printStrs :: Foldable f => f Text -> IO ()
 printStrs = traverse_ TIO.putStrLn
@@ -61,7 +67,7 @@ main = do
     case optCommand of
         Why from to    -> printStrs $ why graph from to
         DirectDepsOn m -> printStrs $ directDepsOn graph m
-        AllDepsOn m    -> printStrs $ allDepsOn graph m
+        AllDepsOn m    -> printStrs $ foldMap (allDepsOn graph) m
         Rankings       -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
         Select m       -> BL.putStr $ encode (graphToDep (restrictTo graph m))
   where
