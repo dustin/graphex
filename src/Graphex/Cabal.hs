@@ -3,16 +3,18 @@
 {-# language OverloadedRecordDot #-}
 
 -- Cribbed from graphmod's 'Graphmod.CabalSupport'
-module Graphex.Cabal (discoverCabalModules) where
+module Graphex.Cabal (discoverCabalModules, discoverCabalModuleGraph) where
 
 import Graphex.Core
+import Graphex.Parser
 
 import Control.Monad (filterM)
 import Data.String (fromString)
 import Data.List (intersperse)
 import Data.Maybe(maybeToList)
-import System.FilePath((</>), (<.>))
-import System.Directory (doesFileExist)
+import Data.Set qualified as Set
+import System.FilePath((</>), (<.>), takeExtension)
+import System.Directory (doesFileExist, getDirectoryContents)
 
 -- Interface to cabal.
 import Distribution.Verbosity(silent)
@@ -62,3 +64,14 @@ discoverCabalModules cabalFile = do
         ] -- TODO: exes + other-modules
 
   filterM (doesFileExist . (.path)) candidateModules
+
+discoverCabalModuleGraph :: IO ModuleGraph
+discoverCabalModuleGraph = do
+  fs <- getDirectoryContents "." -- XXX
+  mods <- case filter ((".cabal" ==) . takeExtension) fs of
+    path : _ -> discoverCabalModules path
+    _ -> error "No cabal file found"
+  imps <- mconcat <$> traverse parseModuleImports mods
+  let modSet = Set.fromList $ fmap (.name) mods
+  let internalImps = filter (\(x, y) -> Set.member x modSet && Set.member y modSet) imps
+  pure $ foldMap (uncurry singletonModuleGraph) internalImps

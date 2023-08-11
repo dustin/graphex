@@ -27,6 +27,7 @@ data Command
     | Why Text Text
     | Rankings
     | Select Text
+    | Cabal
     deriving stock Show
 
 data Options = Options {
@@ -45,6 +46,7 @@ options = Options
         command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
         command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module"))
+        command "cabal" (info (pure Cabal) (progDesc "Generate a graph in Looking Glass JSON based on the current directory's cabal file"))
         ])
 
     where
@@ -70,5 +72,6 @@ main = do
         AllDepsOn m    -> printStrs $ foldMap (allDepsOn graph) m
         Rankings       -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
         Select m       -> BL.putStr $ encode (graphToDep (restrictTo graph m))
+        Cabal          -> pure ()
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

@@ -44,6 +44,9 @@ runParserString = runParser . GHC.stringToStringBuffer
 runParserFile :: FilePath -> GHC.P a -> IO (PR a)
 runParserFile path parser = GHC.hGetStringBuffer path >>= \buf -> pure $ runParser buf parser
 
+renderOutputable :: GHC.Outputable a => a -> String
+renderOutputable = GHC.renderWithContext GHC.defaultSDocContext . GHC.ppr
+
 printOutputable :: GHC.Outputable a => a -> IO ()
 printOutputable = GHC.printSDocLn GHC.defaultSDocContext (GHC.PageMode True) stdout . GHC.ppr
 
