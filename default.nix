@@ -13,5 +13,6 @@ in pkgs.haskell-nix.cabalProject {
     src = ./.;
   };
 
+  supportHpack = true;
   compiler-nix-name = "ghc928";
 }
