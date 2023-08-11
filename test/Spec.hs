@@ -1,5 +1,3 @@
-module Main where
-
 import           Control.Monad         (foldM)
 import           Data.Foldable         (fold)
 import           Data.Map              (Map)
@@ -14,9 +12,6 @@ import           Test.Tasty.HUnit
 import           Test.Tasty.QuickCheck as QC
 
 import           Graphex
-
-newtype Graph = Graph (Map Text (Set Text))
-    deriving stock (Eq, Generic)
 
 -- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
 instance Show Graph where
@@ -59,61 +54,69 @@ instance Arbitrary GraphWithKey where
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
     shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
 
-prop_reverseEdgesId :: GraphWithKey -> Property
-prop_reverseEdgesId (GraphWithKey k g@(Graph m)) =
-    counterexample ("fwd: " <> show g <> "\n rev: " <> show (Graph rg)) $
-    m === reverseEdges (reverseEdges m)
+prop_reverseEdgesId :: Graph -> Property
+prop_reverseEdgesId g =
+    counterexample ("fwd: " <> show g <> "\n rev: " <> show rg) $
+    g === reverseEdges (reverseEdges g)
     where
-        rg = reverseEdges m
+        rg = reverseEdges g
 
 prop_reversedDep :: Graph -> Property
 prop_reversedDep g@(Graph m) =
-    counterexample ("fwd: " <> show g <> "\nrev: " <> show (Graph rg)) $
+    counterexample ("fwd: " <> show g <> "\nrev: " <> show rg) $
     all (\(k, vs) -> all (\k' -> k `elem` directDepsOn rg k') vs) (Map.assocs m)
     where
-        rg = reverseEdges m
+        rg = reverseEdges g
 
 prop_reachableIsFindable :: GraphWithKey -> Property
-prop_reachableIsFindable gwk@(GraphWithKey k (Graph g)) =
+prop_reachableIsFindable gwk@(GraphWithKey k g) =
     cover 50 ((not . null) alld) "connected" $ -- This test isn't useful if there are no dependencies
     checkCoverage $
     not . any (null . why g k) $ alld
     where
         alld = allDepsOn g k
 
+prop_negativePathfinding :: Graph  -> Property
+prop_negativePathfinding g = forAll oneGoodKey (null . uncurry (why g))
+    where oneGoodKey = do
+            good <- elements someStrings
+            let bad = "missingnode"
+            elements [ (good, bad), (bad, good) ]
+
 prop_notSelfDep :: GraphWithKey -> Bool
-prop_notSelfDep (GraphWithKey k (Graph g)) = k `notElem` allDepsOn g k
+prop_notSelfDep (GraphWithKey k g) = k `notElem` allDepsOn g k
 
 prop_notSelfDepDirect :: GraphWithKey -> Bool
-prop_notSelfDepDirect (GraphWithKey k (Graph g)) = k `notElem` directDepsOn g k
+prop_notSelfDepDirect (GraphWithKey k g) = k `notElem` directDepsOn g k
 
 prop_allDepsContainsSelfDeps :: GraphWithKey -> Bool
-prop_allDepsContainsSelfDeps (GraphWithKey k (Graph g)) = directDepsOn g k `Set.isSubsetOf` allDepsOn g k
+prop_allDepsContainsSelfDeps (GraphWithKey k g) = directDepsOn g k `Set.isSubsetOf` allDepsOn g k
 
 prop_ranking :: GraphWithKey -> Bool
-prop_ranking (GraphWithKey k (Graph g)) = length (allDepsOn g k) == rankings g Map.! k
+prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rankings g Map.! k
 
-prop_restrictedInputHasSameDeps :: GraphWithKey -> Bool
-prop_restrictedInputHasSameDeps (GraphWithKey k (Graph g)) = allDepsOn g k == allDepsOn (restrictTo g k) k
+prop_restrictedGraphHasSameDeps :: GraphWithKey -> Bool
+prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g k) k
 
 prop_importExport :: Graph -> Property
-prop_importExport (Graph g) =
+prop_importExport g =
     counterexample ("exported: " <> show exported <> "\nimported: " <> show imported) $
     imported === g
     where
-        exported = export g
-        imported = depToInput exported
+        exported = graphToDep g
+        imported = depToGraph exported
 
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
     testProperty "reversed dep is still dep" prop_reversedDep,
     testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
+    testProperty "we can't find a path when there isn't one" prop_negativePathfinding,
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
     testProperty "ranking is the same size as all deps" prop_ranking,
-    testProperty "restricted input has the same deps as the original" prop_restrictedInputHasSameDeps,
+    testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
     testProperty "can round trip import/export of graph" prop_importExport
     ]
 
