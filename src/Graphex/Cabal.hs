@@ -59,7 +59,6 @@ discoverCabalModules cabalFile = do
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
               , path = sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
-        -- TODO: executables
-        ]
+        ] -- TODO: exes + other-modules
 
   filterM (doesFileExist . (.path)) candidateModules
