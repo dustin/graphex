@@ -29,6 +29,7 @@ dependencies:
 - search-algorithms
 - parallel
 - Cabal
+- megaparsec
 - ghc-lib-parser >= 9.6.2 
 - filepath
 - directory
