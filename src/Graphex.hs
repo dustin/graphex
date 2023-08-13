@@ -3,13 +3,11 @@ module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, why, rankings,
 
 import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
-import           Data.Foldable               (fold, toList)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
-import qualified Data.Text                   as T
 
 import Graphex.LookingGlass
 
@@ -28,12 +26,9 @@ depToGraph GraphDef{..} = Graph (links <> allNodes)
 graphToDep :: Graph -> GraphDef
 graphToDep (Graph m) = GraphDef {
     title = "Internal Package Dependencies",
-    edges = [ Edge { from = newKey k, to = newKey v } | (k, vs) <- Map.assocs m, v <- Set.toList vs ],
-    nodes = Map.fromList [ (newKey k, Node k Nothing) | k <- Map.keys m ]
+    edges = [ Edge { from = k, to = v } | (k, vs) <- Map.assocs m, v <- Set.toList vs ],
+    nodes = Map.fromList [ (k, Node k Nothing) | k <- Map.keys m ]
     }
-    where
-        allk = fold m <> Map.keysSet m
-        newKey f = (Map.! f) . Map.fromList $ zip (toList allk) (T.pack . show <$> [0 :: Int ..])
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Graph -> Graph
