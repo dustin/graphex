@@ -4,3 +4,5 @@ graphex.cabal
 graph.json
 .stack-work
 .direnv
+cabal.project.local
+dist-newstyle/

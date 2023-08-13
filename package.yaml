@@ -28,6 +28,10 @@ dependencies:
 - bytestring
 - search-algorithms
 - parallel
+- Cabal
+- megaparsec
+- filepath
+- directory
 
 library:
   source-dirs: src
@@ -41,9 +45,12 @@ default-extensions:
   - DerivingStrategies
   - DeriveAnyClass
   - DeriveGeneric
+  - GeneralizedNewtypeDeriving
   - ViewPatterns
   - TupleSections
   - BangPatterns
+  - ImportQualifiedPost
+  - LambdaCase
 
 executables:
   graphex:

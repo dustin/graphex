@@ -21,6 +21,10 @@ import           Options.Applicative  (Parser, argument, command,
 
 import           Graphex
 
+
+import Graphex.Cabal
+import Graphex.LookingGlass
+
 data Command
     = DirectDepsOn Text
     | AllDepsOn (NonEmpty Text)
@@ -29,14 +33,29 @@ data Command
     | Select Text
     deriving stock Show
 
-data Options = Options {
+
+data Options = GraphCmd GraphOptions | CabalCmd CabalOptions
+  deriving stock Show
+
+data GraphOptions = GraphOptions {
     optGraph   :: FilePath,
     optReverse :: Bool,
     optCommand :: Command
     } deriving stock Show
 
+data CabalOptions = CabalOptions deriving stock Show
+
 options :: Parser Options
-options = Options
+options = hsubparser $ fold
+  [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
+  , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
+  ]
+
+cabalOptions :: Parser CabalOptions
+cabalOptions = pure CabalOptions
+
+graphOptions :: Parser GraphOptions
+graphOptions = GraphOptions
     <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "path to graph data")
     <*> switch (long "reverse" <> short 'r' <> help "reverse edges")
     <*> hsubparser (fold [
@@ -61,8 +80,8 @@ getInput :: FilePath -> IO Graph
 getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
 
 main :: IO ()
-main = do
-    Options{..} <- customExecParser (prefs showHelpOnError) opts
+main = customExecParser (prefs showHelpOnError) opts >>= \case
+  GraphCmd GraphOptions{..} -> do
     graph <- bool id reverseEdges optReverse <$> getInput optGraph
     case optCommand of
         Why from to    -> printStrs $ why graph from to
@@ -70,5 +89,8 @@ main = do
         AllDepsOn m    -> printStrs $ foldMap (allDepsOn graph) m
         Rankings       -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
         Select m       -> BL.putStr $ encode (graphToDep (restrictTo graph m))
+  CabalCmd CabalOptions{} -> do
+    mg <- discoverCabalModuleGraph
+    BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
