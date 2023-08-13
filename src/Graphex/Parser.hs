@@ -29,11 +29,14 @@ importParser
   => IsString (Tokens s)
   => m Import
 importParser = do
+  -- This newline helps us avoid the word "import" in comments
   _ <- newline
   _ <- string "import"
   space1
-  isQualified <- isJust <$> optional (string "qualified")
+  -- Handle prefix qualified imports
+  _ <- isJust <$> optional (string "qualified")
   space
+  -- Handle PackageImports
   pkg <- optional $ between (char '"') (char '"') $ some $ alphaNumChar <|> char '-' <|> char '_'
   space
 
