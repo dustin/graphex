@@ -2,24 +2,26 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE FlexibleContexts #-}
 
+-- | Implements a very crude Haskell import parser.
+--
+-- All it does is parse full module names that are imported in a file,
+-- ignoring false positives.
+--
+-- It does not use CPP, so all conditional imports are parsed out. For
+-- graphex, this makes sense in a way - those are all still dependencies.
 module Graphex.Parser where
 
 import Data.Text qualified as T
-import Graphex.Core
-
-import GHC.Parser qualified as GHC
-import GHC.Types.SrcLoc qualified as GHC
-import GHC.Hs qualified as GHC
-
-import Graphex.Parser.GHC qualified as GHC
-
 import Data.Void
 import Data.Functor (($>))
-import Text.Megaparsec
-import Text.Megaparsec.Char
 import Data.String (IsString)
 import Control.Applicative (asum)
 import Data.Maybe (isJust)
+
+import Text.Megaparsec
+import Text.Megaparsec.Char
+
+import Graphex.Core
 
 importParser
   :: MonadParsec e s m
