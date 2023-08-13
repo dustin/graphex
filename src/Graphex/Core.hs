@@ -9,6 +9,11 @@ import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 
+data Import = Import
+  { module_ :: ModuleName
+  , package :: Maybe Text
+  } deriving stock (Show)
+
 newtype ModuleName = ModuleName { unModuleName :: Text }
   deriving newtype (Eq, Ord, IsString)
   deriving stock (Show)
