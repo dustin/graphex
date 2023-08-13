@@ -7,17 +7,17 @@ import GHC.Generics
 import Data.Map (Map)
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
-import Data.Text qualified as T
+import Data.Text (Text)
 
 import Graphex.Core
 
 data Node = Node
-  { label :: Maybe String
-  , color :: Maybe String
+  { label :: Text
+  , color :: Maybe Text
   } deriving stock (Show, Generic)
   deriving anyclass (Ae.FromJSON, Ae.ToJSON)
 
-type NodeId = String
+type NodeId = Text
 data Edge = Edge
   { from :: NodeId
   , to :: NodeId
@@ -25,13 +25,13 @@ data Edge = Edge
   deriving anyclass (Ae.FromJSON, Ae.ToJSON)
 
 data GraphDef = GraphDef
-  { title :: String
+  { title :: Text
   , nodes :: Map NodeId Node
   , edges :: [Edge]
   } deriving (Show, Generic)
   deriving anyclass (Ae.FromJSON, Ae.ToJSON)
 
-newtype Color = Color { unColor :: String }
+newtype Color = Color { unColor :: Text }
   deriving stock (Eq, Ord, Show)
   deriving newtype (IsString)
 
@@ -42,17 +42,17 @@ black :: Color
 black = "black"
 
 toLookingGlass
-  :: String -- ^ title
+  :: Text -- ^ title
   -> Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
   -> ModuleGraph
   -> GraphDef
 toLookingGlass title colors ModuleGraph{..} =
-  let mkNodeId (ModuleName m) = T.unpack m
+  let mkNodeId (ModuleName m) = m
       mkNode m =
         ( mkNodeId m
         , Node
           { color = unColor <$> Map.lookup m colors
-          , label = Nothing
+          , label = mkNodeId m
           }
         )
   in GraphDef

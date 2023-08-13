@@ -1,9 +1,8 @@
+{-# LANGUAGE OverloadedRecordDot #-}
 module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, graphToDep, depToGraph) where
 
 import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
-import           Data.Aeson                  (FromJSON, ToJSON)
-import           Data.Coerce                 (coerce)
 import           Data.Foldable               (fold, toList)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
@@ -11,42 +10,26 @@ import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 import qualified Data.Text                   as T
-import           GHC.Generics                (Generic)
 
-data Edge = Edge {
-    from :: Text,
-    to   :: Text
-    }
-    deriving stock (Show, Generic)
-    deriving anyclass (FromJSON, ToJSON)
-
-newtype Node = Node { label :: Text }
-    deriving stock (Show, Generic)
-    deriving anyclass (FromJSON, ToJSON)
-
-data DepFile = DepFile {
-    edges :: [Edge],
-    nodes :: Map Text Node
-    }
-    deriving stock (Show, Generic)
-    deriving anyclass (FromJSON, ToJSON)
+import Graphex.LookingGlass
 
 newtype Graph = Graph { unGraph :: Map Text (Set Text) }
     deriving stock (Eq)
 
 -- | Convert a dependency file to a graph.
-depToGraph :: DepFile -> Graph
-depToGraph DepFile{..} = Graph (links <> allNodes)
+depToGraph :: GraphDef -> Graph
+depToGraph GraphDef{..} = Graph (links <> allNodes)
     where
         links = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
         allNodes = Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
-        name = (coerce nodes Map.!) :: Text -> Text
+        name = (.label) . (nodes Map.!) :: Text -> Text
 
 -- | Convert a graph back to our dependency file format.
-graphToDep :: Graph -> DepFile
-graphToDep (Graph m) = DepFile {
+graphToDep :: Graph -> GraphDef
+graphToDep (Graph m) = GraphDef {
+    title = "Internal Package Dependencies",
     edges = [ Edge { from = newKey k, to = newKey v } | (k, vs) <- Map.assocs m, v <- Set.toList vs ],
-    nodes = Map.fromList [ (newKey k, Node k) | k <- Map.keys m ]
+    nodes = Map.fromList [ (newKey k, Node k Nothing) | k <- Map.keys m ]
     }
     where
         allk = fold m <> Map.keysSet m
