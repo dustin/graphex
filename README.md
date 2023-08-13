@@ -3,9 +3,9 @@
 Simple tool to explore some dependency data.
 
 ```
-Usage: graphex [-g|--graph ARG] [-r|--reverse] COMMAND
+Usage: graphex graph [-g|--graph ARG] [-r|--reverse] COMMAND
 
-  Graph CLI tool.
+  Graph operations
 
 Available options:
   -g,--graph ARG           path to graph data (default: "graph.json")
