@@ -13,6 +13,7 @@ import Data.String (fromString)
 import Data.List (intersperse)
 import Data.Maybe(maybeToList)
 import Data.Set qualified as Set
+import Data.Traversable (for)
 import System.FilePath((</>), (<.>), takeExtension)
 import System.Directory (doesFileExist, getDirectoryContents)
 
@@ -71,7 +72,10 @@ discoverCabalModuleGraph = do
   mods <- case filter ((".cabal" ==) . takeExtension) fs of
     path : _ -> discoverCabalModules path
     _ -> error "No cabal file found"
-  imps <- mconcat <$> traverse parseModuleImports mods
+
   let modSet = Set.fromList $ fmap (.name) mods
-  let internalImps = filter (\(x, y) -> Set.member x modSet && Set.member y modSet) imps
-  pure $ foldMap (uncurry singletonModuleGraph) internalImps
+  gs <- for mods $ \Module{..} -> do
+    imps <- parseFileImports path
+    let internalImps = filter (\Import{..} -> Set.member module_ modSet) imps
+    pure $ mkModuleGraph name $ fmap (.module_) internalImps
+  pure $ mconcat gs

@@ -26,21 +26,22 @@ data Module = Module
 
 data ModuleGraph = ModuleGraph
   { imports :: Map ModuleName (Set ModuleName)
-  , reverseImports :: Map ModuleName (Set ModuleName)
   }
   deriving stock (Show)
 
 singletonModuleGraph :: ModuleName -> ModuleName -> ModuleGraph
 singletonModuleGraph importer importee = ModuleGraph
   { imports = Map.singleton importer (Set.singleton importee)
-  , reverseImports = Map.singleton importee (Set.singleton importer)
   }
+
+mkModuleGraph :: ModuleName -> [ModuleName] -> ModuleGraph
+mkModuleGraph importer importees = ModuleGraph
+  { imports = Map.singleton importer (Set.fromList importees) }
 
 instance Semigroup ModuleGraph where
   x <> y = ModuleGraph
     { imports = Map.unionWith (<>) x.imports y.imports
-    , reverseImports = Map.unionWith (<>) x.reverseImports y.reverseImports
     }
 
 instance Monoid ModuleGraph where
-  mempty = ModuleGraph mempty mempty
+  mempty = ModuleGraph mempty

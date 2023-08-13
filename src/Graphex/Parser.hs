@@ -13,6 +13,7 @@ import GHC.Hs qualified as GHC
 
 import Graphex.Parser.GHC qualified as GHC
 
+import Data.Void
 import Data.Functor (($>))
 import Text.Megaparsec
 import Text.Megaparsec.Char
@@ -58,20 +59,6 @@ importsParser = go []
 parseFileImports :: FilePath -> IO [Import]
 parseFileImports fp = do
   contents <- readFile fp
-  case runParser (importsParser @()) fp contents of
-    Left err -> error "uh oh"
+  case runParser (importsParser @Void) fp contents of
+    Left err -> error $ unlines $ [mconcat ["Failed to parse ", fp, ":"], errorBundlePretty err]
     Right x -> pure x
-
--- to-delete:
-parseModuleImports :: Module -> IO [(ModuleName, ModuleName)]
-parseModuleImports Module{..} = GHC.runParserFile path GHC.parseModule >>= \case
-  GHC.PFail GHC.PFailure{..} -> error $ unwords ["Failed to parse module:", path, "errors:", GHC.renderOutputable errors, "warnings:", GHC.renderOutputable warnings]
-  GHC.PSuccess (GHC.L _ a) -> case a of
-    GHC.HsModule{..} ->
-        pure
-      $ fmap (name,)
-      $ fmap (fromGHCModule . GHC.unLoc . GHC.ideclName . GHC.unLoc)
-      $ hsmodImports
-
-fromGHCModule :: GHC.ModuleName -> ModuleName
-fromGHCModule  = ModuleName . T.pack . GHC.moduleNameString
