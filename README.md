@@ -19,3 +19,9 @@ Available commands:
   rank                     Show the most depended on modules
   select                   Select a subset of the graph from a starting module
 ```
+
+Run this from the root of a cabal project to generate the dependency graph JSON:
+
+```
+graphex cabal > my-deps.json
+```
