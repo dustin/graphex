@@ -25,3 +25,5 @@ Run this from the root of a cabal project to generate the dependency graph JSON:
 ```
 graphex cabal > my-deps.json
 ```
+
+The JSON is compatible with the [Looking Glass graph viewer](https://mercurytechnologies.github.io/looking-glass-viewer/) as well. 
