@@ -30,6 +30,7 @@ dependencies:
 - parallel
 - Cabal
 - megaparsec
+- replace-megaparsec
 - filepath
 - directory
 

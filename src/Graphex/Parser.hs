@@ -17,9 +17,11 @@ import Data.Functor (($>))
 import Data.String (IsString)
 import Control.Applicative (asum)
 import Data.Maybe (isJust)
+import Data.Either (rights)
 
 import Text.Megaparsec
 import Text.Megaparsec.Char
+import Replace.Megaparsec (sepCap)
 
 import Graphex.Core
 
@@ -52,14 +54,7 @@ importsParser
   => Token s ~ Char
   => IsString (Tokens s)
   => m [Import]
-importsParser = go []
-  where
-    go acc = do
-      done <- isJust <$> optional eof
-      if done then pure acc else
-        asum [Just <$> try importParser, anySingle $> Nothing] >>= \case
-          Nothing -> go acc
-          Just i -> go (i : acc)
+importsParser = rights <$> sepCap importParser
   
 parseFileImports :: FilePath -> IO [Import]
 parseFileImports fp = do
