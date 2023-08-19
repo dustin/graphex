@@ -9,10 +9,8 @@ import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 
+import Graphex.Core (Graph (..))
 import Graphex.LookingGlass
-
-newtype Graph = Graph { unGraph :: Map Text (Set Text) }
-    deriving stock (Eq)
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph

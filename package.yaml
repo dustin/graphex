@@ -30,8 +30,10 @@ dependencies:
 - parallel
 - Cabal
 - megaparsec
+- replace-megaparsec
 - filepath
 - directory
+- cassava
 
 library:
   source-dirs: src

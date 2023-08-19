@@ -3,6 +3,7 @@ module Main where
 import           Data.Aeson           (eitherDecode, encode)
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Csv             as CSV
 import           Data.Foldable
 import           Data.List            (sortOn)
 import           Data.List.NonEmpty   (NonEmpty)
@@ -20,9 +21,8 @@ import           Options.Applicative  (Parser, argument, command,
                                        switch, value, (<**>))
 
 import           Graphex
-
-
 import Graphex.Cabal
+import Graphex.CSV qualified
 import Graphex.LookingGlass
 
 data Command
@@ -31,6 +31,7 @@ data Command
     | Why Text Text
     | Rankings
     | Select Text
+    | ToCSV Bool
     deriving stock Show
 
 
@@ -63,7 +64,8 @@ graphOptions = GraphOptions
         command "all" (info allDepsCmd (progDesc "Show all dependencies to a module")),
         command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
         command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
-        command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module"))
+        command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
+        command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi"))
         ])
 
     where
@@ -71,6 +73,7 @@ graphOptions = GraphOptions
         allDepsCmd = AllDepsOn <$> some1 (argument str (metavar "module"))
         selectCmd = Select <$> argument str (metavar "module")
         whyCmd = Why <$> argument str (metavar "module from") <*> argument str (metavar "module to")
+        csvCmd = ToCSV <$> switch (long "no-header" <> short 'n' <> help "Omit CSV header")
         some1 = fmap NE.fromList . some
 
 printStrs :: Foldable f => f Text -> IO ()
@@ -89,6 +92,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         AllDepsOn m    -> printStrs $ foldMap (allDepsOn graph) m
         Rankings       -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
         Select m       -> BL.putStr $ encode (graphToDep (restrictTo graph m))
+        ToCSV noHeader -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
   CabalCmd CabalOptions{} -> do
     mg <- discoverCabalModuleGraph
     BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg

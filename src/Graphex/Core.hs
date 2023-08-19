@@ -9,6 +9,10 @@ import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 
+newtype Graph = Graph { unGraph :: Map Text (Set Text) }
+    deriving stock (Eq)
+
+-- Haskell
 data Import = Import
   { module_ :: ModuleName
   , package :: Maybe Text
