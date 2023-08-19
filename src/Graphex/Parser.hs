@@ -13,9 +13,7 @@ module Graphex.Parser where
 
 import Data.Text qualified as T
 import Data.Void
-import Data.Functor (($>))
 import Data.String (IsString)
-import Control.Applicative (asum)
 import Data.Maybe (isJust)
 import Data.Either (rights)
 

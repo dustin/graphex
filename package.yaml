@@ -33,6 +33,7 @@ dependencies:
 - replace-megaparsec
 - filepath
 - directory
+- cassava
 
 library:
   source-dirs: src
