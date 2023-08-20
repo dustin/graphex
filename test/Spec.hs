@@ -98,11 +98,13 @@ prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rankings g Map.! k
 prop_restrictedGraphHasSameDeps :: GraphWithKey -> Bool
 prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g k) k
 
-prop_restrictedNodesShouldBeDeps :: GraphWithKey -> Bool
+prop_restrictedNodesShouldBeDeps :: GraphWithKey -> Property
 prop_restrictedNodesShouldBeDeps (GraphWithKey k g) =
-  let edges = Map.toList (unGraph $ restrictTo g k)
+  let restricted = restrictTo g k
+      edges = Map.toList (unGraph restricted)
       validNodes = Set.insert k $ allDepsOn g k
-  in all (\(k, vs) -> Set.member k validNodes && all (flip Set.member validNodes) vs) edges
+  in counterexample ("restricted: " <> show restricted) $
+     all (\(k, vs) -> Set.member k validNodes && all (flip Set.member validNodes) vs) edges
 
 prop_importExport :: Graph -> Property
 prop_importExport g =
