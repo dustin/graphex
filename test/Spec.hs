@@ -98,6 +98,14 @@ prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rankings g Map.! k
 prop_restrictedGraphHasSameDeps :: GraphWithKey -> Bool
 prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g k) k
 
+prop_restrictedNodesShouldBeDeps :: GraphWithKey -> Property
+prop_restrictedNodesShouldBeDeps (GraphWithKey k g) =
+  let restricted = restrictTo g k
+      edges = Map.toList (unGraph restricted)
+      validNodes = Set.insert k $ allDepsOn g k
+  in counterexample ("restricted: " <> show restricted) $
+     all (\(k, vs) -> Set.member k validNodes && all (flip Set.member validNodes) vs) edges
+
 prop_importExport :: Graph -> Property
 prop_importExport g =
     counterexample ("exported: " <> show exported <> "\nimported: " <> show imported) $
@@ -117,6 +125,7 @@ tests = [
     testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
     testProperty "ranking is the same size as all deps" prop_ranking,
     testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
+    testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
     testProperty "can round trip import/export of graph" prop_importExport
     ]
 

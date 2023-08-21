@@ -85,13 +85,14 @@ getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
 main :: IO ()
 main = customExecParser (prefs showHelpOnError) opts >>= \case
   GraphCmd GraphOptions{..} -> do
-    graph <- bool id reverseEdges optReverse <$> getInput optGraph
+    let handleReverse = bool id reverseEdges optReverse
+    graph <- handleReverse <$> getInput optGraph
     case optCommand of
         Why from to    -> printStrs $ why graph from to
         DirectDepsOn m -> printStrs $ directDepsOn graph m
         AllDepsOn m    -> printStrs $ foldMap (allDepsOn graph) m
         Rankings       -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
-        Select m       -> BL.putStr $ encode (graphToDep (restrictTo graph m))
+        Select m       -> BL.putStr $ encode (graphToDep (handleReverse (restrictTo graph m)))
         ToCSV noHeader -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
   CabalCmd CabalOptions{} -> do
     mg <- discoverCabalModuleGraph

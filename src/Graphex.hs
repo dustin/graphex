@@ -56,7 +56,10 @@ rankings g@(Graph m) = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDep
 
 -- | Restrict a graph to only the modules that reference a given module.
 restrictTo :: Graph -> Text -> Graph
-restrictTo g@(Graph m) k = Graph . flip Map.mapMaybeWithKey m $ \k' v -> if k' == k then Just v else nonNullSet (Set.intersection keep v)
+restrictTo g@(Graph m) k = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
+  if | k' == k -> Just v
+     | Set.notMember k' keep -> Nothing
+     | otherwise -> nonNullSet (Set.intersection keep v)
     where
         keep = allDepsOn g k
         nonNullSet v = if Set.null v then Nothing else Just v
