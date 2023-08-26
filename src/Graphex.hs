@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedRecordDot #-}
-module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, why, rankings, restrictTo, graphToDep, depToGraph) where
+module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, allDepsOnWithKey, why, rankings, allPathsTo, restrictTo, graphToDep, depToGraph) where
 
 import           Algorithm.Search            (dijkstra)
 import           Control.Parallel.Strategies (parMap, rdeepseq)
@@ -36,9 +36,13 @@ reverseEdges (Graph m) = Graph $ Map.fromListWith (<>) [ (v, Set.singleton k) | 
 directDepsOn :: Graph -> Text -> Set Text
 directDepsOn = flip (Map.findWithDefault mempty) . unGraph
 
--- Flood fill to find all transitive dependencies on a starting module.
+-- | Flood fill to find all transitive dependencies on a starting module, excluding the original key.
 allDepsOn :: Graph -> Text -> Set Text
-allDepsOn m k = Set.delete k . go mempty . Set.singleton $ k
+allDepsOn m k = Set.delete k (allDepsOnWithKey m k)
+
+-- | Flood fill to find all transitive dependencies on a starting module, including the original key.
+allDepsOnWithKey :: Graph -> Text -> Set Text
+allDepsOnWithKey m k = go mempty . Set.singleton $ k
     where
         go !s (flip Set.difference s -> todo)
             | Set.null todo = s
@@ -50,16 +54,18 @@ allDepsOn m k = Set.delete k . go mempty . Set.singleton $ k
 why :: Graph -> Text -> Text -> [Text]
 why m from to = maybe [] snd $ dijkstra (directDepsOn m) (const (const (1::Int))) (== to) from
 
+-- | Find all paths between two modules as a restricted graph of the intersection of
+-- reachable nodes from the start and to the end.
+allPathsTo :: Graph -> Text -> Text -> Graph
+allPathsTo m from to = restrictTo m $ allDepsOnWithKey m from `Set.intersection` allDepsOnWithKey (reverseEdges m) to
+
 -- | Count the number of transitive dependencies for each module.
 rankings :: Graph -> Map Text Int
 rankings g@(Graph m) = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDepsOn g k)) (Map.keys m)
 
--- | Restrict a graph to only the modules that reference a given module.
-restrictTo :: Graph -> Text -> Graph
-restrictTo g@(Graph m) k = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
-  if | k' == k -> Just v
-     | Set.notMember k' keep -> Nothing
-     | otherwise -> nonNullSet (Set.intersection keep v)
+-- | Restrict a graph to only the given set of modules.
+restrictTo :: Graph -> Set Text -> Graph
+restrictTo g@(Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
+  (if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))
     where
-        keep = allDepsOn g k
         nonNullSet v = if Set.null v then Nothing else Just v

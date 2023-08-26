@@ -96,15 +96,25 @@ prop_ranking :: GraphWithKey -> Bool
 prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rankings g Map.! k
 
 prop_restrictedGraphHasSameDeps :: GraphWithKey -> Bool
-prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g k) k
+prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g (allDepsOnWithKey g k)) k
 
 prop_restrictedNodesShouldBeDeps :: GraphWithKey -> Property
 prop_restrictedNodesShouldBeDeps (GraphWithKey k g) =
-  let restricted = restrictTo g k
+  let restricted = restrictTo g (allDepsOnWithKey g k)
       edges = Map.toList (unGraph restricted)
       validNodes = Set.insert k $ allDepsOn g k
   in counterexample ("restricted: " <> show restricted) $
      all (\(k, vs) -> Set.member k validNodes && all (flip Set.member validNodes) vs) edges
+
+prop_allPathsShouldIncludeShortest :: GraphWithKey -> Property
+prop_allPathsShouldIncludeShortest gwk@(GraphWithKey k g) =
+    cover 50 ((not . null) alld) "connected" $
+    checkCoverage $
+    all validate alld
+    where
+        alld = allDepsOn g k
+        -- The easiest way to validate this is to just compare shortest paths.
+        validate dest = why g k dest == why (allPathsTo g k dest) k dest
 
 prop_importExport :: Graph -> Property
 prop_importExport g =
@@ -123,6 +133,7 @@ tests = [
     testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
+    testProperty "all paths include shortest path" prop_allPathsShouldIncludeShortest,
     testProperty "ranking is the same size as all deps" prop_ranking,
     testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
     testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
