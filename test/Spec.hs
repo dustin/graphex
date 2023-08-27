@@ -67,7 +67,7 @@ instance Arbitrary ConnectedGraph where
         where
             connections :: Graph -> Maybe (Graph, Map Text [Text])
             connections g@(Graph m) = do
-                let connMap = Map.fromListWith (<>) [(k, [ks]) | k <- Map.keys m, ks <- Set.toList (allDepsOn g k)]
+                let connMap = Map.fromListWith (<>) [(k, [ks]) | k <- Map.keys m, ks <- Set.toList (Set.delete k $ allDepsOn g k)]
                 guard (not . Map.null $ connMap)
                 pure (g, connMap)
 
@@ -98,9 +98,6 @@ prop_negativePathfinding g = forAll oneGoodKey (null . uncurry (why g))
             let bad = "missingnode"
             elements [ (good, bad), (bad, good) ]
 
-prop_notSelfDep :: GraphWithKey -> Bool
-prop_notSelfDep (GraphWithKey k g) = k `notElem` allDepsOn g k
-
 prop_notSelfDepDirect :: GraphWithKey -> Bool
 prop_notSelfDepDirect (GraphWithKey k g) = k `notElem` directDepsOn g k
 
@@ -111,11 +108,11 @@ prop_ranking :: GraphWithKey -> Bool
 prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rankings g Map.! k
 
 prop_restrictedGraphHasSameDeps :: GraphWithKey -> Bool
-prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g (allDepsOnWithKey g k)) k
+prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g (allDepsOn g k)) k
 
 prop_restrictedNodesShouldBeDeps :: GraphWithKey -> Property
 prop_restrictedNodesShouldBeDeps (GraphWithKey k g) =
-  let restricted = restrictTo g (allDepsOnWithKey g k)
+  let restricted = restrictTo g (allDepsOn g k)
       edges = Map.toList (unGraph restricted)
       validNodes = Set.insert k $ allDepsOn g k
   in counterexample ("restricted: " <> show restricted) $
@@ -132,8 +129,8 @@ prop_allPaths gwk@(ConnectedGraph from to g) =
     where
         got = mapMaybeWithKey (\k -> if k `elem` [from, to] then Nothing else Just (validated k)) g
         validated k = (checkPath (k `Set.member` inBoth) from k, checkPath (k `Set.member` inBoth) k to)
-        allFrom = allDepsOnWithKey g from
-        allTo = allDepsOnWithKey (reverseEdges g) to
+        allFrom = allDepsOn g from
+        allTo = allDepsOn (reverseEdges g) to
         inBoth = allFrom `Set.intersection` allTo
         allPaths = allPathsTo g from to
         hasPath f = not . null . why allPaths f
@@ -154,7 +151,6 @@ tests = [
     testProperty "reversed dep is still dep" prop_reversedDep,
     testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
     testProperty "we can't find a path when there isn't one" prop_negativePathfinding,
-    testProperty "all deps doesn't include self" prop_notSelfDep,
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
     testProperty "all paths include shortest path" prop_allPathsShouldIncludeShortest,

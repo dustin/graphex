@@ -13,17 +13,14 @@ import           Data.Ord             (Down (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
-import           Options.Applicative  (Parser, argument, command,
-                                       customExecParser, fullDesc, help, helper,
-                                       hsubparser, info, long, metavar, prefs,
-                                       progDesc, short, showDefault,
-                                       showHelpOnError, some, str, strOption,
-                                       switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
+                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
+                                       str, strOption, switch, value, (<**>))
 
 import           Graphex
-import Graphex.Cabal
-import Graphex.CSV qualified
-import Graphex.LookingGlass
+import           Graphex.Cabal
+import qualified Graphex.CSV
+import           Graphex.LookingGlass
 
 data Command
     = DirectDepsOn Text
@@ -96,7 +93,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
         Rankings         -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
-        Select m         -> BL.putStr $ encode (graphToDep (handleReverse (restrictTo graph (allDepsOnWithKey graph m))))
+        Select m         -> BL.putStr $ encode (graphToDep (handleReverse (restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
   CabalCmd CabalOptions{} -> do
     mg <- discoverCabalModuleGraph

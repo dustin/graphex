@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedRecordDot #-}
 module Graphex (Graph(..),
-    reverseEdges, directDepsOn, allDepsOn, allDepsOnWithKey,
+    reverseEdges, directDepsOn, allDepsOn,
     why, rankings, allPathsTo, restrictTo, mapMaybeWithKey,
     graphToDep, depToGraph) where
 
@@ -43,11 +43,7 @@ directDepsOn = flip (Map.findWithDefault mempty) . unGraph
 
 -- | Flood fill to find all transitive dependencies on a starting module, excluding the original key.
 allDepsOn :: Graph -> Text -> Set Text
-allDepsOn m k = Set.delete k (allDepsOnWithKey m k)
-
--- | Flood fill to find all transitive dependencies on a starting module, including the original key.
-allDepsOnWithKey :: Graph -> Text -> Set Text
-allDepsOnWithKey m = go mempty . Set.singleton
+allDepsOn m = go mempty . Set.singleton
     where
         go !s (flip Set.difference s -> todo)
             | Set.null todo = s
@@ -62,7 +58,7 @@ why m from to = maybe [] snd $ dijkstra (directDepsOn m) (const (const (1::Int))
 -- | Find all paths between two modules as a restricted graph of the intersection of
 -- reachable nodes from the start and to the end.
 allPathsTo :: Graph -> Text -> Text -> Graph
-allPathsTo m from to = restrictTo m $ allDepsOnWithKey m from `Set.intersection` allDepsOnWithKey (reverseEdges m) to
+allPathsTo m from to = restrictTo m $ allDepsOn m from `Set.intersection` allDepsOn (reverseEdges m) to
 
 -- | Count the number of transitive dependencies for each module.
 rankings :: Graph -> Map Text Int
