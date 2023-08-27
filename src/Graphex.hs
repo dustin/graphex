@@ -1,16 +1,21 @@
 {-# LANGUAGE OverloadedRecordDot #-}
-module Graphex (Graph(..), reverseEdges, directDepsOn, allDepsOn, allDepsOnWithKey, why, rankings, allPathsTo, restrictTo, graphToDep, depToGraph) where
+module Graphex (Graph(..),
+    reverseEdges, directDepsOn, allDepsOn, allDepsOnWithKey,
+    why, rankings, allPathsTo, restrictTo, mapMaybeWithKey,
+    graphToDep, depToGraph) where
 
 import           Algorithm.Search            (dijkstra)
-import           Control.Parallel.Strategies (parMap, rdeepseq)
+import           Control.Monad               (ap)
+import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
+import           Data.Maybe                  (mapMaybe)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 
-import Graphex.Core (Graph (..))
-import Graphex.LookingGlass
+import           Graphex.Core                (Graph (..))
+import           Graphex.LookingGlass
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph
@@ -42,7 +47,7 @@ allDepsOn m k = Set.delete k (allDepsOnWithKey m k)
 
 -- | Flood fill to find all transitive dependencies on a starting module, including the original key.
 allDepsOnWithKey :: Graph -> Text -> Set Text
-allDepsOnWithKey m k = go mempty . Set.singleton $ k
+allDepsOnWithKey m = go mempty . Set.singleton
     where
         go !s (flip Set.difference s -> todo)
             | Set.null todo = s
@@ -61,11 +66,15 @@ allPathsTo m from to = restrictTo m $ allDepsOnWithKey m from `Set.intersection`
 
 -- | Count the number of transitive dependencies for each module.
 rankings :: Graph -> Map Text Int
-rankings g@(Graph m) = Map.fromList $ parMap rdeepseq (\k -> (k, length $ allDepsOn g k)) (Map.keys m)
+rankings g = Map.fromList $ mapMaybeWithKey (Just . length . allDepsOn g) g
+
+-- | Visit each node in the graph and apply a function to it.
+mapMaybeWithKey :: NFData a => (Text -> Maybe a) -> Graph -> [(Text, a)]
+mapMaybeWithKey f = mapMaybe sequenceA . parMap rdeepseq (ap (,) f) . Map.keys . unGraph
 
 -- | Restrict a graph to only the given set of modules.
 restrictTo :: Graph -> Set Text -> Graph
-restrictTo g@(Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
+restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
   (if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))
     where
         nonNullSet v = if Set.null v then Nothing else Just v

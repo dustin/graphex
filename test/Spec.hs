@@ -130,7 +130,7 @@ prop_allPaths gwk@(ConnectedGraph from to g) =
     counterexample ("allPaths: " <> show allPaths <> "\nallFrom: " <> show allFrom <> "\nallTo: " <> show allTo <> "\ninBoth: " <> show inBoth) $
     conjoin ((\(k, (f,t)) -> counterexample ("  at " <> show k <> ": " <> show (f,t)) $ f .&&. t) <$> got)
     where
-        got = (\k -> (k, validated k)) <$> filter (`notElem` [from, to]) (Map.keys (unGraph g))
+        got = mapMaybeWithKey (\k -> if k `elem` [from, to] then Nothing else Just (validated k)) g
         validated k = (checkPath (k `Set.member` inBoth) from k, checkPath (k `Set.member` inBoth) k to)
         allFrom = allDepsOnWithKey g from
         allTo = allDepsOnWithKey (reverseEdges g) to
