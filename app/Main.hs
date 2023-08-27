@@ -88,7 +88,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
     let handleReverse = bool id reverseEdges optReverse
     graph <- handleReverse <$> getInput optGraph
     case optCommand of
-        Why from to      -> printStrs $ why graph from to
+        Why from to      -> printStrs $ [from] <> ((" imports " <>) <$> why graph from to)
         AllPaths from to -> BL.putStr . encode . graphToDep $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
