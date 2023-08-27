@@ -1,4 +1,4 @@
-import           Control.Monad         (foldM)
+import           Control.Monad         (foldM, guard)
 import           Data.Foldable         (fold)
 import           Data.Map              (Map)
 import qualified Data.Map.Strict       as Map
@@ -54,6 +54,26 @@ instance Arbitrary GraphWithKey where
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
     shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
 
+-- A DAG that we know contains two keys that are connected (a path exists to the second one from the first one).
+data ConnectedGraph = ConnectedGraph Text Text Graph
+    deriving stock (Show, Eq, Generic)
+
+instance Arbitrary ConnectedGraph where
+    arbitrary = do
+        (g@(Graph m), connMap) <- arbitrary `suchThatMap` connections
+        from <- QC.elements (Map.keys connMap)
+        to <- QC.elements (connMap Map.! from)
+        pure $ ConnectedGraph from to g
+        where
+            connections :: Graph -> Maybe (Graph, Map Text [Text])
+            connections g@(Graph m) = do
+                let connMap = Map.fromListWith (<>) [(k, [ks]) | k <- Map.keys m, ks <- Set.toList (allDepsOn g k)]
+                guard (not . Map.null $ connMap)
+                pure (g, connMap)
+
+    -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
+    shrink (ConnectedGraph from to g) = ConnectedGraph from to <$> filter ((\(Graph m) -> Map.member from m && Map.member to m)) (shrink g)
+
 prop_reverseEdgesId :: Graph -> Property
 prop_reverseEdgesId g =
     counterexample ("fwd: " <> show g <> "\n rev: " <> show rg) $
@@ -68,13 +88,8 @@ prop_reversedDep g@(Graph m) =
     where
         rg = reverseEdges g
 
-prop_reachableIsFindable :: GraphWithKey -> Property
-prop_reachableIsFindable gwk@(GraphWithKey k g) =
-    cover 50 ((not . null) alld) "connected" $ -- This test isn't useful if there are no dependencies
-    checkCoverage $
-    not . any (null . why g k) $ alld
-    where
-        alld = allDepsOn g k
+prop_reachableIsFindable :: ConnectedGraph -> Bool
+prop_reachableIsFindable gwk@(ConnectedGraph from to g) = not . null $ why g from to
 
 prop_negativePathfinding :: Graph  -> Property
 prop_negativePathfinding g = forAll oneGoodKey (null . uncurry (why g))
@@ -106,15 +121,24 @@ prop_restrictedNodesShouldBeDeps (GraphWithKey k g) =
   in counterexample ("restricted: " <> show restricted) $
      all (\(k, vs) -> Set.member k validNodes && all (flip Set.member validNodes) vs) edges
 
-prop_allPathsShouldIncludeShortest :: GraphWithKey -> Property
-prop_allPathsShouldIncludeShortest gwk@(GraphWithKey k g) =
-    cover 50 ((not . null) alld) "connected" $
-    checkCoverage $
-    all validate alld
+prop_allPathsShouldIncludeShortest :: ConnectedGraph -> Property
+prop_allPathsShouldIncludeShortest gwk@(ConnectedGraph from to g) =
+    why g from to === why (allPathsTo g from to) from to
+
+prop_allPaths :: ConnectedGraph -> Property
+prop_allPaths gwk@(ConnectedGraph from to g) =
+    counterexample ("allPaths: " <> show allPaths <> "\nallFrom: " <> show allFrom <> "\nallTo: " <> show allTo <> "\ninBoth: " <> show inBoth) $
+    conjoin ((\(k, (f,t)) -> counterexample ("  at " <> show k <> ": " <> show (f,t)) $ f .&&. t) <$> got)
     where
-        alld = allDepsOn g k
-        -- The easiest way to validate this is to just compare shortest paths.
-        validate dest = why g k dest == why (allPathsTo g k dest) k dest
+        got = (\k -> (k, validated k)) <$> filter (`notElem` [from, to]) (Map.keys (unGraph g))
+        validated k = (checkPath (k `Set.member` inBoth) from k, checkPath (k `Set.member` inBoth) k to)
+        allFrom = allDepsOnWithKey g from
+        allTo = allDepsOnWithKey (reverseEdges g) to
+        inBoth = allFrom `Set.intersection` allTo
+        allPaths = allPathsTo g from to
+        hasPath f = not . null . why allPaths f
+        checkPath True f  = hasPath f
+        checkPath False f = not . hasPath f
 
 prop_importExport :: Graph -> Property
 prop_importExport g =
@@ -134,6 +158,7 @@ tests = [
     testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
     testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
     testProperty "all paths include shortest path" prop_allPathsShouldIncludeShortest,
+    testProperty "all paths seems right" prop_allPaths,
     testProperty "ranking is the same size as all deps" prop_ranking,
     testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
     testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
