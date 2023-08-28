@@ -12,6 +12,7 @@ import           Test.Tasty.HUnit
 import           Test.Tasty.QuickCheck as QC
 
 import           Graphex
+import           Graphex.Search
 
 -- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
 instance Show Graph where
@@ -145,6 +146,9 @@ prop_importExport g =
         exported = graphToDep g
         imported = depToGraph exported
 
+prop_floodVsBFS :: GraphWithKey -> Bool
+prop_floodVsBFS (GraphWithKey k g) = flood (directDepsOn g) k == Set.fromList (bfsOn id (Set.toList . directDepsOn g) k)
+
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
@@ -158,7 +162,8 @@ tests = [
     testProperty "ranking is the same size as all deps" prop_ranking,
     testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
     testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
-    testProperty "can round trip import/export of graph" prop_importExport
+    testProperty "can round trip import/export of graph" prop_importExport,
+    testProperty "flood finds the same set as BFS" prop_floodVsBFS
     ]
 
 main :: IO ()

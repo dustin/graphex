@@ -16,6 +16,7 @@ import           Data.Text                   (Text)
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
+import           Graphex.Search              (flood)
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph
@@ -43,11 +44,7 @@ directDepsOn = flip (Map.findWithDefault mempty) . unGraph
 
 -- | Flood fill to find all transitive dependencies on a starting module, excluding the original key.
 allDepsOn :: Graph -> Text -> Set Text
-allDepsOn m = go mempty . Set.singleton
-    where
-        go !s (flip Set.difference s -> todo)
-            | Set.null todo = s
-            | otherwise = go (s <> todo) (Set.unions $ Set.map (directDepsOn m) todo)
+allDepsOn = flood . directDepsOn
 
 -- | Find an example path between two modules.
 --
