@@ -1,4 +1,4 @@
-module Graphex.Search (bfsOn, flood) where
+module Graphex.Search (bfsOn, bfsWith, dfsOn, dfsWith, flood) where
 
 import           Data.Set (Set)
 import qualified Data.Set as Set
@@ -22,18 +22,34 @@ qappendList (Queue l r) xs   = Queue l (reverse xs <> r)
 --
 -- The first argument is a representation function is used to deduplicate state.
 -- For some use cases where the entire state is valid, you can use 'id'.
-bfsOn ::  Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
-bfsOn rep next start = go Set.empty (qsingle start)
+bfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
+bfsOn rep next = bfsWith (\r -> Set.insert (rep r)) (\r -> Set.member (rep r)) next
+
+-- | BFS with custom functions for remembering and recalling whether a state has been visited.
+bfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
+bfsWith remember seenf next start = go mempty (qsingle start)
   where
     go seen inq =
       case qpop inq of
         Nothing -> []
         Just (x,xs)
-          | Set.member r seen ->     go seen xs
-          | otherwise         -> x : go (Set.insert r seen) (qappendList xs $ next x)
-          where r = rep x
+          | seenf x seen -> go seen xs
+          | otherwise    -> x : go (remember x seen) (qappendList xs $ next x)
 
--- | Flood fill a graph from a starting point.
+-- | A DFS variant of 'bfsOn'.
+dfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
+dfsOn rep next = dfsWith (\r -> Set.insert (rep r)) (\r -> Set.member (rep r)) next
+
+-- | A DFS variant of 'bfsWith'.
+dfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
+dfsWith remember seenf next start = go mempty [start]
+  where
+    go _ [] = []
+    go seen (x:xs)
+        | seenf x seen = go seen xs
+        | otherwise    = x : go (remember x seen) (next x <> xs)
+
+-- | Flood fill a graph from a starting point and return all visited points.
 flood :: Ord a => (a -> Set a) -> a -> Set a
 flood nf = go mempty . Set.singleton
     where

@@ -149,6 +149,9 @@ prop_importExport g =
 prop_floodVsBFS :: GraphWithKey -> Bool
 prop_floodVsBFS (GraphWithKey k g) = flood (directDepsOn g) k == Set.fromList (bfsOn id (Set.toList . directDepsOn g) k)
 
+prop_floodVsDFS :: GraphWithKey -> Bool
+prop_floodVsDFS (GraphWithKey k g) = flood (directDepsOn g) k == Set.fromList (dfsOn id (Set.toList . directDepsOn g) k)
+
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
@@ -163,7 +166,8 @@ tests = [
     testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
     testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
     testProperty "can round trip import/export of graph" prop_importExport,
-    testProperty "flood finds the same set as BFS" prop_floodVsBFS
+    testProperty "flood finds the same set as BFS" prop_floodVsBFS,
+    testProperty "flood finds the same set as DFS" prop_floodVsDFS
     ]
 
 main :: IO ()
