@@ -34,6 +34,7 @@ instance GHC.Classes.Ord Graphex.Core.ModuleName
 instance GHC.Classes.Eq Graphex.Core.ModuleName
 instance GHC.Show.Show Graphex.Core.Import
 instance GHC.Show.Show Graphex.Core.Module
+instance GHC.Classes.Eq Graphex.Core.ModuleGraph
 instance GHC.Show.Show Graphex.Core.ModuleGraph
 instance GHC.Base.Semigroup Graphex.Core.ModuleGraph
 instance GHC.Base.Monoid Graphex.Core.ModuleGraph

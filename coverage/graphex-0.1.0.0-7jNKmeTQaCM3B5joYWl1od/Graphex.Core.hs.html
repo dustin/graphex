@@ -18,15 +18,15 @@ span.spaces    { background: white }
 </pre>
 <pre>
 <span class="lineno">    1 </span>{-# LANGUAGE OverloadedRecordDot #-}
-<span class="lineno">    2 </span>{-# LANGUAGE StrictData #-}
+<span class="lineno">    2 </span>{-# LANGUAGE StrictData          #-}
 <span class="lineno">    3 </span>module Graphex.Core where
 <span class="lineno">    4 </span>
-<span class="lineno">    5 </span>import Data.String (IsString)
-<span class="lineno">    6 </span>import           Data.Map                    (Map)
-<span class="lineno">    7 </span>import qualified Data.Map.Strict             as Map
-<span class="lineno">    8 </span>import           Data.Set                    (Set)
-<span class="lineno">    9 </span>import qualified Data.Set                    as Set
-<span class="lineno">   10 </span>import           Data.Text                   (Text)
+<span class="lineno">    5 </span>import           Data.Map        (Map)
+<span class="lineno">    6 </span>import qualified Data.Map.Strict as Map
+<span class="lineno">    7 </span>import           Data.Set        (Set)
+<span class="lineno">    8 </span>import qualified Data.Set        as Set
+<span class="lineno">    9 </span>import           Data.String     (IsString)
+<span class="lineno">   10 </span>import           Data.Text       (Text)
 <span class="lineno">   11 </span>
 <span class="lineno">   12 </span>newtype Graph = Graph { <span class="istickedoff"><span class="decl"><span class="istickedoff">unGraph</span></span></span> :: Map Text (Set Text) }
 <span class="lineno">   13 </span>    deriving stock (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
@@ -38,7 +38,7 @@ span.spaces    { background: white }
 <span class="lineno">   19 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
 <span class="lineno">   20 </span>
 <span class="lineno">   21 </span>newtype ModuleName = ModuleName { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unModuleName</span></span></span> :: Text }
-<span class="lineno">   22 </span>  deriving newtype (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">IsString</span></span>)
+<span class="lineno">   22 </span>  deriving newtype (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">IsString</span></span>)
 <span class="lineno">   23 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
 <span class="lineno">   24 </span>
 <span class="lineno">   25 </span>data Module = Module
@@ -48,9 +48,9 @@ span.spaces    { background: white }
 <span class="lineno">   29 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
 <span class="lineno">   30 </span>
 <span class="lineno">   31 </span>data ModuleGraph = ModuleGraph
-<span class="lineno">   32 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">imports</span></span></span> :: Map ModuleName (Set ModuleName)
+<span class="lineno">   32 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">imports</span></span></span> :: Map ModuleName (Set ModuleName)
 <span class="lineno">   33 </span>  }
-<span class="lineno">   34 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   34 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
 <span class="lineno">   35 </span>
 <span class="lineno">   36 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
 <span class="lineno">   37 </span><span class="decl"><span class="nottickedoff">singletonModuleGraph importer importee = ModuleGraph</span>
@@ -61,13 +61,13 @@ span.spaces    { background: white }
 <span class="lineno">   42 </span><span class="decl"><span class="nottickedoff">mkModuleGraph importer importees = ModuleGraph</span>
 <span class="lineno">   43 </span><span class="spaces">  </span><span class="nottickedoff">{ imports = Map.singleton importer (Set.fromList importees) }</span></span>
 <span class="lineno">   44 </span>
-<span class="lineno">   45 </span>instance <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Semigroup ModuleGraph</span></span></span></span> where
-<span class="lineno">   46 </span>  <span class="decl"><span class="nottickedoff">x &lt;&gt; y = ModuleGraph</span>
-<span class="lineno">   47 </span><span class="spaces">    </span><span class="nottickedoff">{ imports = Map.unionWith (&lt;&gt;) x.imports y.imports</span>
-<span class="lineno">   48 </span><span class="spaces">    </span><span class="nottickedoff">}</span></span>
+<span class="lineno">   45 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Semigroup ModuleGraph</span></span></span></span> where
+<span class="lineno">   46 </span>  <span class="decl"><span class="istickedoff">x &lt;&gt; y = ModuleGraph</span>
+<span class="lineno">   47 </span><span class="spaces">    </span><span class="istickedoff">{ imports = Map.unionWith (&lt;&gt;) x.imports y.imports</span>
+<span class="lineno">   48 </span><span class="spaces">    </span><span class="istickedoff">}</span></span>
 <span class="lineno">   49 </span>
-<span class="lineno">   50 </span>instance <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Monoid ModuleGraph</span></span></span></span> where
-<span class="lineno">   51 </span>  <span class="decl"><span class="nottickedoff">mempty = ModuleGraph mempty</span></span>
+<span class="lineno">   50 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Monoid ModuleGraph</span></span></span></span> where
+<span class="lineno">   51 </span>  <span class="decl"><span class="istickedoff">mempty = ModuleGraph mempty</span></span>
 
 </pre>
 </body>
