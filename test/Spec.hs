@@ -1,3 +1,5 @@
+module Spec where
+
 import           Control.Monad         (foldM, guard)
 import           Data.Foldable         (fold)
 import           Data.Map              (Map)
@@ -160,24 +162,3 @@ prop_treeDeps (GraphWithKey k g) =
     allDepsOn g k === Set.fromList (Tree.flatten t)
     where t = (graphToTree k g)
 
-tests :: [TestTree]
-tests = [
-    testProperty "double edge reverse is id" prop_reverseEdgesId,
-    testProperty "reversed dep is still dep" prop_reversedDep,
-    testProperty "we can find a path between any two reachable nodes" prop_reachableIsFindable,
-    testProperty "we can't find a path when there isn't one" prop_negativePathfinding,
-    testProperty "direct deps doesn't include self" prop_notSelfDepDirect,
-    testProperty "all deps contains direct deps" prop_allDepsContainsSelfDeps,
-    testProperty "all paths include shortest path" prop_allPathsShouldIncludeShortest,
-    testProperty "all paths seems right" prop_allPaths,
-    testProperty "ranking is the same size as all deps" prop_ranking,
-    testProperty "restricted input has the same deps as the original" prop_restrictedGraphHasSameDeps,
-    testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
-    testProperty "can round trip import/export of graph" prop_importExport,
-    testProperty "flood finds the same set as BFS" prop_floodVsBFS,
-    testProperty "flood finds the same set as DFS" prop_floodVsDFS,
-    testProperty "tree contains all deps" prop_treeDeps
-    ]
-
-main :: IO ()
-main = defaultMain $ testGroup "All Tests" tests
