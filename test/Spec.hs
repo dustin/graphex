@@ -1,21 +1,24 @@
 module Spec where
 
-import           Control.Monad         (foldM, guard)
-import           Data.Foldable         (fold)
-import           Data.Map              (Map)
-import qualified Data.Map.Strict       as Map
-import           Data.Set              (Set)
-import qualified Data.Set              as Set
-import           Data.Text             (Text)
-import qualified Data.Text             as T
-import qualified Data.Tree             as Tree
-import           GHC.Generics          (Generic)
+import           Control.Monad            (foldM, guard)
+import           Data.Foldable            (fold)
+import           Data.Map                 (Map)
+import qualified Data.Map.Strict          as Map
+import           Data.Set                 (Set)
+import qualified Data.Set                 as Set
+import           Data.Text                (Text)
+import qualified Data.Text                as T
+import qualified Data.Tree                as Tree
+import           GHC.Generics             (Generic)
 
+import           Test.QuickCheck.Checkers
+import           Test.QuickCheck.Classes
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import           Test.Tasty.QuickCheck as QC
+import           Test.Tasty.QuickCheck    as QC
 
 import           Graphex
+import           Graphex.Core
 import           Graphex.Search
 
 -- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
@@ -172,3 +175,17 @@ prop_treeDepsWorksWithCycles (ConnectedGraph from to g@(Graph m)) =
 prop_treeDepsEmptiness :: Graph -> Property
 prop_treeDepsEmptiness g = counterexample (Tree.drawTree (T.unpack <$> t)) $ t === Tree.Node "non-existent-key" []
     where t = graphToTree "non-existent-key" g
+
+toModuleGraph :: Graph -> ModuleGraph
+toModuleGraph (Graph m) = ModuleGraph $ Map.fromListWith (<>) [(ModuleName k, Set.map ModuleName vs) | (k, vs) <- Map.assocs m]
+
+instance EqProp ModuleGraph where (=-=) = eq
+
+instance Arbitrary ModuleGraph where
+    arbitrary = toModuleGraph <$> arbitrary
+
+test_Instances :: [TestTree]
+test_Instances = [
+  testProperties "semigroup" (unbatch $ semigroup (undefined :: ModuleGraph, undefined :: Int)),
+  testProperties "monoid" (unbatch $ monoid (undefined :: ModuleGraph))
+  ]

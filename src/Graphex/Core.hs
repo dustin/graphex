@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE StrictData #-}
+{-# LANGUAGE StrictData          #-}
 module Graphex.Core where
 
-import Data.String (IsString)
-import           Data.Map                    (Map)
-import qualified Data.Map.Strict             as Map
-import           Data.Set                    (Set)
-import qualified Data.Set                    as Set
-import           Data.Text                   (Text)
+import           Data.Map        (Map)
+import qualified Data.Map.Strict as Map
+import           Data.Set        (Set)
+import qualified Data.Set        as Set
+import           Data.String     (IsString)
+import           Data.Text       (Text)
 
 newtype Graph = Graph { unGraph :: Map Text (Set Text) }
     deriving stock (Eq)
@@ -31,7 +31,7 @@ data Module = Module
 data ModuleGraph = ModuleGraph
   { imports :: Map ModuleName (Set ModuleName)
   }
-  deriving stock (Show)
+  deriving stock (Show, Eq)
 
 singletonModuleGraph :: ModuleName -> ModuleName -> ModuleGraph
 singletonModuleGraph importer importee = ModuleGraph

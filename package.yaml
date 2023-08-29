@@ -82,3 +82,4 @@ tests:
     - tasty-hunit
     - tasty-quickcheck
     - tasty-discover
+    - checkers
