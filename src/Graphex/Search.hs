@@ -23,7 +23,7 @@ qappendList (Queue l r) xs   = Queue l (reverse xs <> r)
 
 type SearchFunction r a = (a -> r) -> (a -> [a]) -> a -> [a]
 
--- | Find the first match using the given search function (e.g., bfsOn or dfsOn).
+-- | Find the first match using the given search function (e.g., 'bfsOn' or 'dfsOn').
 findFirst :: Ord r => SearchFunction r a -> (a -> r) -> (a -> [a]) -> a -> (a -> Bool) -> Maybe a
 findFirst search rep nf start termination = find termination (search rep nf start)
 
@@ -32,7 +32,7 @@ findFirst search rep nf start termination = find termination (search rep nf star
 -- The first argument is a representation function is used to deduplicate state.
 -- For some use cases where the entire state is valid, you can use 'id'.
 bfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
-bfsOn rep next = bfsWith (\r -> Set.insert (rep r)) (\r -> Set.member (rep r)) next
+bfsOn rep = bfsWith (Set.insert . rep) (Set.member . rep)
 
 -- | BFS with custom functions for remembering and recalling whether a state has been visited.
 bfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
@@ -47,7 +47,7 @@ bfsWith remember seenf next start = go mempty (qsingle start)
 
 -- | A DFS variant of 'bfsOn'.
 dfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
-dfsOn rep next = dfsWith (\r -> Set.insert (rep r)) (\r -> Set.member (rep r)) next
+dfsOn rep = dfsWith (Set.insert . rep) (Set.member . rep)
 
 -- | A DFS variant of 'bfsWith'.
 dfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
