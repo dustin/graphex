@@ -2,7 +2,7 @@
 module Graphex (Graph(..),
     reverseEdges, directDepsOn, allDepsOn,
     why, rankings, allPathsTo, restrictTo, mapMaybeWithKey,
-    graphToDep, depToGraph) where
+    graphToDep, depToGraph, graphToTree) where
 
 import           Algorithm.Search            (dijkstra)
 import           Control.Monad               (ap)
@@ -13,6 +13,8 @@ import           Data.Maybe                  (mapMaybe)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
+import           Data.Tree                   (Tree)
+import qualified Data.Tree                   as Tree
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
@@ -71,3 +73,11 @@ restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
   (if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))
     where
         nonNullSet v = if Set.null v then Nothing else Just v
+
+-- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.
+graphToTree :: Text -> Graph -> Tree Text
+graphToTree startingAt (Graph rels) = go mempty startingAt
+  where
+    go seen node =
+      let children = Set.toList $ Map.findWithDefault mempty node rels
+      in Tree.Node node $ if (Set.member node seen) then [] else fmap (go (Set.insert node seen)) children
