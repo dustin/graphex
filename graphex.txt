@@ -126,8 +126,8 @@ dfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
 -- | A DFS variant of <a>bfsWith</a>.
 dfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
 
--- | Find the first match using the given search function (e.g., bfsOn or
---   dfsOn).
+-- | Find the first match using the given search function (e.g.,
+--   <a>bfsOn</a> or <a>dfsOn</a>).
 findFirst :: Ord r => SearchFunction r a -> (a -> r) -> (a -> [a]) -> a -> (a -> Bool) -> Maybe a
 
 -- | Flood fill a graph from a starting point and return all visited
