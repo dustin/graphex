@@ -13,6 +13,7 @@ import           Data.Ord             (Down (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
+import           Data.Tree.View       (drawTree)
 import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
                                        info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
                                        str, strOption, switch, value, (<**>))
@@ -25,7 +26,7 @@ import           Graphex.LookingGlass
 data Command
     = DirectDepsOn Text
     | AllDepsOn (NonEmpty Text)
-    | Why Text Text
+    | Why { fromModule :: Text, toModule :: Text, showAll :: Bool }
     | AllPaths Text Text
     | Rankings
     | Select Text
@@ -71,7 +72,7 @@ graphOptions = GraphOptions
         depsCmd = DirectDepsOn <$> argument str (metavar "module")
         allDepsCmd = AllDepsOn <$> some1 (argument str (metavar "module"))
         selectCmd = Select <$> argument str (metavar "module")
-        whyCmd = Why <$> argument str (metavar "module from") <*> argument str (metavar "module to")
+        whyCmd = Why <$> argument str (metavar "module from") <*> argument str (metavar "module to") <*> switch (long "all" <> help "Show all paths")
         allPathsCmd = AllPaths <$> argument str (metavar "module from") <*> argument str (metavar "module to")
         csvCmd = ToCSV <$> switch (long "no-header" <> short 'n' <> help "Omit CSV header")
         some1 = fmap NE.fromList . some
@@ -88,7 +89,16 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
     let handleReverse = bool id reverseEdges optReverse
     graph <- handleReverse <$> getInput optGraph
     case optCommand of
-        Why from to      -> printStrs $ [from] <> ((" imports " <>) <$> why graph from to)
+        Why{..}      ->
+          if showAll
+          then
+              drawTree
+            $ fmap T.unpack
+            $ graphToTree fromModule
+            $ allPathsTo graph fromModule toModule
+          else
+            let explainer = if optReverse then " imports " else " imported by "
+            in printStrs $ [fromModule] <> ((explainer <>) <$> why graph fromModule toModule)
         AllPaths from to -> BL.putStr . encode . graphToDep $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m

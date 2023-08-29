@@ -16,3 +16,7 @@ install: graphex.cabal
 test: graphex.cabal
 	cabal test
 .PHONY: test
+
+fmt:
+	fd .hs --exec stylish-haskell -i
+.PHONY: fmt
