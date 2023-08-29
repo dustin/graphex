@@ -9,8 +9,20 @@ import qualified Data.Set        as Set
 import           Data.String     (IsString)
 import           Data.Text       (Text)
 
-newtype Graph = Graph { unGraph :: Map Text (Set Text) }
-    deriving stock (Eq)
+newtype Graph a = Graph { unGraph :: Map a (Set a) }
+  deriving stock Eq
+
+instance Ord a => Semigroup (Graph a) where
+  Graph x <> Graph y = Graph (Map.unionWith (<>) x y)
+
+instance Ord a => Monoid (Graph a) where
+  mempty = Graph mempty
+
+singletonGraph :: Ord a => a -> a -> Graph a
+singletonGraph k = mkGraph k . pure
+
+mkGraph :: Ord a => a -> [a] -> Graph a
+mkGraph k = Graph . Map.singleton k . Set.fromList
 
 -- Haskell
 data Import = Import
@@ -28,24 +40,15 @@ data Module = Module
   }
   deriving stock (Show)
 
-data ModuleGraph = ModuleGraph
-  { imports :: Map ModuleName (Set ModuleName)
-  }
-  deriving stock (Show, Eq)
+type ModuleGraph = Graph ModuleName
 
 singletonModuleGraph :: ModuleName -> ModuleName -> ModuleGraph
-singletonModuleGraph importer importee = ModuleGraph
-  { imports = Map.singleton importer (Set.singleton importee)
-  }
+singletonModuleGraph = singletonGraph
 
 mkModuleGraph :: ModuleName -> [ModuleName] -> ModuleGraph
-mkModuleGraph importer importees = ModuleGraph
-  { imports = Map.singleton importer (Set.fromList importees) }
+mkModuleGraph = mkGraph
 
-instance Semigroup ModuleGraph where
-  x <> y = ModuleGraph
-    { imports = Map.unionWith (<>) x.imports y.imports
-    }
-
-instance Monoid ModuleGraph where
-  mempty = ModuleGraph mempty
+-- | Convert a Graph of type @a@ to a Graph of type @b@.
+-- This is like a functor, but it can't be a functor because of laws and stuff.
+convertGraph :: Ord b => (a -> b) -> Graph a -> Graph b
+convertGraph f = foldMap (\(k, vs) -> Graph (Map.singleton (f k) (Set.map f vs))) . Map.assocs . unGraph

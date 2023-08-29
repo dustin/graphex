@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Spec where
 
 import           Control.Monad            (foldM, guard)
@@ -22,7 +24,10 @@ import           Graphex.Core
 import           Graphex.Search
 
 -- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
-instance Show Graph where
+instance Show (Graph Text) where
+    show (Graph m) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
+
+instance Show (Graph ModuleName) where
     show (Graph m) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
 
 -- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
@@ -32,7 +37,7 @@ someStrings =
      "alpha", "beta", "gamma", "delta", "list", "value", "result",
      "input", "output", "function", "variable"]
 
-instance Arbitrary Graph where
+instance Arbitrary (Graph Text) where
     arbitrary = do
         -- We begin with some subset of keys in arbitrary order
         somekeys <- shuffle =<< sublistOf someStrings
@@ -50,7 +55,7 @@ instance Arbitrary Graph where
                     keys = Set.fromList (fmap fst kvs)
 
 -- A DAG that we know contains the given node.
-data GraphWithKey = GraphWithKey Text Graph
+data GraphWithKey = GraphWithKey Text (Graph Text)
     deriving stock (Show, Eq, Generic)
 
 instance Arbitrary GraphWithKey where
@@ -63,7 +68,7 @@ instance Arbitrary GraphWithKey where
     shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
 
 -- A DAG that we know contains two keys that are connected (a path exists to the second one from the first one).
-data ConnectedGraph = ConnectedGraph Text Text Graph
+data ConnectedGraph = ConnectedGraph Text Text (Graph Text)
     deriving stock (Show, Eq, Generic)
 
 instance Arbitrary ConnectedGraph where
@@ -73,7 +78,7 @@ instance Arbitrary ConnectedGraph where
         to <- QC.elements (connMap Map.! from)
         pure $ ConnectedGraph from to g
         where
-            connections :: Graph -> Maybe (Graph, Map Text [Text])
+            connections :: Graph Text -> Maybe (Graph Text, Map Text [Text])
             connections g@(Graph m) = do
                 let connMap = Map.fromListWith (<>) [(k, [ks]) | k <- Map.keys m, ks <- Set.toList (Set.delete k $ allDepsOn g k)]
                 guard (not . Map.null $ connMap)
@@ -82,14 +87,14 @@ instance Arbitrary ConnectedGraph where
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
     shrink (ConnectedGraph from to g) = ConnectedGraph from to <$> filter (\(Graph m) -> Map.member from m && Map.member to m) (shrink g)
 
-prop_reverseEdgesId :: Graph -> Property
+prop_reverseEdgesId :: Graph Text -> Property
 prop_reverseEdgesId g =
     counterexample ("fwd: " <> show g <> "\n rev: " <> show rg) $
     g === reverseEdges (reverseEdges g)
     where
         rg = reverseEdges g
 
-prop_reversedDep :: Graph -> Property
+prop_reversedDep :: Graph Text -> Property
 prop_reversedDep g@(Graph m) =
     counterexample ("fwd: " <> show g <> "\nrev: " <> show rg) $
     all (\(k, vs) -> all (\k' -> k `elem` directDepsOn rg k') vs) (Map.assocs m)
@@ -99,7 +104,7 @@ prop_reversedDep g@(Graph m) =
 prop_reachableIsFindable :: ConnectedGraph -> Bool
 prop_reachableIsFindable gwk@(ConnectedGraph from to g) = not . null $ why g from to
 
-prop_negativePathfinding :: Graph  -> Property
+prop_negativePathfinding :: Graph Text -> Property
 prop_negativePathfinding g = forAll oneGoodKey (null . uncurry (why g))
     where oneGoodKey = do
             good <- elements someStrings
@@ -145,7 +150,7 @@ prop_allPaths gwk@(ConnectedGraph from to g) =
         checkPath True f  = hasPath f
         checkPath False f = not . hasPath f
 
-prop_importExport :: Graph -> Property
+prop_importExport :: Graph Text -> Property
 prop_importExport g =
     counterexample ("exported: " <> show exported <> "\nimported: " <> show imported) $
     imported === g
@@ -172,7 +177,7 @@ prop_treeDepsWorksWithCycles (ConnectedGraph from to g@(Graph m)) =
   where g' = Graph (Map.insertWith (<>) to (Set.singleton from) m)
         t = graphToTree from g'
 
-prop_treeDepsEmptiness :: Graph -> Property
+prop_treeDepsEmptiness :: Graph Text -> Property
 prop_treeDepsEmptiness g = counterexample (Tree.drawTree (T.unpack <$> t)) $ t === Tree.Node "non-existent-key" []
     where t = graphToTree "non-existent-key" g
 
@@ -182,13 +187,10 @@ instance Arbitrary ModuleName where
 prop_moduleSingleton :: ModuleName -> ModuleName -> Bool
 prop_moduleSingleton importer importee = singletonModuleGraph importer importee == mkModuleGraph importer [importee]
 
-toModuleGraph :: Graph -> ModuleGraph
-toModuleGraph (Graph m) = foldMap (\(k,v) -> mkModuleGraph (ModuleName k) (ModuleName <$> Set.toList v)) $ Map.assocs m
-
 instance EqProp ModuleGraph where (=-=) = eq
 
 instance Arbitrary ModuleGraph where
-    arbitrary = toModuleGraph <$> arbitrary
+    arbitrary = convertGraph ModuleName <$> arbitrary
 
 test_Instances :: [TestTree]
 test_Instances = [
