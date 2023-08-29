@@ -32,7 +32,7 @@ findFirst search rep nf start termination = find termination (search rep nf star
 -- The first argument is a representation function is used to deduplicate state.
 -- For some use cases where the entire state is valid, you can use 'id'.
 bfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
-bfsOn rep next = bfsWith (Set.insert . rep) (Set.member . rep) next
+bfsOn rep = bfsWith (Set.insert . rep) (Set.member . rep)
 
 -- | BFS with custom functions for remembering and recalling whether a state has been visited.
 bfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
@@ -47,7 +47,7 @@ bfsWith remember seenf next start = go mempty (qsingle start)
 
 -- | A DFS variant of 'bfsOn'.
 dfsOn :: Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
-dfsOn rep next = dfsWith (Set.insert . rep) (Set.member . rep) next
+dfsOn rep = dfsWith (Set.insert . rep) (Set.member . rep)
 
 -- | A DFS variant of 'bfsWith'.
 dfsWith :: Monoid s => (a -> s -> s) -> (a -> s -> Bool) -> (a -> [a]) -> a -> [a]
