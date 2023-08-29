@@ -20,3 +20,7 @@ test: graphex.cabal
 fmt:
 	fd .hs --exec stylish-haskell -i
 .PHONY: fmt
+
+graph.json:
+	cabal run -v0 exe:graphex -- cabal > graph.json
+.PHONY: graph.json

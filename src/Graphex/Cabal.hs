@@ -22,7 +22,8 @@ import Distribution.Verbosity(silent)
 import Distribution.PackageDescription
         ( PackageDescription(..)
         , Library(..), Executable(..)
-        , BuildInfo(..) )
+        , BuildInfo(..), TestSuite(..)
+        , unUnqualComponentName )
 import Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import Distribution.ModuleName qualified as Cabal
 
@@ -55,14 +56,33 @@ discoverCabalModules cabalFile = do
   let PackageDescription{..} = flattenPackageDescription gpd
   let candidateModules = mconcat
         [ do
-            Library{..} <- maybeToList library
+            Library{..} <- mconcat [maybeToList library, subLibraries]
             srcDir <- hsSourceDirs libBuildInfo
             exMod <- exposedModules
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
               , path = sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
-        ] -- TODO: exes + other-modules
+        , do
+            Executable{..} <- executables
+            srcDir <- hsSourceDirs buildInfo
+            otherMod <- "Main" : buildInfo.otherModules
+            pure Module
+              { name = fromString $
+                if otherMod == "Main"
+                then unUnqualComponentName exeName ++ "-Main"
+                else mconcat $ intersperse "." $ Cabal.components otherMod
+              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              }
+        , do
+            TestSuite{..} <- testSuites
+            srcDir <- hsSourceDirs testBuildInfo
+            otherMod <- testBuildInfo.otherModules
+            pure Module
+              { name = fromString $ mconcat $ intersperse "." $ Cabal.components otherMod
+              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              }
+        ]
 
   filterM (doesFileExist . (.path)) candidateModules
 
