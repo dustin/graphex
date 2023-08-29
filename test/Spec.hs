@@ -5,6 +5,8 @@ import qualified Data.Map.Strict       as Map
 import           Data.Set              (Set)
 import qualified Data.Set              as Set
 import           Data.Text             (Text)
+import qualified Data.Text             as T
+import qualified Data.Tree             as Tree
 import           GHC.Generics          (Generic)
 
 import           Test.Tasty
@@ -152,6 +154,12 @@ prop_floodVsBFS (GraphWithKey k g) = flood (directDepsOn g) k == Set.fromList (b
 prop_floodVsDFS :: GraphWithKey -> Bool
 prop_floodVsDFS (GraphWithKey k g) = flood (directDepsOn g) k == Set.fromList (dfsOn id (Set.toList . directDepsOn g) k)
 
+prop_treeDeps :: GraphWithKey -> Property
+prop_treeDeps (GraphWithKey k g) =
+    counterexample ("graph: " <> show g <> "\nTree:\n" <> Tree.drawTree (T.unpack <$> t)) $
+    allDepsOn g k === Set.fromList (Tree.flatten t)
+    where t = (graphToTree k g)
+
 tests :: [TestTree]
 tests = [
     testProperty "double edge reverse is id" prop_reverseEdgesId,
@@ -167,7 +175,8 @@ tests = [
     testProperty "restricted input should only contain nodes that are deps of the original" prop_restrictedNodesShouldBeDeps,
     testProperty "can round trip import/export of graph" prop_importExport,
     testProperty "flood finds the same set as BFS" prop_floodVsBFS,
-    testProperty "flood finds the same set as DFS" prop_floodVsDFS
+    testProperty "flood finds the same set as DFS" prop_floodVsDFS,
+    testProperty "tree contains all deps" prop_treeDeps
     ]
 
 main :: IO ()
