@@ -176,6 +176,12 @@ prop_treeDepsEmptiness :: Graph -> Property
 prop_treeDepsEmptiness g = counterexample (Tree.drawTree (T.unpack <$> t)) $ t === Tree.Node "non-existent-key" []
     where t = graphToTree "non-existent-key" g
 
+instance Arbitrary ModuleName where
+    arbitrary = ModuleName <$> elements someStrings
+
+prop_moduleSingleton :: ModuleName -> ModuleName -> Bool
+prop_moduleSingleton importer importee = singletonModuleGraph importer importee == mkModuleGraph importer [importee]
+
 toModuleGraph :: Graph -> ModuleGraph
 toModuleGraph (Graph m) = foldMap (\(k,v) -> mkModuleGraph (ModuleName k) (ModuleName <$> Set.toList v)) $ Map.assocs m
 
