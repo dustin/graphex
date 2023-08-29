@@ -53,13 +53,13 @@ span.spaces    { background: white }
 <span class="lineno">   34 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
 <span class="lineno">   35 </span>
 <span class="lineno">   36 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
-<span class="lineno">   37 </span><span class="decl"><span class="nottickedoff">singletonModuleGraph importer importee = ModuleGraph</span>
-<span class="lineno">   38 </span><span class="spaces">  </span><span class="nottickedoff">{ imports = Map.singleton importer (Set.singleton importee)</span>
-<span class="lineno">   39 </span><span class="spaces">  </span><span class="nottickedoff">}</span></span>
+<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">singletonModuleGraph importer importee = ModuleGraph</span>
+<span class="lineno">   38 </span><span class="spaces">  </span><span class="istickedoff">{ imports = Map.singleton importer (Set.singleton importee)</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">}</span></span>
 <span class="lineno">   40 </span>
 <span class="lineno">   41 </span>mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
-<span class="lineno">   42 </span><span class="decl"><span class="nottickedoff">mkModuleGraph importer importees = ModuleGraph</span>
-<span class="lineno">   43 </span><span class="spaces">  </span><span class="nottickedoff">{ imports = Map.singleton importer (Set.fromList importees) }</span></span>
+<span class="lineno">   42 </span><span class="decl"><span class="istickedoff">mkModuleGraph importer importees = ModuleGraph</span>
+<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">{ imports = Map.singleton importer (Set.fromList importees) }</span></span>
 <span class="lineno">   44 </span>
 <span class="lineno">   45 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Semigroup ModuleGraph</span></span></span></span> where
 <span class="lineno">   46 </span>  <span class="decl"><span class="istickedoff">x &lt;&gt; y = ModuleGraph</span>

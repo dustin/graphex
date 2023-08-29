@@ -11,7 +11,7 @@
 </span><span id="line-11"></span><span>
 </span><span id="line-12"></span><span class="hs-keyword">newtype</span><span> </span><span id="Graph"><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Graph"><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unGraph"><span class="annot"><span class="annottext">Graph -&gt; Map Text (Set Text)
 </span><a href="Graphex.Core.html#unGraph"><span class="hs-identifier hs-var hs-var">unGraph</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-13"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115834"><span id="local-6989586621679115840"><span class="annot"><span class="annottext">Graph -&gt; Graph -&gt; Bool
+</span><span id="line-13"></span><span>    </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115832"><span id="local-6989586621679115838"><span class="annot"><span class="annottext">Graph -&gt; Graph -&gt; Bool
 (Graph -&gt; Graph -&gt; Bool) -&gt; (Graph -&gt; Graph -&gt; Bool) -&gt; Eq Graph
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c== :: Graph -&gt; Graph -&gt; Bool
@@ -26,7 +26,7 @@ $c/= :: Graph -&gt; Graph -&gt; Bool
 </span><a href="Graphex.Core.html#module_"><span class="hs-identifier hs-var hs-var">module_</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span>
 </span><span id="line-18"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="package"><span class="annot"><span class="annottext">Import -&gt; Maybe Text
 </span><a href="Graphex.Core.html#package"><span class="hs-identifier hs-var hs-var">package</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-19"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115850"><span id="local-6989586621679115859"><span id="local-6989586621679115863"><span class="annot"><span class="annottext">Int -&gt; Import -&gt; ShowS
+</span><span id="line-19"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115848"><span id="local-6989586621679115857"><span id="local-6989586621679115861"><span class="annot"><span class="annottext">Int -&gt; Import -&gt; ShowS
 [Import] -&gt; ShowS
 Import -&gt; String
 (Int -&gt; Import -&gt; ShowS)
@@ -43,7 +43,7 @@ showList :: [Import] -&gt; ShowS
 </span><span id="line-20"></span><span>
 </span><span id="line-21"></span><span class="hs-keyword">newtype</span><span> </span><span id="ModuleName"><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-var">ModuleName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="ModuleName"><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-var">ModuleName</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unModuleName"><span class="annot"><span class="annottext">ModuleName -&gt; Text
 </span><a href="Graphex.Core.html#unModuleName"><span class="hs-identifier hs-var hs-var">unModuleName</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-22"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115870"><span id="local-6989586621679115874"><span class="annot"><span class="annottext">ModuleName -&gt; ModuleName -&gt; Bool
+</span><span id="line-22"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115868"><span id="local-6989586621679115872"><span class="annot"><span class="annottext">ModuleName -&gt; ModuleName -&gt; Bool
 (ModuleName -&gt; ModuleName -&gt; Bool)
 -&gt; (ModuleName -&gt; ModuleName -&gt; Bool) -&gt; Eq ModuleName
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -51,7 +51,7 @@ $c== :: ModuleName -&gt; ModuleName -&gt; Bool
 == :: ModuleName -&gt; ModuleName -&gt; Bool
 $c/= :: ModuleName -&gt; ModuleName -&gt; Bool
 /= :: ModuleName -&gt; ModuleName -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679115881"><span id="local-6989586621679115886"><span id="local-6989586621679115890"><span id="local-6989586621679115894"><span id="local-6989586621679115898"><span id="local-6989586621679115902"><span id="local-6989586621679115906"><span class="annot"><span class="annottext">Eq ModuleName
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679115879"><span id="local-6989586621679115884"><span id="local-6989586621679115888"><span id="local-6989586621679115892"><span id="local-6989586621679115896"><span id="local-6989586621679115900"><span id="local-6989586621679115904"><span class="annot"><span class="annottext">Eq ModuleName
 Eq ModuleName
 -&gt; (ModuleName -&gt; ModuleName -&gt; Ordering)
 -&gt; (ModuleName -&gt; ModuleName -&gt; Bool)
@@ -88,13 +88,13 @@ $cmax :: ModuleName -&gt; ModuleName -&gt; ModuleName
 max :: ModuleName -&gt; ModuleName -&gt; ModuleName
 $cmin :: ModuleName -&gt; ModuleName -&gt; ModuleName
 min :: ModuleName -&gt; ModuleName -&gt; ModuleName
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679115911"><span class="annot"><span class="annottext">String -&gt; ModuleName
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679115909"><span class="annot"><span class="annottext">String -&gt; ModuleName
 (String -&gt; ModuleName) -&gt; IsString ModuleName
 forall a. (String -&gt; a) -&gt; IsString a
 $cfromString :: String -&gt; ModuleName
 fromString :: String -&gt; ModuleName
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-23"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115918"><span id="local-6989586621679115922"><span id="local-6989586621679115925"><span class="annot"><span class="annottext">Int -&gt; ModuleName -&gt; ShowS
+</span><span id="line-23"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115916"><span id="local-6989586621679115920"><span id="local-6989586621679115923"><span class="annot"><span class="annottext">Int -&gt; ModuleName -&gt; ShowS
 [ModuleName] -&gt; ShowS
 ModuleName -&gt; String
 (Int -&gt; ModuleName -&gt; ShowS)
@@ -117,7 +117,7 @@ showList :: [ModuleName] -&gt; ShowS
 </span><span id="line-27"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="path"><span class="annot"><span class="annottext">Module -&gt; String
 </span><a href="Graphex.Core.html#path"><span class="hs-identifier hs-var hs-var">path</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span>
 </span><span id="line-28"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-29"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115932"><span id="local-6989586621679115939"><span id="local-6989586621679115943"><span class="annot"><span class="annottext">Int -&gt; Module -&gt; ShowS
+</span><span id="line-29"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115930"><span id="local-6989586621679115937"><span id="local-6989586621679115941"><span class="annot"><span class="annottext">Int -&gt; Module -&gt; ShowS
 [Module] -&gt; ShowS
 Module -&gt; String
 (Int -&gt; Module -&gt; ShowS)
@@ -136,7 +136,7 @@ showList :: [Module] -&gt; ShowS
 </span><span id="line-32"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="imports"><span class="annot"><span class="annottext">ModuleGraph -&gt; Map ModuleName (Set ModuleName)
 </span><a href="Graphex.Core.html#imports"><span class="hs-identifier hs-var hs-var">imports</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-33"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-34"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115949"><span id="local-6989586621679115956"><span id="local-6989586621679115960"><span class="annot"><span class="annottext">Int -&gt; ModuleGraph -&gt; ShowS
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679115947"><span id="local-6989586621679115954"><span id="local-6989586621679115958"><span class="annot"><span class="annottext">Int -&gt; ModuleGraph -&gt; ShowS
 [ModuleGraph] -&gt; ShowS
 ModuleGraph -&gt; String
 (Int -&gt; ModuleGraph -&gt; ShowS)
@@ -151,7 +151,7 @@ $cshow :: ModuleGraph -&gt; String
 show :: ModuleGraph -&gt; String
 $cshowList :: [ModuleGraph] -&gt; ShowS
 showList :: [ModuleGraph] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679115964"><span id="local-6989586621679115969"><span class="annot"><span class="annottext">ModuleGraph -&gt; ModuleGraph -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679115962"><span id="local-6989586621679115967"><span class="annot"><span class="annottext">ModuleGraph -&gt; ModuleGraph -&gt; Bool
 (ModuleGraph -&gt; ModuleGraph -&gt; Bool)
 -&gt; (ModuleGraph -&gt; ModuleGraph -&gt; Bool) -&gt; Eq ModuleGraph
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -163,38 +163,38 @@ $c/= :: ModuleGraph -&gt; ModuleGraph -&gt; Bool
 </span><span id="line-35"></span><span>
 </span><span id="line-36"></span><span class="annot"><a href="Graphex.Core.html#singletonModuleGraph"><span class="hs-identifier hs-type">singletonModuleGraph</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
 </span><span id="line-37"></span><span id="singletonModuleGraph"><span class="annot"><span class="annottext">singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
-</span><a href="Graphex.Core.html#singletonModuleGraph"><span class="hs-identifier hs-var hs-var">singletonModuleGraph</span></a></span></span><span> </span><span id="local-6989586621679115973"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679115973"><span class="hs-identifier hs-var">importer</span></a></span></span><span> </span><span id="local-6989586621679115974"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679115974"><span class="hs-identifier hs-var">importee</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
+</span><a href="Graphex.Core.html#singletonModuleGraph"><span class="hs-identifier hs-var hs-var">singletonModuleGraph</span></a></span></span><span> </span><span id="local-6989586621679115971"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679115971"><span class="hs-identifier hs-var">importer</span></a></span></span><span> </span><span id="local-6989586621679115972"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679115972"><span class="hs-identifier hs-var">importee</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
 </span><span id="line-38"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">imports :: Map ModuleName (Set ModuleName)
 </span><a href="Graphex.Core.html#imports"><span class="hs-identifier hs-var">imports</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; Set ModuleName -&gt; Map ModuleName (Set ModuleName)
 forall k a. k -&gt; a -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679115973"><span class="hs-identifier hs-var">importer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ModuleName -&gt; Set ModuleName
+</span><a href="#local-6989586621679115971"><span class="hs-identifier hs-var">importer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ModuleName -&gt; Set ModuleName
 forall a. a -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.singleton</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679115974"><span class="hs-identifier hs-var">importee</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679115972"><span class="hs-identifier hs-var">importee</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-39"></span><span>  </span><span class="hs-special">}</span><span>
 </span><span id="line-40"></span><span>
 </span><span id="line-41"></span><span class="annot"><a href="Graphex.Core.html#mkModuleGraph"><span class="hs-identifier hs-type">mkModuleGraph</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
 </span><span id="line-42"></span><span id="mkModuleGraph"><span class="annot"><span class="annottext">mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
-</span><a href="Graphex.Core.html#mkModuleGraph"><span class="hs-identifier hs-var hs-var">mkModuleGraph</span></a></span></span><span> </span><span id="local-6989586621679115978"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679115978"><span class="hs-identifier hs-var">importer</span></a></span></span><span> </span><span id="local-6989586621679115979"><span class="annot"><span class="annottext">[ModuleName]
-</span><a href="#local-6989586621679115979"><span class="hs-identifier hs-var">importees</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
+</span><a href="Graphex.Core.html#mkModuleGraph"><span class="hs-identifier hs-var hs-var">mkModuleGraph</span></a></span></span><span> </span><span id="local-6989586621679115976"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679115976"><span class="hs-identifier hs-var">importer</span></a></span></span><span> </span><span id="local-6989586621679115977"><span class="annot"><span class="annottext">[ModuleName]
+</span><a href="#local-6989586621679115977"><span class="hs-identifier hs-var">importees</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
 </span><span id="line-43"></span><span>  </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">imports :: Map ModuleName (Set ModuleName)
 </span><a href="Graphex.Core.html#imports"><span class="hs-identifier hs-var">imports</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; Set ModuleName -&gt; Map ModuleName (Set ModuleName)
 forall k a. k -&gt; a -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.singleton</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679115978"><span class="hs-identifier hs-var">importer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[ModuleName] -&gt; Set ModuleName
+</span><a href="#local-6989586621679115976"><span class="hs-identifier hs-var">importer</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[ModuleName] -&gt; Set ModuleName
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.fromList</span></span><span> </span><span class="annot"><span class="annottext">[ModuleName]
-</span><a href="#local-6989586621679115979"><span class="hs-identifier hs-var">importees</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">}</span><span>
+</span><a href="#local-6989586621679115977"><span class="hs-identifier hs-var">importees</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">}</span><span>
 </span><span id="line-44"></span><span>
-</span><span id="line-45"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679115983"><span id="local-6989586621679115987"><span class="annot"><span class="hs-identifier hs-type">Semigroup</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-46"></span><span>  </span><span id="local-6989586621679115997"><span class="annot"><span class="annottext">ModuleGraph
-</span><a href="#local-6989586621679115997"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679115998"><span class="annot"><span class="annottext">&lt;&gt; :: ModuleGraph -&gt; ModuleGraph -&gt; ModuleGraph
-</span><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;&gt;</span></span></span><span> </span><span id="local-6989586621679115999"><span class="annot"><span class="annottext">ModuleGraph
-</span><a href="#local-6989586621679115999"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
+</span><span id="line-45"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679115981"><span id="local-6989586621679115985"><span class="annot"><span class="hs-identifier hs-type">Semigroup</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-46"></span><span>  </span><span id="local-6989586621679115995"><span class="annot"><span class="annottext">ModuleGraph
+</span><a href="#local-6989586621679115995"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679115996"><span class="annot"><span class="annottext">&lt;&gt; :: ModuleGraph -&gt; ModuleGraph -&gt; ModuleGraph
+</span><span class="hs-operator hs-var hs-var hs-var hs-var">&lt;&gt;</span></span></span><span> </span><span id="local-6989586621679115997"><span class="annot"><span class="annottext">ModuleGraph
+</span><a href="#local-6989586621679115997"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
 </span><span id="line-47"></span><span>    </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">imports :: Map ModuleName (Set ModuleName)
 </span><a href="Graphex.Core.html#imports"><span class="hs-identifier hs-var">imports</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set ModuleName -&gt; Set ModuleName -&gt; Set ModuleName)
 -&gt; Map ModuleName (Set ModuleName)
@@ -204,12 +204,12 @@ forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; Map k a -&gt; Map k a -&gt; Ma
 </span><span class="hs-identifier hs-var">Map.unionWith</span></span><span> </span><span class="annot"><span class="annottext">Set ModuleName -&gt; Set ModuleName -&gt; Set ModuleName
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">(&lt;&gt;)</span></span><span> </span><span class="annot"><span class="annottext">ModuleGraph
-</span><a href="#local-6989586621679115997"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-operator">.</span><span class="hs-identifier">imports</span><span> </span><span class="annot"><span class="annottext">ModuleGraph
-</span><a href="#local-6989586621679115999"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-operator">.</span><span class="hs-identifier">imports</span><span>
+</span><a href="#local-6989586621679115995"><span class="hs-identifier hs-var">x</span></a></span><span class="hs-operator">.</span><span class="hs-identifier">imports</span><span> </span><span class="annot"><span class="annottext">ModuleGraph
+</span><a href="#local-6989586621679115997"><span class="hs-identifier hs-var">y</span></a></span><span class="hs-operator">.</span><span class="hs-identifier">imports</span><span>
 </span><span id="line-48"></span><span>    </span><span class="hs-special">}</span><span>
 </span><span id="line-49"></span><span>
-</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679116005"><span id="local-6989586621679116009"><span class="annot"><span class="hs-identifier hs-type">Monoid</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-51"></span><span>  </span><span id="local-6989586621679116014"><span class="annot"><span class="annottext">mempty :: ModuleGraph
+</span><span id="line-50"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679116003"><span id="local-6989586621679116007"><span class="annot"><span class="hs-identifier hs-type">Monoid</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-51"></span><span>  </span><span id="local-6989586621679116012"><span class="annot"><span class="annottext">mempty :: ModuleGraph
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">mempty</span></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName) -&gt; ModuleGraph
 </span><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-var">ModuleGraph</span></a></span><span> </span><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName)
 forall a. Monoid a =&gt; a
