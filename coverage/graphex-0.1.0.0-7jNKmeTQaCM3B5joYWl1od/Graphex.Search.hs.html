@@ -40,7 +40,7 @@ span.spaces    { background: white }
 <span class="lineno">   21 </span><span class="spaces"></span><span class="istickedoff">qappendList (Queue [] r) xs  = <span class="nottickedoff">Queue (reverse r) (reverse xs)</span></span>
 <span class="lineno">   22 </span><span class="spaces"></span><span class="istickedoff">qappendList (Queue l r) xs   = Queue l (reverse xs &lt;&gt; r)</span></span>
 <span class="lineno">   23 </span>
-<span class="lineno">   24 </span>type SearchFunction r a = Ord r =&gt; (a -&gt; r) -&gt; (a -&gt; [a]) -&gt; a -&gt; [a]
+<span class="lineno">   24 </span>type SearchFunction r a = (a -&gt; r) -&gt; (a -&gt; [a]) -&gt; a -&gt; [a]
 <span class="lineno">   25 </span>
 <span class="lineno">   26 </span>-- | Find the first match using the given search function (e.g., bfsOn or dfsOn).
 <span class="lineno">   27 </span>findFirst :: Ord r =&gt; SearchFunction r a -&gt; (a -&gt; r) -&gt; (a -&gt; [a]) -&gt; a -&gt; (a -&gt; Bool) -&gt; Maybe a
