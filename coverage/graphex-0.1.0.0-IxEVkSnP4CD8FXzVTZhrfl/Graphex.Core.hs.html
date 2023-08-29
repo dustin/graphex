@@ -1,0 +1,74 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-# LANGUAGE OverloadedRecordDot #-}
+<span class="lineno">    2 </span>{-# LANGUAGE StrictData #-}
+<span class="lineno">    3 </span>module Graphex.Core where
+<span class="lineno">    4 </span>
+<span class="lineno">    5 </span>import Data.String (IsString)
+<span class="lineno">    6 </span>import           Data.Map                    (Map)
+<span class="lineno">    7 </span>import qualified Data.Map.Strict             as Map
+<span class="lineno">    8 </span>import           Data.Set                    (Set)
+<span class="lineno">    9 </span>import qualified Data.Set                    as Set
+<span class="lineno">   10 </span>import           Data.Text                   (Text)
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>newtype Graph = Graph { <span class="istickedoff"><span class="decl"><span class="istickedoff">unGraph</span></span></span> :: Map Text (Set Text) }
+<span class="lineno">   13 </span>    deriving stock (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>-- Haskell
+<span class="lineno">   16 </span>data Import = Import
+<span class="lineno">   17 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">module_</span></span></span> :: ModuleName
+<span class="lineno">   18 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">package</span></span></span> :: Maybe Text
+<span class="lineno">   19 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>newtype ModuleName = ModuleName { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unModuleName</span></span></span> :: Text }
+<span class="lineno">   22 </span>  deriving newtype (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">IsString</span></span>)
+<span class="lineno">   23 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   24 </span>
+<span class="lineno">   25 </span>data Module = Module
+<span class="lineno">   26 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">name</span></span></span> :: ModuleName
+<span class="lineno">   27 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">path</span></span></span> :: FilePath
+<span class="lineno">   28 </span>  }
+<span class="lineno">   29 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   30 </span>
+<span class="lineno">   31 </span>data ModuleGraph = ModuleGraph
+<span class="lineno">   32 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">imports</span></span></span> :: Map ModuleName (Set ModuleName)
+<span class="lineno">   33 </span>  }
+<span class="lineno">   34 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
+<span class="lineno">   37 </span><span class="decl"><span class="nottickedoff">singletonModuleGraph importer importee = ModuleGraph</span>
+<span class="lineno">   38 </span><span class="spaces">  </span><span class="nottickedoff">{ imports = Map.singleton importer (Set.singleton importee)</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="nottickedoff">}</span></span>
+<span class="lineno">   40 </span>
+<span class="lineno">   41 </span>mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
+<span class="lineno">   42 </span><span class="decl"><span class="nottickedoff">mkModuleGraph importer importees = ModuleGraph</span>
+<span class="lineno">   43 </span><span class="spaces">  </span><span class="nottickedoff">{ imports = Map.singleton importer (Set.fromList importees) }</span></span>
+<span class="lineno">   44 </span>
+<span class="lineno">   45 </span>instance <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Semigroup ModuleGraph</span></span></span></span> where
+<span class="lineno">   46 </span>  <span class="decl"><span class="nottickedoff">x &lt;&gt; y = ModuleGraph</span>
+<span class="lineno">   47 </span><span class="spaces">    </span><span class="nottickedoff">{ imports = Map.unionWith (&lt;&gt;) x.imports y.imports</span>
+<span class="lineno">   48 </span><span class="spaces">    </span><span class="nottickedoff">}</span></span>
+<span class="lineno">   49 </span>
+<span class="lineno">   50 </span>instance <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Monoid ModuleGraph</span></span></span></span> where
+<span class="lineno">   51 </span>  <span class="decl"><span class="nottickedoff">mempty = ModuleGraph mempty</span></span>
+
+</pre>
+</body>
+</html>
