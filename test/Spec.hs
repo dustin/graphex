@@ -80,7 +80,7 @@ instance Arbitrary ConnectedGraph where
                 pure (g, connMap)
 
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
-    shrink (ConnectedGraph from to g) = ConnectedGraph from to <$> filter ((\(Graph m) -> Map.member from m && Map.member to m)) (shrink g)
+    shrink (ConnectedGraph from to g) = ConnectedGraph from to <$> filter (\(Graph m) -> Map.member from m && Map.member to m) (shrink g)
 
 prop_reverseEdgesId :: Graph -> Property
 prop_reverseEdgesId g =
@@ -124,7 +124,7 @@ prop_restrictedNodesShouldBeDeps (GraphWithKey k g) =
       edges = Map.toList (unGraph restricted)
       validNodes = Set.insert k $ allDepsOn g k
   in counterexample ("restricted: " <> show restricted) $
-     all (\(k, vs) -> Set.member k validNodes && all (flip Set.member validNodes) vs) edges
+     all (\(k, vs) -> Set.member k validNodes && all (`Set.member` validNodes) vs) edges
 
 prop_allPathsShouldIncludeShortest :: ConnectedGraph -> Property
 prop_allPathsShouldIncludeShortest gwk@(ConnectedGraph from to g) =
@@ -163,7 +163,7 @@ prop_treeDeps :: GraphWithKey -> Property
 prop_treeDeps (GraphWithKey k g) =
     counterexample ("graph: " <> show g <> "\nTree:\n" <> Tree.drawTree (T.unpack <$> t)) $
     allDepsOn g k === Set.fromList (Tree.flatten t)
-    where t = (graphToTree k g)
+    where t = graphToTree k g
 
 prop_treeDepsWorksWithCycles :: ConnectedGraph -> Property
 prop_treeDepsWorksWithCycles (ConnectedGraph from to g@(Graph m)) =
@@ -177,7 +177,7 @@ prop_treeDepsEmptiness g = counterexample (Tree.drawTree (T.unpack <$> t)) $ t =
     where t = graphToTree "non-existent-key" g
 
 toModuleGraph :: Graph -> ModuleGraph
-toModuleGraph (Graph m) = ModuleGraph $ Map.fromListWith (<>) [(ModuleName k, Set.map ModuleName vs) | (k, vs) <- Map.assocs m]
+toModuleGraph (Graph m) = foldMap (\(k,v) -> mkModuleGraph (ModuleName k) (ModuleName <$> Set.toList v)) $ Map.assocs m
 
 instance EqProp ModuleGraph where (=-=) = eq
 
