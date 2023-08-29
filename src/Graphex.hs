@@ -4,12 +4,11 @@ module Graphex (Graph(..),
     why, rankings, allPathsTo, restrictTo, mapMaybeWithKey,
     graphToDep, depToGraph, graphToTree) where
 
-import           Algorithm.Search            (dijkstra)
 import           Control.Monad               (ap)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
-import           Data.Maybe                  (mapMaybe)
+import           Data.Maybe                  (fromMaybe, mapMaybe)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
@@ -18,7 +17,7 @@ import qualified Data.Tree                   as Tree
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
-import           Graphex.Search              (flood)
+import           Graphex.Search              (bfsOn, findFirst, flood)
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph
@@ -52,7 +51,7 @@ allDepsOn = flood . directDepsOn
 --
 -- This is a short path, but the important part is that it represents how connectivy works.
 why :: Graph -> Text -> Text -> [Text]
-why m from to = maybe [] snd $ dijkstra (directDepsOn m) (const (const (1::Int))) (== to) from
+why m from to = fromMaybe [] $ findFirst bfsOn head (\ks -> (:ks) <$> (Set.toList . directDepsOn m . head) ks) [from] ((== to) . head)
 
 -- | Find all paths between two modules as a restricted graph of the intersection of
 -- reachable nodes from the start and to the end.

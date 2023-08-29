@@ -26,7 +26,6 @@ dependencies:
 - optparse-applicative
 - text
 - bytestring
-- search-algorithms
 - parallel
 - Cabal
 - megaparsec
