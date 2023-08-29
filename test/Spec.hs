@@ -162,3 +162,13 @@ prop_treeDeps (GraphWithKey k g) =
     allDepsOn g k === Set.fromList (Tree.flatten t)
     where t = (graphToTree k g)
 
+prop_treeDepsWorksWithCycles :: ConnectedGraph -> Property
+prop_treeDepsWorksWithCycles (ConnectedGraph from to g@(Graph m)) =
+    counterexample (Tree.drawTree (T.unpack <$> t)) $
+    allDepsOn g from === Set.fromList (Tree.flatten t)
+  where g' = Graph (Map.insertWith (<>) to (Set.singleton from) m)
+        t = graphToTree from g'
+
+prop_treeDepsEmptiness :: Graph -> Property
+prop_treeDepsEmptiness g = counterexample (Tree.drawTree (T.unpack <$> t)) $ t === Tree.Node "non-existent-key" []
+    where t = graphToTree "non-existent-key" g
