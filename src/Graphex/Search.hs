@@ -21,7 +21,7 @@ qappendList (Queue [] []) xs = Queue xs []
 qappendList (Queue [] r) xs  = Queue (reverse r) (reverse xs)
 qappendList (Queue l r) xs   = Queue l (reverse xs <> r)
 
-type SearchFunction r a = Ord r => (a -> r) -> (a -> [a]) -> a -> [a]
+type SearchFunction r a = (a -> r) -> (a -> [a]) -> a -> [a]
 
 -- | Find the first match using the given search function (e.g., bfsOn or dfsOn).
 findFirst :: Ord r => SearchFunction r a -> (a -> r) -> (a -> [a]) -> a -> (a -> Bool) -> Maybe a
