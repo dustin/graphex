@@ -8,9 +8,11 @@
 @version 0.1.0.0
 
 module Graphex.Core
-newtype Graph
-Graph :: Map Text (Set Text) -> Graph
-[unGraph] :: Graph -> Map Text (Set Text)
+newtype Graph a
+Graph :: Map a (Set a) -> Graph a
+[unGraph] :: Graph a -> Map a (Set a)
+singletonGraph :: Ord a => a -> a -> Graph a
+mkGraph :: Ord a => a -> [a] -> Graph a
 data Import
 Import :: ModuleName -> Maybe Text -> Import
 [module_] :: Import -> ModuleName
@@ -22,29 +24,30 @@ data Module
 Module :: ModuleName -> FilePath -> Module
 [name] :: Module -> ModuleName
 [path] :: Module -> FilePath
-data ModuleGraph
-ModuleGraph :: Map ModuleName (Set ModuleName) -> ModuleGraph
-[imports] :: ModuleGraph -> Map ModuleName (Set ModuleName)
+type ModuleGraph = Graph ModuleName
 singletonModuleGraph :: ModuleName -> ModuleName -> ModuleGraph
 mkModuleGraph :: ModuleName -> [ModuleName] -> ModuleGraph
-instance GHC.Classes.Eq Graphex.Core.Graph
+
+-- | Convert a Graph of type <tt>a</tt> to a Graph of type <tt>b</tt>. This
+--   is like a functor, but it can't be a functor because of laws and
+--   stuff.
+convertGraph :: Ord b => (a -> b) -> Graph a -> Graph b
+instance GHC.Classes.Eq a => GHC.Classes.Eq (Graphex.Core.Graph a)
 instance GHC.Show.Show Graphex.Core.ModuleName
 instance Data.String.IsString Graphex.Core.ModuleName
 instance GHC.Classes.Ord Graphex.Core.ModuleName
 instance GHC.Classes.Eq Graphex.Core.ModuleName
 instance GHC.Show.Show Graphex.Core.Import
 instance GHC.Show.Show Graphex.Core.Module
-instance GHC.Classes.Eq Graphex.Core.ModuleGraph
-instance GHC.Show.Show Graphex.Core.ModuleGraph
-instance GHC.Base.Semigroup Graphex.Core.ModuleGraph
-instance GHC.Base.Monoid Graphex.Core.ModuleGraph
+instance GHC.Classes.Ord a => GHC.Base.Semigroup (Graphex.Core.Graph a)
+instance GHC.Classes.Ord a => GHC.Base.Monoid (Graphex.Core.Graph a)
 
 module Graphex.CSV
 data Edge
 Edge :: Text -> Text -> Edge
 [from] :: Edge -> Text
 [to] :: Edge -> Text
-toEdges :: Graph -> [Edge]
+toEdges :: Graph Text -> [Edge]
 instance Data.Csv.Conversion.ToNamedRecord Graphex.CSV.Edge
 instance Data.Csv.Conversion.ToRecord Graphex.CSV.Edge
 instance Data.Csv.Conversion.DefaultOrdered Graphex.CSV.Edge
@@ -135,45 +138,45 @@ findFirst :: Ord r => SearchFunction r a -> (a -> r) -> (a -> [a]) -> a -> (a ->
 flood :: Ord a => (a -> Set a) -> a -> Set a
 
 module Graphex
-newtype Graph
-Graph :: Map Text (Set Text) -> Graph
-[unGraph] :: Graph -> Map Text (Set Text)
+newtype Graph a
+Graph :: Map a (Set a) -> Graph a
+[unGraph] :: Graph a -> Map a (Set a)
 
 -- | Reverse all the arrows in the graphs.
-reverseEdges :: Graph -> Graph
+reverseEdges :: Ord a => Graph a -> Graph a
 
 -- | Find the direct list of things that are referencing this module.
-directDepsOn :: Graph -> Text -> Set Text
+directDepsOn :: Ord a => Graph a -> a -> Set a
 
 -- | Flood fill to find all transitive dependencies on a starting module,
 --   excluding the original key.
-allDepsOn :: Graph -> Text -> Set Text
+allDepsOn :: Ord a => Graph a -> a -> Set a
 
 -- | Find an example path between two modules.
 --   
 --   This is a short path, but the important part is that it represents how
 --   connectivy works.
-why :: Graph -> Text -> Text -> [Text]
+why :: Ord a => Graph a -> a -> a -> [a]
 
 -- | Count the number of transitive dependencies for each module.
-rankings :: Graph -> Map Text Int
+rankings :: (NFData a, Ord a) => Graph a -> Map a Int
 
 -- | Find all paths between two modules as a restricted graph of the
 --   intersection of reachable nodes from the start and to the end.
-allPathsTo :: Graph -> Text -> Text -> Graph
+allPathsTo :: (NFData a, Ord a) => Graph a -> a -> a -> Graph a
 
 -- | Restrict a graph to only the given set of modules.
-restrictTo :: Graph -> Set Text -> Graph
+restrictTo :: (Ord a, NFData a) => Graph a -> Set a -> Graph a
 
 -- | Visit each node in the graph and apply a function to it.
-mapMaybeWithKey :: NFData a => (Text -> Maybe a) -> Graph -> [(Text, a)]
+mapMaybeWithKey :: (NFData a, NFData g) => (g -> Maybe a) -> Graph g -> [(g, a)]
 
 -- | Convert a graph back to our dependency file format.
-graphToDep :: Graph -> GraphDef
+graphToDep :: Graph Text -> GraphDef
 
 -- | Convert a dependency file to a graph.
-depToGraph :: GraphDef -> Graph
+depToGraph :: GraphDef -> Graph Text
 
 -- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point
 --   as a leaf.
-graphToTree :: Text -> Graph -> Tree Text
+graphToTree :: Ord a => a -> Graph a -> Tree a

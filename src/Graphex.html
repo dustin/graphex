@@ -20,9 +20,9 @@
 </span><span id="line-20"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Graphex.Search.html"><span class="hs-identifier">Graphex.Search</span></a></span><span>              </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Search.html#bfsOn"><span class="hs-identifier">bfsOn</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Graphex.Search.html#findFirst"><span class="hs-identifier">findFirst</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Graphex.Search.html#flood"><span class="hs-identifier">flood</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-21"></span><span>
 </span><span id="line-22"></span><span class="annot"><span class="hs-comment">-- | Convert a dependency file to a graph.</span></span><span>
-</span><span id="line-23"></span><span class="annot"><a href="Graphex.html#depToGraph"><span class="hs-identifier hs-type">depToGraph</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span>
-</span><span id="line-24"></span><span id="depToGraph"><span class="annot"><span class="annottext">depToGraph :: GraphDef -&gt; Graph
-</span><a href="Graphex.html#depToGraph"><span class="hs-identifier hs-var hs-var">depToGraph</span></a></span></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span class="hs-special">{</span><span id="local-6989586621679117890"><span id="local-6989586621679117891"><span id="local-6989586621679117892"><span class="annot"><span class="annottext">[Edge]
+</span><span id="line-23"></span><span class="annot"><a href="Graphex.html#depToGraph"><span class="hs-identifier hs-type">depToGraph</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-24"></span><span id="depToGraph"><span class="annot"><span class="annottext">depToGraph :: GraphDef -&gt; Graph Text
+</span><a href="Graphex.html#depToGraph"><span class="hs-identifier hs-var hs-var">depToGraph</span></a></span></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118246"><span id="local-6989586621679118247"><span id="local-6989586621679118248"><span class="annot"><span class="annottext">[Edge]
 Map Text Node
 Text
 title :: Text
@@ -31,390 +31,399 @@ edges :: [Edge]
 title :: GraphDef -&gt; Text
 nodes :: GraphDef -&gt; Map Text Node
 edges :: GraphDef -&gt; [Edge]
-</span><a href="#local-6989586621679117890"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Graph
+</span><a href="#local-6989586621679118246"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Graph Text
+forall a. Map a (Set a) -&gt; Graph a
 </span><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117897"><span class="hs-identifier hs-var">links</span></a></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Map Text (Set Text) -&gt; Map Text (Set Text)
+</span><a href="#local-6989586621679118253"><span class="hs-identifier hs-var">links</span></a></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Map Text (Set Text) -&gt; Map Text (Set Text)
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117898"><span class="hs-identifier hs-var">allNodes</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679118254"><span class="hs-identifier hs-var">allNodes</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-25"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-26"></span><span>        </span><span id="local-6989586621679117897"><span class="annot"><span class="annottext">links :: Map Text (Set Text)
-</span><a href="#local-6989586621679117897"><span class="hs-identifier hs-var hs-var">links</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; Set Text -&gt; Set Text)
+</span><span id="line-26"></span><span>        </span><span id="local-6989586621679118253"><span class="annot"><span class="annottext">links :: Map Text (Set Text)
+</span><a href="#local-6989586621679118253"><span class="hs-identifier hs-var hs-var">links</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; Set Text -&gt; Set Text)
 -&gt; [(Text, Set Text)] -&gt; Map Text (Set Text)
 forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; [(k, a)] -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.fromListWith</span></span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Set Text -&gt; Set Text
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">(&lt;&gt;)</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text
-</span><a href="#local-6989586621679117902"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117903"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Set Text
+</span><a href="#local-6989586621679118259"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118260"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Set Text
 forall a. a -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.singleton</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text
-</span><a href="#local-6989586621679117902"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117905"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-type">Edge</span></a></span><span class="hs-special">{</span><span id="local-6989586621679117903"><span id="local-6989586621679117905"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118259"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118262"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-type">Edge</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118260"><span id="local-6989586621679118262"><span class="annot"><span class="annottext">Text
 from :: Text
 to :: Text
 from :: Edge -&gt; Text
 to :: Edge -&gt; Text
-</span><a href="#local-6989586621679117903"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[Edge]
-</span><a href="#local-6989586621679117892"><span class="hs-identifier hs-var">edges</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-27"></span><span>        </span><span id="local-6989586621679117898"><span class="annot"><span class="annottext">allNodes :: Map Text (Set Text)
-</span><a href="#local-6989586621679117898"><span class="hs-identifier hs-var hs-var">allNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Text, Set Text)] -&gt; Map Text (Set Text)
+</span><a href="#local-6989586621679118260"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[Edge]
+</span><a href="#local-6989586621679118248"><span class="hs-identifier hs-var">edges</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-27"></span><span>        </span><span id="local-6989586621679118254"><span class="annot"><span class="annottext">allNodes :: Map Text (Set Text)
+</span><a href="#local-6989586621679118254"><span class="hs-identifier hs-var hs-var">allNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Text, Set Text)] -&gt; Map Text (Set Text)
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117913"><span class="hs-keyword hs-var">label</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Set Text
+</span><a href="#local-6989586621679118271"><span class="hs-keyword hs-var">label</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Set Text
 forall a. Monoid a =&gt; a
-</span><span class="hs-identifier hs-var">mempty</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span class="hs-special">{</span><span id="local-6989586621679117913"><span id="local-6989586621679117915"><span class="annot"><span class="annottext">Maybe Text
+</span><span class="hs-identifier hs-var">mempty</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118271"><span id="local-6989586621679118273"><span class="annot"><span class="annottext">Maybe Text
 Text
 label :: Text
 color :: Maybe Text
 label :: Node -&gt; Text
 color :: Node -&gt; Maybe Text
-</span><a href="#local-6989586621679117913"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text Node -&gt; [Node]
+</span><a href="#local-6989586621679118271"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text Node -&gt; [Node]
 forall k a. Map k a -&gt; [a]
 </span><span class="hs-identifier hs-var">Map.elems</span></span><span> </span><span class="annot"><span class="annottext">Map Text Node
-</span><a href="#local-6989586621679117891"><span class="hs-identifier hs-var">nodes</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-28"></span><span>        </span><span id="local-6989586621679117902"><span class="annot"><span class="annottext">name :: Text -&gt; Text
-</span><a href="#local-6989586621679117902"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-operator">.</span><span class="hs-keyword">label</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Node -&gt; Text) -&gt; (Text -&gt; Node) -&gt; Text -&gt; Text
+</span><a href="#local-6989586621679118247"><span class="hs-identifier hs-var">nodes</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-28"></span><span>        </span><span id="local-6989586621679118259"><span class="annot"><span class="annottext">name :: Text -&gt; Text
+</span><a href="#local-6989586621679118259"><span class="hs-identifier hs-var hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-operator">.</span><span class="hs-keyword">label</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Node -&gt; Text) -&gt; (Text -&gt; Node) -&gt; Text -&gt; Text
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Text Node
-</span><a href="#local-6989586621679117891"><span class="hs-identifier hs-var">nodes</span></a></span><span> </span><span class="annot"><span class="annottext">Map Text Node -&gt; Text -&gt; Node
+</span><a href="#local-6989586621679118247"><span class="hs-identifier hs-var">nodes</span></a></span><span> </span><span class="annot"><span class="annottext">Map Text Node -&gt; Text -&gt; Node
 forall k a. Ord k =&gt; Map k a -&gt; k -&gt; a
 </span><span class="hs-operator hs-var">Map.!</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
 </span><span id="line-29"></span><span>
 </span><span id="line-30"></span><span class="annot"><span class="hs-comment">-- | Convert a graph back to our dependency file format.</span></span><span>
-</span><span id="line-31"></span><span class="annot"><a href="Graphex.html#graphToDep"><span class="hs-identifier hs-type">graphToDep</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span>
-</span><span id="line-32"></span><span id="graphToDep"><span class="annot"><span class="annottext">graphToDep :: Graph -&gt; GraphDef
-</span><a href="Graphex.html#graphToDep"><span class="hs-identifier hs-var hs-var">graphToDep</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679117923"><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117923"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span> </span><span class="hs-special">{</span><span>
+</span><span id="line-31"></span><span class="annot"><a href="Graphex.html#graphToDep"><span class="hs-identifier hs-type">graphToDep</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span>
+</span><span id="line-32"></span><span id="graphToDep"><span class="annot"><span class="annottext">graphToDep :: Graph Text -&gt; GraphDef
+</span><a href="Graphex.html#graphToDep"><span class="hs-identifier hs-var hs-var">graphToDep</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679118281"><span class="annot"><span class="annottext">Map Text (Set Text)
+</span><a href="#local-6989586621679118281"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span> </span><span class="hs-special">{</span><span>
 </span><span id="line-33"></span><span>    </span><span class="annot"><span class="annottext">title :: Text
 </span><a href="Graphex.LookingGlass.html#title"><span class="hs-identifier hs-var">title</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
 </span><span class="hs-string">&quot;Internal Package Dependencies&quot;</span></span><span class="hs-special">,</span><span>
 </span><span id="line-34"></span><span>    </span><span class="annot"><span class="annottext">edges :: [Edge]
 </span><a href="Graphex.LookingGlass.html#edges"><span class="hs-identifier hs-var">edges</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-type">Edge</span></a></span><span> </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">from :: Text
 </span><a href="Graphex.LookingGlass.html#from"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117924"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">to :: Text
+</span><a href="#local-6989586621679118282"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">to :: Text
 </span><a href="Graphex.LookingGlass.html#to"><span class="hs-identifier hs-var">to</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117925"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117924"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117924"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117926"><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117926"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; [(Text, Set Text)]
+</span><a href="#local-6989586621679118283"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-special">}</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679118282"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118282"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118284"><span class="annot"><span class="annottext">Set Text
+</span><a href="#local-6989586621679118284"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; [(Text, Set Text)]
 forall k a. Map k a -&gt; [(k, a)]
 </span><span class="hs-identifier hs-var">Map.assocs</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117923"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117925"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117925"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
+</span><a href="#local-6989586621679118281"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118283"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118283"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
 forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117926"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="hs-special">]</span><span class="hs-special">,</span><span>
+</span><a href="#local-6989586621679118284"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="hs-special">]</span><span class="hs-special">,</span><span>
 </span><span id="line-35"></span><span>    </span><span class="annot"><span class="annottext">nodes :: Map Text Node
 </span><a href="Graphex.LookingGlass.html#nodes"><span class="hs-identifier hs-var">nodes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Text, Node)] -&gt; Map Text Node
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117929"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text -&gt; Node
+</span><a href="#local-6989586621679118287"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe Text -&gt; Node
 </span><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-var">Node</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117929"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Text
+</span><a href="#local-6989586621679118287"><span class="hs-identifier hs-var">k</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Text
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679117929"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117929"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; [Text]
+</span><span class="hs-identifier hs-var">Nothing</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span id="local-6989586621679118287"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118287"><span class="hs-identifier hs-var">k</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; [Text]
 forall k a. Map k a -&gt; [k]
 </span><span class="hs-identifier hs-var">Map.keys</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117923"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679118281"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="hs-special">]</span><span>
 </span><span id="line-36"></span><span>    </span><span class="hs-special">}</span><span>
 </span><span id="line-37"></span><span>
 </span><span id="line-38"></span><span class="annot"><span class="hs-comment">-- | Reverse all the arrows in the graphs.</span></span><span>
-</span><span id="line-39"></span><span class="annot"><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-type">reverseEdges</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span>
-</span><span id="line-40"></span><span id="reverseEdges"><span class="annot"><span class="annottext">reverseEdges :: Graph -&gt; Graph
-</span><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-var hs-var">reverseEdges</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679117931"><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117931"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Graph
-</span><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Text (Set Text) -&gt; Graph) -&gt; Map Text (Set Text) -&gt; Graph
+</span><span id="line-39"></span><span id="local-6989586621679118138"><span class="annot"><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-type">reverseEdges</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118138"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118138"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118138"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-40"></span><span id="reverseEdges"><span class="annot"><span class="annottext">reverseEdges :: forall a. Ord a =&gt; Graph a -&gt; Graph a
+</span><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-var hs-var">reverseEdges</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679118294"><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118294"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map a (Set a) -&gt; Graph a
+forall a. Map a (Set a) -&gt; Graph a
+</span><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span><span> </span><span class="annot"><span class="annottext">(Map a (Set a) -&gt; Graph a) -&gt; Map a (Set a) -&gt; Graph a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; Set Text -&gt; Set Text)
--&gt; [(Text, Set Text)] -&gt; Map Text (Set Text)
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Set a -&gt; Set a -&gt; Set a) -&gt; [(a, Set a)] -&gt; Map a (Set a)
 forall k a. Ord k =&gt; (a -&gt; a -&gt; a) -&gt; [(k, a)] -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.fromListWith</span></span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Set Text -&gt; Set Text
+</span><span class="hs-identifier hs-var">Map.fromListWith</span></span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Set a -&gt; Set a
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">(&lt;&gt;)</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117932"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Set Text
+</span><span class="hs-operator hs-var">(&lt;&gt;)</span></span><span> </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118295"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">a -&gt; Set a
 forall a. a -&gt; Set a
-</span><span class="hs-identifier hs-var">Set.singleton</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117933"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117933"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117933"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117934"><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117934"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; [(Text, Set Text)]
+</span><span class="hs-identifier hs-var">Set.singleton</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118296"><span class="hs-identifier hs-var">k</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">|</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679118296"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118296"><span class="hs-identifier hs-var">k</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118297"><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118297"><span class="hs-identifier hs-var">vs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Map a (Set a) -&gt; [(a, Set a)]
 forall k a. Map k a -&gt; [(k, a)]
-</span><span class="hs-identifier hs-var">Map.assocs</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117931"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117932"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117932"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
+</span><span class="hs-identifier hs-var">Map.assocs</span></span><span> </span><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118294"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118295"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118295"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; [a]
 forall a. Set a -&gt; [a]
-</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117934"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Map Text (Set Text) -&gt; Map Text (Set Text)
+</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118297"><span class="hs-identifier hs-var">vs</span></a></span><span> </span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">Map a (Set a) -&gt; Map a (Set a) -&gt; Map a (Set a)
 forall a. Semigroup a =&gt; a -&gt; a -&gt; a
-</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Set Text) -&gt; Set Text -&gt; Map Text (Set Text)
+</span><span class="hs-operator hs-var">&lt;&gt;</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Set a) -&gt; Set a -&gt; Map a (Set a)
 forall k a. (k -&gt; a) -&gt; Set k -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.fromSet</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; Text -&gt; Set Text
+</span><span class="hs-identifier hs-var">Map.fromSet</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set a -&gt; a -&gt; Set a
 forall a b. a -&gt; b -&gt; a
-</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Set Text
+</span><span class="hs-identifier hs-var">const</span></span><span> </span><span class="annot"><span class="annottext">Set a
 forall a. Monoid a =&gt; a
-</span><span class="hs-identifier hs-var">mempty</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Set Text
+</span><span class="hs-identifier hs-var">mempty</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Map a (Set a) -&gt; Set a
 forall k a. Map k a -&gt; Set k
-</span><span class="hs-identifier hs-var">Map.keysSet</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117931"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span>
+</span><span class="hs-identifier hs-var">Map.keysSet</span></span><span> </span><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118294"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-41"></span><span>
 </span><span id="line-42"></span><span class="annot"><span class="hs-comment">-- | Find the direct list of things that are referencing this module.</span></span><span>
-</span><span id="line-43"></span><span class="annot"><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-type">directDepsOn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-44"></span><span id="directDepsOn"><span class="annot"><span class="annottext">directDepsOn :: Graph -&gt; Text -&gt; Set Text
-</span><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-var hs-var">directDepsOn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Map Text (Set Text) -&gt; Set Text)
--&gt; Map Text (Set Text) -&gt; Text -&gt; Set Text
+</span><span id="line-43"></span><span id="local-6989586621679118149"><span class="annot"><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-type">directDepsOn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118149"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118149"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118149"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="#local-6989586621679118149"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-44"></span><span id="directDepsOn"><span class="annot"><span class="annottext">directDepsOn :: forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
+</span><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-var hs-var">directDepsOn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Map a (Set a) -&gt; Set a) -&gt; Map a (Set a) -&gt; a -&gt; Set a
 forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
-</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; Text -&gt; Map Text (Set Text) -&gt; Set Text
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set a -&gt; a -&gt; Map a (Set a) -&gt; Set a
 forall k a. Ord k =&gt; a -&gt; k -&gt; Map k a -&gt; a
-</span><span class="hs-identifier hs-var">Map.findWithDefault</span></span><span> </span><span class="annot"><span class="annottext">Set Text
+</span><span class="hs-identifier hs-var">Map.findWithDefault</span></span><span> </span><span class="annot"><span class="annottext">Set a
 forall a. Monoid a =&gt; a
-</span><span class="hs-identifier hs-var">mempty</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map Text (Set Text) -&gt; Text -&gt; Set Text)
--&gt; (Graph -&gt; Map Text (Set Text)) -&gt; Graph -&gt; Text -&gt; Set Text
+</span><span class="hs-identifier hs-var">mempty</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Map a (Set a) -&gt; a -&gt; Set a)
+-&gt; (Graph a -&gt; Map a (Set a)) -&gt; Graph a -&gt; a -&gt; Set a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Map Text (Set Text)
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; Map a (Set a)
+forall a. Graph a -&gt; Map a (Set a)
 </span><a href="Graphex.Core.html#unGraph"><span class="hs-identifier hs-var">unGraph</span></a></span><span>
 </span><span id="line-45"></span><span>
 </span><span id="line-46"></span><span class="annot"><span class="hs-comment">-- | Flood fill to find all transitive dependencies on a starting module, excluding the original key.</span></span><span>
-</span><span id="line-47"></span><span class="annot"><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-type">allDepsOn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-48"></span><span id="allDepsOn"><span class="annot"><span class="annottext">allDepsOn :: Graph -&gt; Text -&gt; Set Text
-</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var hs-var">allDepsOn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Set Text) -&gt; Text -&gt; Set Text
+</span><span id="line-47"></span><span id="local-6989586621679118307"><span class="annot"><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-type">allDepsOn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118307"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118307"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118307"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="#local-6989586621679118307"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-48"></span><span id="allDepsOn"><span class="annot"><span class="annottext">allDepsOn :: forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
+</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var hs-var">allDepsOn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Set a) -&gt; a -&gt; Set a
 forall a. Ord a =&gt; (a -&gt; Set a) -&gt; a -&gt; Set a
-</span><a href="Graphex.Search.html#flood"><span class="hs-identifier hs-var">flood</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Set Text) -&gt; Text -&gt; Set Text)
--&gt; (Graph -&gt; Text -&gt; Set Text) -&gt; Graph -&gt; Text -&gt; Set Text
+</span><a href="Graphex.Search.html#flood"><span class="hs-identifier hs-var">flood</span></a></span><span> </span><span class="annot"><span class="annottext">((a -&gt; Set a) -&gt; a -&gt; Set a)
+-&gt; (Graph a -&gt; a -&gt; Set a) -&gt; Graph a -&gt; a -&gt; Set a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Text -&gt; Set Text
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; a -&gt; Set a
+forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
 </span><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-var">directDepsOn</span></a></span><span>
 </span><span id="line-49"></span><span>
 </span><span id="line-50"></span><span class="hs-comment">-- | Find an example path between two modules.</span><span>
 </span><span id="line-51"></span><span class="hs-comment">--</span><span>
 </span><span id="line-52"></span><span class="hs-comment">-- This is a short path, but the important part is that it represents how connectivy works.</span><span>
-</span><span id="line-53"></span><span class="annot"><a href="Graphex.html#why"><span class="hs-identifier hs-type">why</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">]</span><span>
-</span><span id="line-54"></span><span id="why"><span class="annot"><span class="annottext">why :: Graph -&gt; Text -&gt; Text -&gt; [Text]
-</span><a href="Graphex.html#why"><span class="hs-identifier hs-var hs-var">why</span></a></span></span><span> </span><span id="local-6989586621679117941"><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117941"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679117942"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117942"><span class="hs-identifier hs-var">from</span></a></span></span><span> </span><span id="local-6989586621679117943"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117943"><span class="hs-identifier hs-var">to</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Maybe [Text] -&gt; [Text]
+</span><span id="line-53"></span><span id="local-6989586621679118159"><span class="annot"><a href="Graphex.html#why"><span class="hs-identifier hs-type">why</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118159"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118159"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118159"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118159"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="#local-6989586621679118159"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">]</span></span><span>
+</span><span id="line-54"></span><span id="why"><span class="annot"><span class="annottext">why :: forall a. Ord a =&gt; Graph a -&gt; a -&gt; a -&gt; [a]
+</span><a href="Graphex.html#why"><span class="hs-identifier hs-var hs-var">why</span></a></span></span><span> </span><span id="local-6989586621679118326"><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118326"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679118327"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118327"><span class="hs-identifier hs-var">from</span></a></span></span><span> </span><span id="local-6989586621679118328"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118328"><span class="hs-identifier hs-var">to</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[a] -&gt; Maybe [a] -&gt; [a]
 forall a. a -&gt; Maybe a -&gt; a
-</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">(Maybe [Text] -&gt; [Text]) -&gt; Maybe [Text] -&gt; [Text]
+</span><span class="hs-identifier hs-var">fromMaybe</span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="annot"><span class="annottext">(Maybe [a] -&gt; [a]) -&gt; Maybe [a] -&gt; [a]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SearchFunction Text [Text]
--&gt; ([Text] -&gt; Text)
--&gt; ([Text] -&gt; [[Text]])
--&gt; [Text]
--&gt; ([Text] -&gt; Bool)
--&gt; Maybe [Text]
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SearchFunction a [a]
+-&gt; ([a] -&gt; a)
+-&gt; ([a] -&gt; [[a]])
+-&gt; [a]
+-&gt; ([a] -&gt; Bool)
+-&gt; Maybe [a]
 forall r a.
 Ord r =&gt;
 SearchFunction r a
 -&gt; (a -&gt; r) -&gt; (a -&gt; [a]) -&gt; a -&gt; (a -&gt; Bool) -&gt; Maybe a
-</span><a href="Graphex.Search.html#findFirst"><span class="hs-identifier hs-var">findFirst</span></a></span><span> </span><span class="annot"><span class="annottext">SearchFunction Text [Text]
+</span><a href="Graphex.Search.html#findFirst"><span class="hs-identifier hs-var">findFirst</span></a></span><span> </span><span class="annot"><span class="annottext">SearchFunction a [a]
 forall r a. Ord r =&gt; (a -&gt; r) -&gt; (a -&gt; [a]) -&gt; a -&gt; [a]
-</span><a href="Graphex.Search.html#bfsOn"><span class="hs-identifier hs-var">bfsOn</span></a></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Text
+</span><a href="Graphex.Search.html#bfsOn"><span class="hs-identifier hs-var">bfsOn</span></a></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; a
 forall a. HasCallStack =&gt; [a] -&gt; a
-</span><span class="hs-identifier hs-var">head</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679117945"><span class="annot"><span class="annottext">[Text]
-</span><a href="#local-6989586621679117945"><span class="hs-identifier hs-var">ks</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; [Text] -&gt; [Text]
+</span><span class="hs-identifier hs-var">head</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679118330"><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679118330"><span class="hs-identifier hs-var">ks</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; [a] -&gt; [a]
 forall a. a -&gt; [a] -&gt; [a]
-</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[Text]
-</span><a href="#local-6989586621679117945"><span class="hs-identifier hs-var">ks</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; [Text]) -&gt; [Text] -&gt; [[Text]]
+</span><span class="hs-glyph hs-var">:</span></span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679118330"><span class="hs-identifier hs-var">ks</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(a -&gt; [a]) -&gt; [a] -&gt; [[a]]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set a -&gt; [a]
 forall a. Set a -&gt; [a]
-</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; [Text]) -&gt; ([Text] -&gt; Set Text) -&gt; [Text] -&gt; [Text]
+</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set a -&gt; [a]) -&gt; ([a] -&gt; Set a) -&gt; [a] -&gt; [a]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Text -&gt; Set Text
-</span><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-var">directDepsOn</span></a></span><span> </span><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117941"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Set Text) -&gt; ([Text] -&gt; Text) -&gt; [Text] -&gt; Set Text
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; a -&gt; Set a
+forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
+</span><a href="Graphex.html#directDepsOn"><span class="hs-identifier hs-var">directDepsOn</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118326"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Set a) -&gt; ([a] -&gt; a) -&gt; [a] -&gt; Set a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Text
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; a
 forall a. HasCallStack =&gt; [a] -&gt; a
-</span><span class="hs-identifier hs-var">head</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Text]
-</span><a href="#local-6989586621679117945"><span class="hs-identifier hs-var">ks</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117942"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Bool
+</span><span class="hs-identifier hs-var">head</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679118330"><span class="hs-identifier hs-var">ks</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118327"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
 forall a. Eq a =&gt; a -&gt; a -&gt; Bool
-</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117943"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Bool) -&gt; ([Text] -&gt; Text) -&gt; [Text] -&gt; Bool
+</span><span class="hs-operator hs-var">==</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118328"><span class="hs-identifier hs-var">to</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Bool) -&gt; ([a] -&gt; a) -&gt; [a] -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[Text] -&gt; Text
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">[a] -&gt; a
 forall a. HasCallStack =&gt; [a] -&gt; a
 </span><span class="hs-identifier hs-var">head</span></span><span class="hs-special">)</span><span>
 </span><span id="line-55"></span><span>
 </span><span id="line-56"></span><span class="hs-comment">-- | Find all paths between two modules as a restricted graph of the intersection of</span><span>
 </span><span id="line-57"></span><span class="hs-comment">-- reachable nodes from the start and to the end.</span><span>
-</span><span id="line-58"></span><span class="annot"><a href="Graphex.html#allPathsTo"><span class="hs-identifier hs-type">allPathsTo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span>
-</span><span id="line-59"></span><span id="allPathsTo"><span class="annot"><span class="annottext">allPathsTo :: Graph -&gt; Text -&gt; Text -&gt; Graph
-</span><a href="Graphex.html#allPathsTo"><span class="hs-identifier hs-var hs-var">allPathsTo</span></a></span></span><span> </span><span id="local-6989586621679117947"><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117947"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679117948"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117948"><span class="hs-identifier hs-var">from</span></a></span></span><span> </span><span id="local-6989586621679117949"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117949"><span class="hs-identifier hs-var">to</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Set Text -&gt; Graph
-</span><a href="Graphex.html#restrictTo"><span class="hs-identifier hs-var">restrictTo</span></a></span><span> </span><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117947"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; Graph) -&gt; Set Text -&gt; Graph
+</span><span id="line-58"></span><span id="local-6989586621679118174"><span class="annot"><a href="Graphex.html#allPathsTo"><span class="hs-identifier hs-type">allPathsTo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679118174"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118174"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118174"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118174"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118174"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118174"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-59"></span><span id="allPathsTo"><span class="annot"><span class="annottext">allPathsTo :: forall a. (NFData a, Ord a) =&gt; Graph a -&gt; a -&gt; a -&gt; Graph a
+</span><a href="Graphex.html#allPathsTo"><span class="hs-identifier hs-var hs-var">allPathsTo</span></a></span></span><span> </span><span id="local-6989586621679118340"><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118340"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span id="local-6989586621679118341"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118341"><span class="hs-identifier hs-var">from</span></a></span></span><span> </span><span id="local-6989586621679118342"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118342"><span class="hs-identifier hs-var">to</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; Set a -&gt; Graph a
+forall a. (Ord a, NFData a) =&gt; Graph a -&gt; Set a -&gt; Graph a
+</span><a href="Graphex.html#restrictTo"><span class="hs-identifier hs-var">restrictTo</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118340"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">(Set a -&gt; Graph a) -&gt; Set a -&gt; Graph a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Text -&gt; Set Text
-</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var">allDepsOn</span></a></span><span> </span><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117947"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117948"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Set Text -&gt; Set Text
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; a -&gt; Set a
+forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
+</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var">allDepsOn</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118340"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118341"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Set a -&gt; Set a
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
-</span><span class="hs-operator hs-var">`Set.intersection`</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Text -&gt; Set Text
-</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var">allDepsOn</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Graph -&gt; Graph
-</span><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-var">reverseEdges</span></a></span><span> </span><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117947"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117949"><span class="hs-identifier hs-var">to</span></a></span><span>
+</span><span class="hs-operator hs-var">`Set.intersection`</span></span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; a -&gt; Set a
+forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
+</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var">allDepsOn</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Graph a -&gt; Graph a
+forall a. Ord a =&gt; Graph a -&gt; Graph a
+</span><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-var">reverseEdges</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118340"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118342"><span class="hs-identifier hs-var">to</span></a></span><span>
 </span><span id="line-60"></span><span>
 </span><span id="line-61"></span><span class="annot"><span class="hs-comment">-- | Count the number of transitive dependencies for each module.</span></span><span>
-</span><span id="line-62"></span><span class="annot"><a href="Graphex.html#rankings"><span class="hs-identifier hs-type">rankings</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
-</span><span id="line-63"></span><span id="rankings"><span class="annot"><span class="annottext">rankings :: Graph -&gt; Map Text Int
-</span><a href="Graphex.html#rankings"><span class="hs-identifier hs-var hs-var">rankings</span></a></span></span><span> </span><span id="local-6989586621679117951"><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117951"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Text, Int)] -&gt; Map Text Int
+</span><span id="line-62"></span><span id="local-6989586621679118179"><span class="annot"><a href="Graphex.html#rankings"><span class="hs-identifier hs-type">rankings</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679118179"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118179"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118179"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679118179"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span></span><span>
+</span><span id="line-63"></span><span id="rankings"><span class="annot"><span class="annottext">rankings :: forall a. (NFData a, Ord a) =&gt; Graph a -&gt; Map a Int
+</span><a href="Graphex.html#rankings"><span class="hs-identifier hs-var hs-var">rankings</span></a></span></span><span> </span><span id="local-6989586621679118353"><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118353"><span class="hs-identifier hs-var">g</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(a, Int)] -&gt; Map a Int
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
-</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(Text, Int)] -&gt; Map Text Int) -&gt; [(Text, Int)] -&gt; Map Text Int
+</span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(a, Int)] -&gt; Map a Int) -&gt; [(a, Int)] -&gt; Map a Int
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Maybe Int) -&gt; Graph -&gt; [(Text, Int)]
-forall a. NFData a =&gt; (Text -&gt; Maybe a) -&gt; Graph -&gt; [(Text, a)]
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Maybe Int) -&gt; Graph a -&gt; [(a, Int)]
+forall a g.
+(NFData a, NFData g) =&gt;
+(g -&gt; Maybe a) -&gt; Graph g -&gt; [(g, a)]
 </span><a href="Graphex.html#mapMaybeWithKey"><span class="hs-identifier hs-var">mapMaybeWithKey</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Maybe Int
 forall a. a -&gt; Maybe a
-</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Maybe Int) -&gt; (Text -&gt; Int) -&gt; Text -&gt; Maybe Int
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Maybe Int) -&gt; (a -&gt; Int) -&gt; a -&gt; Maybe Int
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Int
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Int
 forall a. Set a -&gt; Int
 forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
-</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; Int) -&gt; (Text -&gt; Set Text) -&gt; Text -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">(Set a -&gt; Int) -&gt; (a -&gt; Set a) -&gt; a -&gt; Int
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Text -&gt; Set Text
-</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var">allDepsOn</span></a></span><span> </span><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117951"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Graph
-</span><a href="#local-6989586621679117951"><span class="hs-identifier hs-var">g</span></a></span><span>
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; a -&gt; Set a
+forall a. Ord a =&gt; Graph a -&gt; a -&gt; Set a
+</span><a href="Graphex.html#allDepsOn"><span class="hs-identifier hs-var">allDepsOn</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118353"><span class="hs-identifier hs-var">g</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679118353"><span class="hs-identifier hs-var">g</span></a></span><span>
 </span><span id="line-64"></span><span>
 </span><span id="line-65"></span><span class="annot"><span class="hs-comment">-- | Visit each node in the graph and apply a function to it.</span></span><span>
-</span><span id="line-66"></span><span id="local-6989586621679117799"><span class="annot"><a href="Graphex.html#mapMaybeWithKey"><span class="hs-identifier hs-type">mapMaybeWithKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679117799"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679117799"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679117799"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span></span><span>
-</span><span id="line-67"></span><span id="mapMaybeWithKey"><span class="annot"><span class="annottext">mapMaybeWithKey :: forall a. NFData a =&gt; (Text -&gt; Maybe a) -&gt; Graph -&gt; [(Text, a)]
-</span><a href="Graphex.html#mapMaybeWithKey"><span class="hs-identifier hs-var hs-var">mapMaybeWithKey</span></a></span></span><span> </span><span id="local-6989586621679117966"><span class="annot"><span class="annottext">Text -&gt; Maybe a
-</span><a href="#local-6989586621679117966"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((Text, Maybe a) -&gt; Maybe (Text, a))
--&gt; [(Text, Maybe a)] -&gt; [(Text, a)]
+</span><span id="line-66"></span><span id="local-6989586621679118181"><span id="local-6989586621679118182"><span class="annot"><a href="Graphex.html#mapMaybeWithKey"><span class="hs-identifier hs-type">mapMaybeWithKey</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679118181"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679118182"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679118182"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><a href="#local-6989586621679118181"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118182"><span class="hs-identifier hs-type">g</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679118182"><span class="hs-identifier hs-type">g</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="#local-6989586621679118181"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span></span></span><span>
+</span><span id="line-67"></span><span id="mapMaybeWithKey"><span class="annot"><span class="annottext">mapMaybeWithKey :: forall a g.
+(NFData a, NFData g) =&gt;
+(g -&gt; Maybe a) -&gt; Graph g -&gt; [(g, a)]
+</span><a href="Graphex.html#mapMaybeWithKey"><span class="hs-identifier hs-var hs-var">mapMaybeWithKey</span></a></span></span><span> </span><span id="local-6989586621679118367"><span class="annot"><span class="annottext">g -&gt; Maybe a
+</span><a href="#local-6989586621679118367"><span class="hs-identifier hs-var">f</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">((g, Maybe a) -&gt; Maybe (g, a)) -&gt; [(g, Maybe a)] -&gt; [(g, a)]
 forall a b. (a -&gt; Maybe b) -&gt; [a] -&gt; [b]
-</span><span class="hs-identifier hs-var">mapMaybe</span></span><span> </span><span class="annot"><span class="annottext">(Text, Maybe a) -&gt; Maybe (Text, a)
+</span><span class="hs-identifier hs-var">mapMaybe</span></span><span> </span><span class="annot"><span class="annottext">(g, Maybe a) -&gt; Maybe (g, a)
 forall (t :: * -&gt; *) (f :: * -&gt; *) a.
 (Traversable t, Applicative f) =&gt;
 t (f a) -&gt; f (t a)
-forall (f :: * -&gt; *) a. Applicative f =&gt; (Text, f a) -&gt; f (Text, a)
-</span><span class="hs-identifier hs-var">sequenceA</span></span><span> </span><span class="annot"><span class="annottext">([(Text, Maybe a)] -&gt; [(Text, a)])
--&gt; (Graph -&gt; [(Text, Maybe a)]) -&gt; Graph -&gt; [(Text, a)]
+forall (f :: * -&gt; *) a. Applicative f =&gt; (g, f a) -&gt; f (g, a)
+</span><span class="hs-identifier hs-var">sequenceA</span></span><span> </span><span class="annot"><span class="annottext">([(g, Maybe a)] -&gt; [(g, a)])
+-&gt; (Graph g -&gt; [(g, Maybe a)]) -&gt; Graph g -&gt; [(g, a)]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Strategy (Text, Maybe a)
--&gt; (Text -&gt; (Text, Maybe a)) -&gt; [Text] -&gt; [(Text, Maybe a)]
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Strategy (g, Maybe a)
+-&gt; (g -&gt; (g, Maybe a)) -&gt; [g] -&gt; [(g, Maybe a)]
 forall b a. Strategy b -&gt; (a -&gt; b) -&gt; [a] -&gt; [b]
-</span><span class="hs-identifier hs-var">parMap</span></span><span> </span><span class="annot"><span class="annottext">Strategy (Text, Maybe a)
+</span><span class="hs-identifier hs-var">parMap</span></span><span> </span><span class="annot"><span class="annottext">Strategy (g, Maybe a)
 forall a. NFData a =&gt; Strategy a
-</span><span class="hs-identifier hs-var">rdeepseq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Text -&gt; Maybe a -&gt; (Text, Maybe a))
--&gt; (Text -&gt; Maybe a) -&gt; Text -&gt; (Text, Maybe a)
+</span><span class="hs-identifier hs-var">rdeepseq</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(g -&gt; Maybe a -&gt; (g, Maybe a))
+-&gt; (g -&gt; Maybe a) -&gt; g -&gt; (g, Maybe a)
 forall (m :: * -&gt; *) a b. Monad m =&gt; m (a -&gt; b) -&gt; m a -&gt; m b
-</span><span class="hs-identifier hs-var">ap</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Maybe a
-</span><a href="#local-6989586621679117966"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([Text] -&gt; [(Text, Maybe a)])
--&gt; (Graph -&gt; [Text]) -&gt; Graph -&gt; [(Text, Maybe a)]
+</span><span class="hs-identifier hs-var">ap</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">g -&gt; Maybe a
+</span><a href="#local-6989586621679118367"><span class="hs-identifier hs-var">f</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([g] -&gt; [(g, Maybe a)])
+-&gt; (Graph g -&gt; [g]) -&gt; Graph g -&gt; [(g, Maybe a)]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; [Text]
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Map g (Set g) -&gt; [g]
 forall k a. Map k a -&gt; [k]
-</span><span class="hs-identifier hs-var">Map.keys</span></span><span> </span><span class="annot"><span class="annottext">(Map Text (Set Text) -&gt; [Text])
--&gt; (Graph -&gt; Map Text (Set Text)) -&gt; Graph -&gt; [Text]
+</span><span class="hs-identifier hs-var">Map.keys</span></span><span> </span><span class="annot"><span class="annottext">(Map g (Set g) -&gt; [g])
+-&gt; (Graph g -&gt; Map g (Set g)) -&gt; Graph g -&gt; [g]
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph -&gt; Map Text (Set Text)
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Graph g -&gt; Map g (Set g)
+forall a. Graph a -&gt; Map a (Set a)
 </span><a href="Graphex.Core.html#unGraph"><span class="hs-identifier hs-var">unGraph</span></a></span><span>
 </span><span id="line-68"></span><span>
 </span><span id="line-69"></span><span class="annot"><span class="hs-comment">-- | Restrict a graph to only the given set of modules.</span></span><span>
-</span><span id="line-70"></span><span class="annot"><a href="Graphex.html#restrictTo"><span class="hs-identifier hs-type">restrictTo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span>
-</span><span id="line-71"></span><span id="restrictTo"><span class="annot"><span class="annottext">restrictTo :: Graph -&gt; Set Text -&gt; Graph
-</span><a href="Graphex.html#restrictTo"><span class="hs-identifier hs-var hs-var">restrictTo</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679117968"><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117968"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679117969"><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117969"><span class="hs-identifier hs-var">keep</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text) -&gt; Graph
-</span><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span><span> </span><span class="annot"><span class="annottext">(Map Text (Set Text) -&gt; Graph)
--&gt; ((Text -&gt; Set Text -&gt; Maybe (Set Text)) -&gt; Map Text (Set Text))
--&gt; (Text -&gt; Set Text -&gt; Maybe (Set Text))
--&gt; Graph
+</span><span id="line-70"></span><span id="local-6989586621679118177"><span class="annot"><a href="Graphex.html#restrictTo"><span class="hs-identifier hs-type">restrictTo</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118177"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679118177"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118177"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Set</span></span><span> </span><span class="annot"><a href="#local-6989586621679118177"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118177"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-71"></span><span id="restrictTo"><span class="annot"><span class="annottext">restrictTo :: forall a. (Ord a, NFData a) =&gt; Graph a -&gt; Set a -&gt; Graph a
+</span><a href="Graphex.html#restrictTo"><span class="hs-identifier hs-var hs-var">restrictTo</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679118373"><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118373"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679118374"><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118374"><span class="hs-identifier hs-var">keep</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map a (Set a) -&gt; Graph a
+forall a. Map a (Set a) -&gt; Graph a
+</span><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-var">Graph</span></a></span><span> </span><span class="annot"><span class="annottext">(Map a (Set a) -&gt; Graph a)
+-&gt; ((a -&gt; Set a -&gt; Maybe (Set a)) -&gt; Map a (Set a))
+-&gt; (a -&gt; Set a -&gt; Maybe (Set a))
+-&gt; Graph a
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
-</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Set Text -&gt; Maybe (Set Text))
- -&gt; Map Text (Set Text) -&gt; Map Text (Set Text))
--&gt; Map Text (Set Text)
--&gt; (Text -&gt; Set Text -&gt; Maybe (Set Text))
--&gt; Map Text (Set Text)
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">((a -&gt; Set a -&gt; Maybe (Set a)) -&gt; Map a (Set a) -&gt; Map a (Set a))
+-&gt; Map a (Set a) -&gt; (a -&gt; Set a -&gt; Maybe (Set a)) -&gt; Map a (Set a)
 forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
-</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Set Text -&gt; Maybe (Set Text))
--&gt; Map Text (Set Text) -&gt; Map Text (Set Text)
+</span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">(a -&gt; Set a -&gt; Maybe (Set a)) -&gt; Map a (Set a) -&gt; Map a (Set a)
 forall k a b. (k -&gt; a -&gt; Maybe b) -&gt; Map k a -&gt; Map k b
-</span><span class="hs-identifier hs-var">Map.mapMaybeWithKey</span></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117968"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">((Text -&gt; Set Text -&gt; Maybe (Set Text)) -&gt; Graph)
--&gt; (Text -&gt; Set Text -&gt; Maybe (Set Text)) -&gt; Graph
+</span><span class="hs-identifier hs-var">Map.mapMaybeWithKey</span></span><span> </span><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118373"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">((a -&gt; Set a -&gt; Maybe (Set a)) -&gt; Graph a)
+-&gt; (a -&gt; Set a -&gt; Maybe (Set a)) -&gt; Graph a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679117971"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117971"><span class="hs-identifier hs-var">k'</span></a></span></span><span> </span><span id="local-6989586621679117972"><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117972"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
-</span><span id="line-72"></span><span>  </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Text -&gt; Set Text -&gt; Bool
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679118376"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118376"><span class="hs-identifier hs-var">k'</span></a></span></span><span> </span><span id="local-6989586621679118377"><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118377"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span id="line-72"></span><span>  </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">a -&gt; Set a -&gt; Bool
 forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.notMember</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117971"><span class="hs-identifier hs-var">k'</span></a></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117969"><span class="hs-identifier hs-var">keep</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Maybe (Set Text)
+</span><span class="hs-identifier hs-var">Set.notMember</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118376"><span class="hs-identifier hs-var">k'</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118374"><span class="hs-identifier hs-var">keep</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Maybe (Set a)
 forall a. Maybe a
-</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Maybe (Set Text)
+</span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Maybe (Set a)
 forall {a}. Set a -&gt; Maybe (Set a)
-</span><a href="#local-6989586621679117974"><span class="hs-identifier hs-var">nonNullSet</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; Set Text -&gt; Set Text
+</span><a href="#local-6989586621679118379"><span class="hs-identifier hs-var">nonNullSet</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set a -&gt; Set a -&gt; Set a
 forall a. Ord a =&gt; Set a -&gt; Set a -&gt; Set a
-</span><span class="hs-identifier hs-var">Set.intersection</span></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117969"><span class="hs-identifier hs-var">keep</span></a></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117972"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span class="hs-identifier hs-var">Set.intersection</span></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118374"><span class="hs-identifier hs-var">keep</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118377"><span class="hs-identifier hs-var">v</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
 </span><span id="line-73"></span><span>    </span><span class="hs-keyword">where</span><span>
-</span><span id="line-74"></span><span>        </span><span id="local-6989586621679117974"><span class="annot"><span class="annottext">nonNullSet :: Set a -&gt; Maybe (Set a)
-</span><a href="#local-6989586621679117974"><span class="hs-identifier hs-var hs-var">nonNullSet</span></a></span></span><span> </span><span id="local-6989586621679117975"><span class="annot"><span class="annottext">Set a
-</span><a href="#local-6989586621679117975"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Bool
+</span><span id="line-74"></span><span>        </span><span id="local-6989586621679118379"><span class="annot"><span class="annottext">nonNullSet :: Set a -&gt; Maybe (Set a)
+</span><a href="#local-6989586621679118379"><span class="hs-identifier hs-var hs-var">nonNullSet</span></a></span></span><span> </span><span id="local-6989586621679118380"><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118380"><span class="hs-identifier hs-var">v</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Bool
 forall a. Set a -&gt; Bool
 </span><span class="hs-identifier hs-var">Set.null</span></span><span> </span><span class="annot"><span class="annottext">Set a
-</span><a href="#local-6989586621679117975"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Maybe (Set a)
+</span><a href="#local-6989586621679118380"><span class="hs-identifier hs-var">v</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Maybe (Set a)
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; Maybe (Set a)
 forall a. a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Set a
-</span><a href="#local-6989586621679117975"><span class="hs-identifier hs-var">v</span></a></span><span>
+</span><a href="#local-6989586621679118380"><span class="hs-identifier hs-var">v</span></a></span><span>
 </span><span id="line-75"></span><span>
 </span><span id="line-76"></span><span class="annot"><span class="hs-comment">-- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.</span></span><span>
-</span><span id="line-77"></span><span class="annot"><a href="Graphex.html#graphToTree"><span class="hs-identifier hs-type">graphToTree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tree</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-78"></span><span id="graphToTree"><span class="annot"><span class="annottext">graphToTree :: Text -&gt; Graph -&gt; Tree Text
-</span><a href="Graphex.html#graphToTree"><span class="hs-identifier hs-var hs-var">graphToTree</span></a></span></span><span> </span><span id="local-6989586621679117977"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117977"><span class="hs-identifier hs-var">startingAt</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679117978"><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117978"><span class="hs-identifier hs-var">rels</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Text -&gt; Tree Text
-</span><a href="#local-6989586621679117979"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Set Text
+</span><span id="line-77"></span><span id="local-6989586621679118212"><span class="annot"><a href="Graphex.html#graphToTree"><span class="hs-identifier hs-type">graphToTree</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679118212"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118212"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118212"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Tree</span></span><span> </span><span class="annot"><a href="#local-6989586621679118212"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-78"></span><span id="graphToTree"><span class="annot"><span class="annottext">graphToTree :: forall a. Ord a =&gt; a -&gt; Graph a -&gt; Tree a
+</span><a href="Graphex.html#graphToTree"><span class="hs-identifier hs-var hs-var">graphToTree</span></a></span></span><span> </span><span id="local-6989586621679118385"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118385"><span class="hs-identifier hs-var">startingAt</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span id="local-6989586621679118386"><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118386"><span class="hs-identifier hs-var">rels</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; a -&gt; Tree a
+</span><a href="#local-6989586621679118387"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
 forall a. Monoid a =&gt; a
-</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117977"><span class="hs-identifier hs-var">startingAt</span></a></span><span>
+</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118385"><span class="hs-identifier hs-var">startingAt</span></a></span><span>
 </span><span id="line-79"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-80"></span><span>    </span><span id="local-6989586621679117979"><span class="annot"><span class="annottext">go :: Set Text -&gt; Text -&gt; Tree Text
-</span><a href="#local-6989586621679117979"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679117983"><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117983"><span class="hs-identifier hs-var">seen</span></a></span></span><span> </span><span id="local-6989586621679117984"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117984"><span class="hs-identifier hs-var">node</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-81"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679117987"><span class="annot"><span class="annottext">children :: [Text]
-</span><a href="#local-6989586621679117987"><span class="hs-identifier hs-var hs-var">children</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
+</span><span id="line-80"></span><span>    </span><span id="local-6989586621679118387"><span class="annot"><span class="annottext">go :: Set a -&gt; a -&gt; Tree a
+</span><a href="#local-6989586621679118387"><span class="hs-identifier hs-var hs-var">go</span></a></span></span><span> </span><span id="local-6989586621679118392"><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118392"><span class="hs-identifier hs-var">seen</span></a></span></span><span> </span><span id="local-6989586621679118393"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118393"><span class="hs-identifier hs-var">node</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-81"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118397"><span class="annot"><span class="annottext">children :: [a]
+</span><a href="#local-6989586621679118397"><span class="hs-identifier hs-var hs-var">children</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Set a -&gt; [a]
 forall a. Set a -&gt; [a]
-</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set Text -&gt; [Text]) -&gt; Set Text -&gt; [Text]
+</span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">(Set a -&gt; [a]) -&gt; Set a -&gt; [a]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set Text -&gt; Text -&gt; Map Text (Set Text) -&gt; Set Text
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set a -&gt; a -&gt; Map a (Set a) -&gt; Set a
 forall k a. Ord k =&gt; a -&gt; k -&gt; Map k a -&gt; a
-</span><span class="hs-identifier hs-var">Map.findWithDefault</span></span><span> </span><span class="annot"><span class="annottext">Set Text
+</span><span class="hs-identifier hs-var">Map.findWithDefault</span></span><span> </span><span class="annot"><span class="annottext">Set a
 forall a. Monoid a =&gt; a
-</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117984"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">Map Text (Set Text)
-</span><a href="#local-6989586621679117978"><span class="hs-identifier hs-var">rels</span></a></span><span>
-</span><span id="line-82"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Text -&gt; [Tree Text] -&gt; Tree Text
+</span><span class="hs-identifier hs-var">mempty</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118393"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">Map a (Set a)
+</span><a href="#local-6989586621679118386"><span class="hs-identifier hs-var">rels</span></a></span><span>
+</span><span id="line-82"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">a -&gt; [Tree a] -&gt; Tree a
 forall a. a -&gt; [Tree a] -&gt; Tree a
-</span><span class="hs-identifier hs-var">Tree.Node</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117984"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">([Tree Text] -&gt; Tree Text) -&gt; [Tree Text] -&gt; Tree Text
+</span><span class="hs-identifier hs-var">Tree.Node</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118393"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">([Tree a] -&gt; Tree a) -&gt; [Tree a] -&gt; Tree a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">if</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Set Text -&gt; Bool
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">if</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Set a -&gt; Bool
 forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
-</span><span class="hs-identifier hs-var">Set.member</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117984"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117983"><span class="hs-identifier hs-var">seen</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Tree Text) -&gt; [Text] -&gt; [Tree Text]
+</span><span class="hs-identifier hs-var">Set.member</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118393"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118392"><span class="hs-identifier hs-var">seen</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-keyword">else</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Tree a) -&gt; [a] -&gt; [Tree a]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; Text -&gt; Tree Text
-</span><a href="#local-6989586621679117979"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Set Text -&gt; Set Text
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set a -&gt; a -&gt; Tree a
+</span><a href="#local-6989586621679118387"><span class="hs-identifier hs-var">go</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Set a -&gt; Set a
 forall a. Ord a =&gt; a -&gt; Set a -&gt; Set a
-</span><span class="hs-identifier hs-var">Set.insert</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117984"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117983"><span class="hs-identifier hs-var">seen</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Text]
-</span><a href="#local-6989586621679117987"><span class="hs-identifier hs-var">children</span></a></span><span>
+</span><span class="hs-identifier hs-var">Set.insert</span></span><span> </span><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679118393"><span class="hs-identifier hs-var">node</span></a></span><span> </span><span class="annot"><span class="annottext">Set a
+</span><a href="#local-6989586621679118392"><span class="hs-identifier hs-var">seen</span></a></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[a]
+</span><a href="#local-6989586621679118397"><span class="hs-identifier hs-var">children</span></a></span><span>
 </span><span id="line-83"></span></pre></body></html>

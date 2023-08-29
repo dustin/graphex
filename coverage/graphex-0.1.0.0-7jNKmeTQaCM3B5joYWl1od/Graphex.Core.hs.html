@@ -28,46 +28,49 @@ span.spaces    { background: white }
 <span class="lineno">    9 </span>import           Data.String     (IsString)
 <span class="lineno">   10 </span>import           Data.Text       (Text)
 <span class="lineno">   11 </span>
-<span class="lineno">   12 </span>newtype Graph = Graph { <span class="istickedoff"><span class="decl"><span class="istickedoff">unGraph</span></span></span> :: Map Text (Set Text) }
-<span class="lineno">   13 </span>    deriving stock (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">   12 </span>newtype Graph a = Graph { <span class="istickedoff"><span class="decl"><span class="istickedoff">unGraph</span></span></span> :: Map a (Set a) }
+<span class="lineno">   13 </span>  deriving stock <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>
 <span class="lineno">   14 </span>
-<span class="lineno">   15 </span>-- Haskell
-<span class="lineno">   16 </span>data Import = Import
-<span class="lineno">   17 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">module_</span></span></span> :: ModuleName
-<span class="lineno">   18 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">package</span></span></span> :: Maybe Text
-<span class="lineno">   19 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   15 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Ord a =&gt; Semigroup (Graph a)</span></span></span></span> where
+<span class="lineno">   16 </span>  <span class="decl"><span class="istickedoff">Graph x &lt;&gt; Graph y = Graph (Map.unionWith (&lt;&gt;) x y)</span></span>
+<span class="lineno">   17 </span>
+<span class="lineno">   18 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Ord a =&gt; Monoid (Graph a)</span></span></span></span> where
+<span class="lineno">   19 </span>  <span class="decl"><span class="istickedoff">mempty = Graph mempty</span></span>
 <span class="lineno">   20 </span>
-<span class="lineno">   21 </span>newtype ModuleName = ModuleName { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unModuleName</span></span></span> :: Text }
-<span class="lineno">   22 </span>  deriving newtype (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">IsString</span></span>)
-<span class="lineno">   23 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
-<span class="lineno">   24 </span>
-<span class="lineno">   25 </span>data Module = Module
-<span class="lineno">   26 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">name</span></span></span> :: ModuleName
-<span class="lineno">   27 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">path</span></span></span> :: FilePath
-<span class="lineno">   28 </span>  }
-<span class="lineno">   29 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
-<span class="lineno">   30 </span>
-<span class="lineno">   31 </span>data ModuleGraph = ModuleGraph
-<span class="lineno">   32 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">imports</span></span></span> :: Map ModuleName (Set ModuleName)
-<span class="lineno">   33 </span>  }
-<span class="lineno">   34 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
-<span class="lineno">   35 </span>
-<span class="lineno">   36 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
-<span class="lineno">   37 </span><span class="decl"><span class="istickedoff">singletonModuleGraph importer importee = ModuleGraph</span>
-<span class="lineno">   38 </span><span class="spaces">  </span><span class="istickedoff">{ imports = Map.singleton importer (Set.singleton importee)</span>
-<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">}</span></span>
-<span class="lineno">   40 </span>
-<span class="lineno">   41 </span>mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
-<span class="lineno">   42 </span><span class="decl"><span class="istickedoff">mkModuleGraph importer importees = ModuleGraph</span>
-<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">{ imports = Map.singleton importer (Set.fromList importees) }</span></span>
+<span class="lineno">   21 </span>singletonGraph :: Ord a =&gt; a -&gt; a -&gt; Graph a
+<span class="lineno">   22 </span><span class="decl"><span class="istickedoff">singletonGraph k = mkGraph k . pure</span></span>
+<span class="lineno">   23 </span>
+<span class="lineno">   24 </span>mkGraph :: Ord a =&gt; a -&gt; [a] -&gt; Graph a
+<span class="lineno">   25 </span><span class="decl"><span class="istickedoff">mkGraph k = Graph . Map.singleton k . Set.fromList</span></span>
+<span class="lineno">   26 </span>
+<span class="lineno">   27 </span>-- Haskell
+<span class="lineno">   28 </span>data Import = Import
+<span class="lineno">   29 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">module_</span></span></span> :: ModuleName
+<span class="lineno">   30 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">package</span></span></span> :: Maybe Text
+<span class="lineno">   31 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   32 </span>
+<span class="lineno">   33 </span>newtype ModuleName = ModuleName { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unModuleName</span></span></span> :: Text }
+<span class="lineno">   34 </span>  deriving newtype (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff">IsString</span></span>)
+<span class="lineno">   35 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   36 </span>
+<span class="lineno">   37 </span>data Module = Module
+<span class="lineno">   38 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">name</span></span></span> :: ModuleName
+<span class="lineno">   39 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">path</span></span></span> :: FilePath
+<span class="lineno">   40 </span>  }
+<span class="lineno">   41 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   42 </span>
+<span class="lineno">   43 </span>type ModuleGraph = Graph ModuleName
 <span class="lineno">   44 </span>
-<span class="lineno">   45 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Semigroup ModuleGraph</span></span></span></span> where
-<span class="lineno">   46 </span>  <span class="decl"><span class="istickedoff">x &lt;&gt; y = ModuleGraph</span>
-<span class="lineno">   47 </span><span class="spaces">    </span><span class="istickedoff">{ imports = Map.unionWith (&lt;&gt;) x.imports y.imports</span>
-<span class="lineno">   48 </span><span class="spaces">    </span><span class="istickedoff">}</span></span>
-<span class="lineno">   49 </span>
-<span class="lineno">   50 </span>instance <span class="decl"><span class="istickedoff"><span class="decl"><span class="istickedoff">Monoid ModuleGraph</span></span></span></span> where
-<span class="lineno">   51 </span>  <span class="decl"><span class="istickedoff">mempty = ModuleGraph mempty</span></span>
+<span class="lineno">   45 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
+<span class="lineno">   46 </span><span class="decl"><span class="istickedoff">singletonModuleGraph = singletonGraph</span></span>
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
+<span class="lineno">   49 </span><span class="decl"><span class="istickedoff">mkModuleGraph = mkGraph</span></span>
+<span class="lineno">   50 </span>
+<span class="lineno">   51 </span>-- | Convert a Graph of type @a@ to a Graph of type @b@.
+<span class="lineno">   52 </span>-- This is like a functor, but it can't be a functor because of laws and stuff.
+<span class="lineno">   53 </span>convertGraph :: Ord b =&gt; (a -&gt; b) -&gt; Graph a -&gt; Graph b
+<span class="lineno">   54 </span><span class="decl"><span class="istickedoff">convertGraph f = foldMap (\(k, vs) -&gt; Graph (Map.singleton (f k) (Set.map f vs))) . Map.assocs . unGraph</span></span>
 
 </pre>
 </body>

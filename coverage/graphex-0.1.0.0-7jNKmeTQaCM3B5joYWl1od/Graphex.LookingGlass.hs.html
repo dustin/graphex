@@ -20,15 +20,15 @@ span.spaces    { background: white }
 <span class="lineno">    1 </span>{-# LANGUAGE StrictData #-}
 <span class="lineno">    2 </span>module Graphex.LookingGlass where
 <span class="lineno">    3 </span>
-<span class="lineno">    4 </span>import Data.Aeson qualified as Ae
-<span class="lineno">    5 </span>import Data.String (IsString)
-<span class="lineno">    6 </span>import GHC.Generics
-<span class="lineno">    7 </span>import Data.Map (Map)
-<span class="lineno">    8 </span>import Data.Map.Strict qualified as Map
-<span class="lineno">    9 </span>import Data.Set qualified as Set
-<span class="lineno">   10 </span>import Data.Text (Text)
+<span class="lineno">    4 </span>import qualified Data.Aeson      as Ae
+<span class="lineno">    5 </span>import           Data.Map        (Map)
+<span class="lineno">    6 </span>import qualified Data.Map.Strict as Map
+<span class="lineno">    7 </span>import qualified Data.Set        as Set
+<span class="lineno">    8 </span>import           Data.String     (IsString)
+<span class="lineno">    9 </span>import           Data.Text       (Text)
+<span class="lineno">   10 </span>import           GHC.Generics
 <span class="lineno">   11 </span>
-<span class="lineno">   12 </span>import Graphex.Core
+<span class="lineno">   12 </span>import           Graphex.Core
 <span class="lineno">   13 </span>
 <span class="lineno">   14 </span>data Node = Node
 <span class="lineno">   15 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">label</span></span></span> :: Text
@@ -39,7 +39,7 @@ span.spaces    { background: white }
 <span class="lineno">   20 </span>type NodeId = Text
 <span class="lineno">   21 </span>data Edge = Edge
 <span class="lineno">   22 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">from</span></span></span> :: NodeId
-<span class="lineno">   23 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">to</span></span></span> :: NodeId
+<span class="lineno">   23 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">to</span></span></span>   :: NodeId
 <span class="lineno">   24 </span>  } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
 <span class="lineno">   25 </span>  deriving anyclass (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.FromJSON</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>)
 <span class="lineno">   26 </span>
@@ -65,7 +65,7 @@ span.spaces    { background: white }
 <span class="lineno">   46 </span>  -&gt; Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
 <span class="lineno">   47 </span>  -&gt; ModuleGraph
 <span class="lineno">   48 </span>  -&gt; GraphDef
-<span class="lineno">   49 </span><span class="decl"><span class="nottickedoff">toLookingGlass title colors ModuleGraph{..} =</span>
+<span class="lineno">   49 </span><span class="decl"><span class="nottickedoff">toLookingGlass title colors Graph{..} =</span>
 <span class="lineno">   50 </span><span class="spaces">  </span><span class="nottickedoff">let mkNodeId (ModuleName m) = m</span>
 <span class="lineno">   51 </span><span class="spaces">      </span><span class="nottickedoff">mkNode m =</span>
 <span class="lineno">   52 </span><span class="spaces">        </span><span class="nottickedoff">( mkNodeId m</span>
@@ -75,8 +75,8 @@ span.spaces    { background: white }
 <span class="lineno">   56 </span><span class="spaces">          </span><span class="nottickedoff">}</span>
 <span class="lineno">   57 </span><span class="spaces">        </span><span class="nottickedoff">)</span>
 <span class="lineno">   58 </span><span class="spaces">  </span><span class="nottickedoff">in GraphDef</span>
-<span class="lineno">   59 </span><span class="spaces">     </span><span class="nottickedoff">{ nodes = Map.fromList $ fmap (\(m, _) -&gt; mkNode m) $ Map.toList imports</span>
-<span class="lineno">   60 </span><span class="spaces">     </span><span class="nottickedoff">, edges = Map.toList imports &gt;&gt;= \(m, children) -&gt; fmap (\c -&gt; Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children</span>
+<span class="lineno">   59 </span><span class="spaces">     </span><span class="nottickedoff">{ nodes = Map.fromList $ fmap (\(m, _) -&gt; mkNode m) $ Map.toList unGraph</span>
+<span class="lineno">   60 </span><span class="spaces">     </span><span class="nottickedoff">, edges = Map.toList unGraph &gt;&gt;= \(m, children) -&gt; fmap (\c -&gt; Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children</span>
 <span class="lineno">   61 </span><span class="spaces">     </span><span class="nottickedoff">, ..</span>
 <span class="lineno">   62 </span><span class="spaces">     </span><span class="nottickedoff">}</span></span>
 

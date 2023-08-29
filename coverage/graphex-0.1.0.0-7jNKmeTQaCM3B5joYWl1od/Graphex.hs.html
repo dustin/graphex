@@ -39,7 +39,7 @@ span.spaces    { background: white }
 <span class="lineno">   20 </span>import           Graphex.Search              (bfsOn, findFirst, flood)
 <span class="lineno">   21 </span>
 <span class="lineno">   22 </span>-- | Convert a dependency file to a graph.
-<span class="lineno">   23 </span>depToGraph :: GraphDef -&gt; Graph
+<span class="lineno">   23 </span>depToGraph :: GraphDef -&gt; Graph Text
 <span class="lineno">   24 </span><span class="decl"><span class="istickedoff">depToGraph GraphDef{..} = Graph (links &lt;&gt; allNodes)</span>
 <span class="lineno">   25 </span><span class="spaces">    </span><span class="istickedoff">where</span>
 <span class="lineno">   26 </span><span class="spaces">        </span><span class="istickedoff">links = Map.fromListWith (&lt;&gt;) [ (name from, Set.singleton (name to)) | Edge{..} &lt;- edges]</span>
@@ -47,7 +47,7 @@ span.spaces    { background: white }
 <span class="lineno">   28 </span><span class="spaces">        </span><span class="istickedoff">name = (.label) . (nodes Map.!) :: Text -&gt; Text</span></span>
 <span class="lineno">   29 </span>
 <span class="lineno">   30 </span>-- | Convert a graph back to our dependency file format.
-<span class="lineno">   31 </span>graphToDep :: Graph -&gt; GraphDef
+<span class="lineno">   31 </span>graphToDep :: Graph Text -&gt; GraphDef
 <span class="lineno">   32 </span><span class="decl"><span class="istickedoff">graphToDep (Graph m) = GraphDef {</span>
 <span class="lineno">   33 </span><span class="spaces">    </span><span class="istickedoff">title = &quot;Internal Package Dependencies&quot;,</span>
 <span class="lineno">   34 </span><span class="spaces">    </span><span class="istickedoff">edges = [ Edge { from = k, to = v } | (k, vs) &lt;- Map.assocs m, v &lt;- Set.toList vs ],</span>
@@ -55,45 +55,45 @@ span.spaces    { background: white }
 <span class="lineno">   36 </span><span class="spaces">    </span><span class="istickedoff">}</span></span>
 <span class="lineno">   37 </span>
 <span class="lineno">   38 </span>-- | Reverse all the arrows in the graphs.
-<span class="lineno">   39 </span>reverseEdges :: Graph -&gt; Graph
+<span class="lineno">   39 </span>reverseEdges :: Ord a =&gt; Graph a -&gt; Graph a
 <span class="lineno">   40 </span><span class="decl"><span class="istickedoff">reverseEdges (Graph m) = Graph $ Map.fromListWith (&lt;&gt;) [ (v, Set.singleton k) | (k, vs) &lt;- Map.assocs m, v &lt;- Set.toList vs ] &lt;&gt; Map.fromSet (const mempty) (Map.keysSet m)</span></span>
 <span class="lineno">   41 </span>
 <span class="lineno">   42 </span>-- | Find the direct list of things that are referencing this module.
-<span class="lineno">   43 </span>directDepsOn :: Graph -&gt; Text -&gt; Set Text
+<span class="lineno">   43 </span>directDepsOn :: Ord a =&gt; Graph a -&gt; a -&gt; Set a
 <span class="lineno">   44 </span><span class="decl"><span class="istickedoff">directDepsOn = flip (Map.findWithDefault mempty) . unGraph</span></span>
 <span class="lineno">   45 </span>
 <span class="lineno">   46 </span>-- | Flood fill to find all transitive dependencies on a starting module, excluding the original key.
-<span class="lineno">   47 </span>allDepsOn :: Graph -&gt; Text -&gt; Set Text
+<span class="lineno">   47 </span>allDepsOn :: Ord a =&gt; Graph a -&gt; a -&gt; Set a
 <span class="lineno">   48 </span><span class="decl"><span class="istickedoff">allDepsOn = flood . directDepsOn</span></span>
 <span class="lineno">   49 </span>
 <span class="lineno">   50 </span>-- | Find an example path between two modules.
 <span class="lineno">   51 </span>--
 <span class="lineno">   52 </span>-- This is a short path, but the important part is that it represents how connectivy works.
-<span class="lineno">   53 </span>why :: Graph -&gt; Text -&gt; Text -&gt; [Text]
+<span class="lineno">   53 </span>why :: Ord a =&gt; Graph a -&gt; a -&gt; a -&gt; [a]
 <span class="lineno">   54 </span><span class="decl"><span class="istickedoff">why m from to = fromMaybe [] $ findFirst bfsOn head (\ks -&gt; (:ks) &lt;$&gt; (Set.toList . directDepsOn m . head) ks) [from] ((== to) . head)</span></span>
 <span class="lineno">   55 </span>
 <span class="lineno">   56 </span>-- | Find all paths between two modules as a restricted graph of the intersection of
 <span class="lineno">   57 </span>-- reachable nodes from the start and to the end.
-<span class="lineno">   58 </span>allPathsTo :: Graph -&gt; Text -&gt; Text -&gt; Graph
+<span class="lineno">   58 </span>allPathsTo :: (NFData a, Ord a) =&gt; Graph a -&gt; a -&gt; a -&gt; Graph a
 <span class="lineno">   59 </span><span class="decl"><span class="istickedoff">allPathsTo m from to = restrictTo m $ allDepsOn m from `Set.intersection` allDepsOn (reverseEdges m) to</span></span>
 <span class="lineno">   60 </span>
 <span class="lineno">   61 </span>-- | Count the number of transitive dependencies for each module.
-<span class="lineno">   62 </span>rankings :: Graph -&gt; Map Text Int
+<span class="lineno">   62 </span>rankings :: (NFData a, Ord a) =&gt; Graph a -&gt; Map a Int
 <span class="lineno">   63 </span><span class="decl"><span class="istickedoff">rankings g = Map.fromList $ mapMaybeWithKey (Just . length . allDepsOn g) g</span></span>
 <span class="lineno">   64 </span>
 <span class="lineno">   65 </span>-- | Visit each node in the graph and apply a function to it.
-<span class="lineno">   66 </span>mapMaybeWithKey :: NFData a =&gt; (Text -&gt; Maybe a) -&gt; Graph -&gt; [(Text, a)]
+<span class="lineno">   66 </span>mapMaybeWithKey :: (NFData a, NFData g) =&gt; (g -&gt; Maybe a) -&gt; Graph g -&gt; [(g, a)]
 <span class="lineno">   67 </span><span class="decl"><span class="istickedoff">mapMaybeWithKey f = mapMaybe sequenceA . parMap rdeepseq (ap (,) f) . Map.keys . unGraph</span></span>
 <span class="lineno">   68 </span>
 <span class="lineno">   69 </span>-- | Restrict a graph to only the given set of modules.
-<span class="lineno">   70 </span>restrictTo :: Graph -&gt; Set Text -&gt; Graph
+<span class="lineno">   70 </span>restrictTo :: (Ord a, NFData a) =&gt; Graph a -&gt; Set a -&gt; Graph a
 <span class="lineno">   71 </span><span class="decl"><span class="istickedoff">restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v -&gt;</span>
 <span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">(if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))</span>
 <span class="lineno">   73 </span><span class="spaces">    </span><span class="istickedoff">where</span>
 <span class="lineno">   74 </span><span class="spaces">        </span><span class="istickedoff">nonNullSet v = if Set.null v then Nothing else Just v</span></span>
 <span class="lineno">   75 </span>
 <span class="lineno">   76 </span>-- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.
-<span class="lineno">   77 </span>graphToTree :: Text -&gt; Graph -&gt; Tree Text
+<span class="lineno">   77 </span>graphToTree :: Ord a =&gt; a -&gt; Graph a -&gt; Tree a
 <span class="lineno">   78 </span><span class="decl"><span class="istickedoff">graphToTree startingAt (Graph rels) = go mempty startingAt</span>
 <span class="lineno">   79 </span><span class="spaces">  </span><span class="istickedoff">where</span>
 <span class="lineno">   80 </span><span class="spaces">    </span><span class="istickedoff">go seen node =</span>
