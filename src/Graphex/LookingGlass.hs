@@ -1,15 +1,15 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.LookingGlass where
 
-import Data.Aeson qualified as Ae
-import Data.String (IsString)
-import GHC.Generics
-import Data.Map (Map)
-import Data.Map.Strict qualified as Map
-import Data.Set qualified as Set
-import Data.Text (Text)
+import qualified Data.Aeson      as Ae
+import           Data.Map        (Map)
+import qualified Data.Map.Strict as Map
+import qualified Data.Set        as Set
+import           Data.String     (IsString)
+import           Data.Text       (Text)
+import           GHC.Generics
 
-import Graphex.Core
+import           Graphex.Core
 
 data Node = Node
   { label :: Text
@@ -20,7 +20,7 @@ data Node = Node
 type NodeId = Text
 data Edge = Edge
   { from :: NodeId
-  , to :: NodeId
+  , to   :: NodeId
   } deriving (Show, Generic)
   deriving anyclass (Ae.FromJSON, Ae.ToJSON)
 
@@ -46,7 +46,7 @@ toLookingGlass
   -> Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
   -> ModuleGraph
   -> GraphDef
-toLookingGlass title colors ModuleGraph{..} =
+toLookingGlass title colors Graph{..} =
   let mkNodeId (ModuleName m) = m
       mkNode m =
         ( mkNodeId m
@@ -56,7 +56,7 @@ toLookingGlass title colors ModuleGraph{..} =
           }
         )
   in GraphDef
-     { nodes = Map.fromList $ fmap (\(m, _) -> mkNode m) $ Map.toList imports
-     , edges = Map.toList imports >>= \(m, children) -> fmap (\c -> Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children
+     { nodes = Map.fromList $ fmap (\(m, _) -> mkNode m) $ Map.toList unGraph
+     , edges = Map.toList unGraph >>= \(m, children) -> fmap (\c -> Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children
      , ..
      }
