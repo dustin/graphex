@@ -1,7 +1,11 @@
 {-# LANGUAGE OverloadedRecordDot #-}
-module Graphex (Graph(..),
-    reverseEdges, directDepsOn, allDepsOn,
-    why, rankings, allPathsTo, restrictTo, mapMaybeWithKey,
+module Graphex (
+    -- * The Graph
+    Graph(..),
+    -- * Working from an individual node in the graph.
+    reverseEdges, directDepsOn, allDepsOn, why,
+    -- * Working on the graph as a whole.
+    rankings, allPathsTo, restrictTo, mapMaybeWithKey,
     graphToDep, depToGraph, graphToTree) where
 
 import           Control.Monad               (ap)
@@ -55,7 +59,7 @@ why m from to = fromMaybe [] $ findFirst bfsOn head (\ks -> (:ks) <$> (Set.toLis
 
 -- | Find all paths between two modules as a restricted graph of the intersection of
 -- reachable nodes from the start and to the end.
-allPathsTo :: (NFData a, Ord a) => Graph a -> a -> a -> Graph a
+allPathsTo :: Ord a => Graph a -> a -> a -> Graph a
 allPathsTo m from to = restrictTo m $ allDepsOn m from `Set.intersection` allDepsOn (reverseEdges m) to
 
 -- | Count the number of transitive dependencies for each module.
@@ -67,7 +71,7 @@ mapMaybeWithKey :: (NFData a, NFData g) => (g -> Maybe a) -> Graph g -> [(g, a)]
 mapMaybeWithKey f = mapMaybe sequenceA . parMap rdeepseq (ap (,) f) . Map.keys . unGraph
 
 -- | Restrict a graph to only the given set of modules.
-restrictTo :: (Ord a, NFData a) => Graph a -> Set a -> Graph a
+restrictTo :: Ord a => Graph a -> Set a -> Graph a
 restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
   (if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))
     where
