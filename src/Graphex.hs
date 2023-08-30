@@ -77,9 +77,7 @@ mapMaybeWithKey f = mapMaybe sequenceA . parMap rdeepseq (ap (,) f) . Map.keys .
 -- | Restrict a graph to only the given set of modules.
 restrictTo :: Ord a => Graph a -> Set a -> Graph a
 restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
-  (if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))
-    where
-        nonNullSet v = if Set.null v then Nothing else Just v
+  if Set.notMember k' keep then Nothing else Just (Set.intersection keep v)
 
 -- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.
 graphToTree :: Ord a => a -> Graph a -> Tree a

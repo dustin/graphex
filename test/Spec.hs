@@ -152,6 +152,17 @@ prop_allPaths gwk@(ConnectedGraph from to g) =
         checkPath True f  = hasPath f
         checkPath False f = not . hasPath f
 
+validateCoherence :: Graph Text -> Property
+validateCoherence (Graph m) = counterexample ("nodes: " <> show ks <> "\nedges: " <> show edges) $ edges `Set.isSubsetOf` ks
+    where ks = Map.keysSet m
+          edges = fold m
+
+prop_generatorCoherence :: Graph Text -> Property
+prop_generatorCoherence = validateCoherence
+
+prop_allPathsCoherence :: ConnectedGraph -> Property
+prop_allPathsCoherence (ConnectedGraph from to g) = validateCoherence $ allPathsTo g from to
+
 prop_importExport :: Graph Text -> Property
 prop_importExport g =
     counterexample ("exported: " <> show exported <> "\nimported: " <> show imported) $
