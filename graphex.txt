@@ -161,12 +161,15 @@ why :: Ord a => Graph a -> a -> a -> [a]
 -- | Count the number of transitive dependencies for each module.
 rankings :: (NFData a, Ord a) => Graph a -> Map a Int
 
+-- | Find the longest path in a Graph.
+longest :: (NFData a, Ord a) => Graph a -> [a]
+
 -- | Find all paths between two modules as a restricted graph of the
 --   intersection of reachable nodes from the start and to the end.
-allPathsTo :: (NFData a, Ord a) => Graph a -> a -> a -> Graph a
+allPathsTo :: Ord a => Graph a -> a -> a -> Graph a
 
 -- | Restrict a graph to only the given set of modules.
-restrictTo :: (Ord a, NFData a) => Graph a -> Set a -> Graph a
+restrictTo :: Ord a => Graph a -> Set a -> Graph a
 
 -- | Visit each node in the graph and apply a function to it.
 mapMaybeWithKey :: (NFData a, NFData g) => (g -> Maybe a) -> Graph g -> [(g, a)]
