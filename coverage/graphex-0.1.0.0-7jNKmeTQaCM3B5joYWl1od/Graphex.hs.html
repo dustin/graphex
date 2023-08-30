@@ -108,13 +108,14 @@ span.spaces    { background: white }
 <span class="lineno">   89 </span>
 <span class="lineno">   90 </span>-- | Find the longest path in a Graph.
 <span class="lineno">   91 </span>longest :: (NFData a, Ord a) =&gt; Graph a -&gt; [a]
-<span class="lineno">   92 </span><span class="decl"><span class="istickedoff">longest g = reverse . maxByLen . fmap snd $ mapMaybeWithKey one g</span>
+<span class="lineno">   92 </span><span class="decl"><span class="istickedoff">longest g = reverse . snd . maximumOn (length . snd) $ mapMaybeWithKey one g</span>
 <span class="lineno">   93 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   94 </span><span class="spaces">    </span><span class="istickedoff">one = Just . fmap fst . maxByLen . dfsWith store seen (\ks -&gt; (:ks) . (, succ . snd . head $ ks) &lt;$&gt; foldMap (Set.toList . directDepsOn g . fst) (listToMaybe ks)) . (:[]) . (,1::Int)</span>
+<span class="lineno">   94 </span><span class="spaces">    </span><span class="istickedoff">one = Just . fmap fst . maximumOn length . dfsWith store seen (\ks -&gt; (:ks) . (, succ . snd . head $ ks) &lt;$&gt; foldMap (Set.toList . directDepsOn g . fst) (listToMaybe ks)) . (:[]) . (,1::Int)</span>
 <span class="lineno">   95 </span><span class="spaces">    </span><span class="istickedoff">-- store and head cannot be called with empty lists.</span>
 <span class="lineno">   96 </span><span class="spaces">    </span><span class="istickedoff">store (head -&gt; (k,l)) = Map.insert k l</span>
 <span class="lineno">   97 </span><span class="spaces">    </span><span class="istickedoff">seen (head -&gt; (k,l)) = maybe False (&lt; l) . Map.lookup k</span>
-<span class="lineno">   98 </span><span class="spaces">    </span><span class="istickedoff">maxByLen = maximumBy (comparing length)</span></span>
+<span class="lineno">   98 </span><span class="spaces">    </span><span class="istickedoff">maximumOn :: Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; a</span>
+<span class="lineno">   99 </span><span class="spaces">    </span><span class="istickedoff">maximumOn f = maximumBy (comparing f)</span></span>
 
 </pre>
 </body>
