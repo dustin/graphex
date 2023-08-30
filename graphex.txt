@@ -159,7 +159,7 @@ allDepsOn :: Ord a => Graph a -> a -> Set a
 why :: Ord a => Graph a -> a -> a -> [a]
 
 -- | Count the number of transitive dependencies for each module.
-rankings :: (NFData a, Ord a) => Graph a -> Map a Int
+rankings :: (NFData a, Ord a) => Graph a -> [(Int, a)]
 
 -- | Find the longest path in a Graph.
 longest :: (NFData a, Ord a) => Graph a -> [a]
