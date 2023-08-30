@@ -1,6 +1,7 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.LookingGlass where
 
+import           Data.Aeson      (withObject, (.!=), (.:), (.:?))
 import qualified Data.Aeson      as Ae
 import           Data.Map        (Map)
 import qualified Data.Map.Strict as Map
@@ -28,8 +29,17 @@ data GraphDef = GraphDef
   { title :: Text
   , nodes :: Map NodeId Node
   , edges :: [Edge]
+  , attrs :: Map NodeId (Map Text Text)
   } deriving (Show, Generic)
-  deriving anyclass (Ae.FromJSON, Ae.ToJSON)
+  deriving anyclass Ae.ToJSON
+
+instance Ae.FromJSON GraphDef where
+  parseJSON = withObject "GraphDef" $ \o -> do
+    title <- o .: "title"
+    nodes <- o .: "nodes"
+    edges <- o .: "edges"
+    attrs <- o .:? "attrs" .!= mempty
+    pure GraphDef{..}
 
 newtype Color = Color { unColor :: Text }
   deriving stock (Eq, Ord, Show)
@@ -58,5 +68,6 @@ toLookingGlass title colors Graph{..} =
   in GraphDef
      { nodes = Map.fromList $ fmap (\(m, _) -> mkNode m) $ Map.toList unGraph
      , edges = Map.toList unGraph >>= \(m, children) -> fmap (\c -> Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children
+     , attrs = mempty
      , ..
      }

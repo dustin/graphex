@@ -26,10 +26,10 @@ import           Graphex.Search
 
 -- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
 instance Show (Graph Text) where
-    show (Graph m) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
+    show (Graph m _) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
 
 instance Show (Graph ModuleName) where
-    show (Graph m) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
+    show (Graph m _) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
 
 -- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
 someStrings :: [Text]
@@ -42,13 +42,16 @@ instance Arbitrary (Graph Text) where
     arbitrary = do
         -- We begin with some subset of keys in arbitrary order
         somekeys <- shuffle =<< sublistOf someStrings
+        attrs <- Map.fromList <$> listOf ((,) <$> elements somekeys <*> genAttrs)
         -- We build a graph of acyclic connections, ensuring that all keys are present
-        Graph . (<> Map.fromList [(k, mempty) | k <- somekeys]) <$> foldM next mempty somekeys
+        Graph . (<> Map.fromList [(k, mempty) | k <- somekeys]) <$> foldM next mempty somekeys <*> pure attrs
         where
             next m k = flip (Map.insert k) m . Set.fromList <$> sublistOf (Map.keys m)
+            genAttrs :: Gen (Map Text Text)
+            genAttrs = Map.fromList <$> listOf ((,) <$> elements someStrings <*> elements someStrings)
 
     -- A custom shrink here needs to make sure
-    shrink (Graph m) = Graph . Map.fromList <$> keySubs (Map.assocs m)
+    shrink (Graph m attrs) = Graph . Map.fromList <$> keySubs (Map.assocs m) <*> pure attrs
         where
             keySubs = fmap clean . shrinkList (const [])
             clean kvs = (\(k, vs) -> (k, vs `Set.intersection` keys)) <$> kvs
@@ -61,12 +64,12 @@ data GraphWithKey = GraphWithKey Text (Graph Text)
 
 instance Arbitrary GraphWithKey where
     arbitrary = do
-        Graph g <- arbitrary `suchThat` (\(Graph m) -> (not . Map.null) m)
+        Graph g attrs <- arbitrary `suchThat` (\(Graph m _) -> (not . Map.null) m)
         k <- QC.elements (Map.keys g)
-        pure $ GraphWithKey k (Graph g)
+        pure $ GraphWithKey k (Graph g attrs)
 
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
-    shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m) -> Map.member k m) (shrink g)
+    shrink (GraphWithKey k g) = GraphWithKey k <$> filter (\(Graph m _) -> Map.member k m) (shrink g)
 
 -- A DAG that we know contains two keys that are connected (a path exists to the second one from the first one).
 data ConnectedGraph = ConnectedGraph Text Text (Graph Text)
@@ -74,19 +77,19 @@ data ConnectedGraph = ConnectedGraph Text Text (Graph Text)
 
 instance Arbitrary ConnectedGraph where
     arbitrary = do
-        (g@(Graph m), connMap) <- arbitrary `suchThatMap` connections
+        (g@(Graph m _), connMap) <- arbitrary `suchThatMap` connections
         from <- QC.elements (Map.keys connMap)
         to <- QC.elements (connMap Map.! from)
         pure $ ConnectedGraph from to g
         where
             connections :: Graph Text -> Maybe (Graph Text, Map Text [Text])
-            connections g@(Graph m) = do
+            connections g@(Graph m _) = do
                 let connMap = Map.fromListWith (<>) [(k, [ks]) | k <- Map.keys m, ks <- Set.toList (Set.delete k $ allDepsOn g k)]
                 guard (not . Map.null $ connMap)
                 pure (g, connMap)
 
     -- When shrinking, our k is constant and should still be in the resulting map keyset (though links can be removed)
-    shrink (ConnectedGraph from to g) = ConnectedGraph from to <$> filter (\(Graph m) -> Map.member from m && Map.member to m) (shrink g)
+    shrink (ConnectedGraph from to g) = ConnectedGraph from to <$> filter (\(Graph m _) -> Map.member from m && Map.member to m) (shrink g)
 
 prop_reverseEdgesId :: Graph Text -> Property
 prop_reverseEdgesId g =
@@ -96,7 +99,7 @@ prop_reverseEdgesId g =
         rg = reverseEdges g
 
 prop_reversedDep :: Graph Text -> Property
-prop_reversedDep g@(Graph m) =
+prop_reversedDep g@(Graph m _) =
     counterexample ("fwd: " <> show g <> "\nrev: " <> show rg) $
     all (\(k, vs) -> all (\k' -> k `elem` directDepsOn rg k') vs) (Map.assocs m)
     where
@@ -153,7 +156,7 @@ prop_allPaths gwk@(ConnectedGraph from to g) =
         checkPath False f = not . hasPath f
 
 validateCoherence :: Graph Text -> Property
-validateCoherence (Graph m) = counterexample ("nodes: " <> show ks <> "\nedges: " <> show edges) $ edges `Set.isSubsetOf` ks
+validateCoherence (Graph m _) = counterexample ("nodes: " <> show ks <> "\nedges: " <> show edges) $ edges `Set.isSubsetOf` ks
     where ks = Map.keysSet m
           edges = fold m
 
@@ -184,10 +187,10 @@ prop_treeDeps (GraphWithKey k g) =
     where t = graphToTree k g
 
 prop_treeDepsWorksWithCycles :: ConnectedGraph -> Property
-prop_treeDepsWorksWithCycles (ConnectedGraph from to g@(Graph m)) =
+prop_treeDepsWorksWithCycles (ConnectedGraph from to g@(Graph m attrs)) =
     counterexample (Tree.drawTree (T.unpack <$> t)) $
     allDepsOn g from === Set.fromList (Tree.flatten t)
-  where g' = Graph (Map.insertWith (<>) to (Set.singleton from) m)
+  where g' = Graph (Map.insertWith (<>) to (Set.singleton from) m) attrs
         t = graphToTree from g'
 
 prop_treeDepsEmptiness :: Graph Text -> Property

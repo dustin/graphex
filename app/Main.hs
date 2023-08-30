@@ -11,12 +11,16 @@ import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
-                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
-                                       str, strOption, switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command,
+                                       customExecParser, fullDesc, help, helper,
+                                       hsubparser, info, long, metavar, prefs,
+                                       progDesc, short, showDefault,
+                                       showHelpOnError, some, str, strOption,
+                                       switch, value, (<**>))
 
 import           Graphex
 import           Graphex.Cabal
+import           Graphex.Core
 import qualified Graphex.CSV
 import           Graphex.LookingGlass
 
@@ -98,7 +102,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
           else
             let explainer = if optReverse then " imports " else " imported by "
             in printStrs $ [fromModule] <> ((explainer <>) <$> why graph fromModule toModule)
-        AllPaths from to -> BL.putStr . encode . graphToDep $ allPathsTo graph from to
+        AllPaths from to -> BL.putStr . encode . graphToDep . (setAttribute from "note" "start" . setAttribute to "note" "end") $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
         Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph

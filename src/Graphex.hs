@@ -29,23 +29,25 @@ import           Graphex.Search              (bfsOn, dfsWith, findFirst, flood)
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph Text
-depToGraph GraphDef{..} = Graph (links <> allNodes)
+depToGraph GraphDef{..} = Graph (links <> allNodes) mappedAttrs
     where
         links = Map.fromListWith (<>) [ (name from, Set.singleton (name to)) | Edge{..} <- edges]
         allNodes = Map.fromList [(label, mempty) | Node{..} <- Map.elems nodes]
         name = (.label) . (nodes Map.!) :: Text -> Text
+        mappedAttrs = Map.mapKeys name attrs
 
 -- | Convert a graph back to our dependency file format.
 graphToDep :: Graph Text -> GraphDef
-graphToDep (Graph m) = GraphDef {
+graphToDep (Graph m attrs) = GraphDef {
     title = "Internal Package Dependencies",
     edges = [ Edge { from = k, to = v } | (k, vs) <- Map.assocs m, v <- Set.toList vs ],
-    nodes = Map.fromList [ (k, Node k Nothing) | k <- Map.keys m ]
+    nodes = Map.fromList [ (k, Node k Nothing) | k <- Map.keys m ],
+    attrs = Map.fromList [ (k, v) | k <- Map.keys m, v <- maybe [] pure (Map.lookup k attrs)]
     }
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Ord a => Graph a -> Graph a
-reverseEdges (Graph m) = Graph $ Map.fromListWith (<>) [ (v, Set.singleton k) | (k, vs) <- Map.assocs m, v <- Set.toList vs ] <> Map.fromSet (const mempty) (Map.keysSet m)
+reverseEdges g@(Graph m _) = g{unGraph = Map.fromListWith (<>) [ (v, Set.singleton k) | (k, vs) <- Map.assocs m, v <- Set.toList vs ] <> Map.fromSet (const mempty) (Map.keysSet m)}
 
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Ord a => Graph a -> a -> Set a
@@ -76,12 +78,12 @@ mapMaybeWithKey f = mapMaybe sequenceA . parMap rdeepseq (ap (,) f) . Map.keys .
 
 -- | Restrict a graph to only the given set of modules.
 restrictTo :: Ord a => Graph a -> Set a -> Graph a
-restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v ->
-  if Set.notMember k' keep then Nothing else Just (Set.intersection keep v)
+restrictTo (Graph m attrs) keep = Graph (flip Map.mapMaybeWithKey m $ \k' v ->
+  if Set.notMember k' keep then Nothing else Just (Set.intersection keep v)) (Map.restrictKeys attrs keep)
 
 -- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.
 graphToTree :: Ord a => a -> Graph a -> Tree a
-graphToTree startingAt (Graph rels) = go mempty startingAt
+graphToTree startingAt (Graph rels _) = go mempty startingAt
   where
     go seen node =
       let children = Set.toList $ Map.findWithDefault mempty node rels
