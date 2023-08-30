@@ -5,11 +5,8 @@ import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
 import           Data.Foldable
-import           Data.List            (sortOn)
 import           Data.List.NonEmpty   (NonEmpty)
 import qualified Data.List.NonEmpty   as NE
-import qualified Data.Map.Strict      as Map
-import           Data.Ord             (Down (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
@@ -23,6 +20,7 @@ import           Options.Applicative  (Parser, argument, command,
 
 import           Graphex
 import           Graphex.Cabal
+import           Graphex.Core
 import qualified Graphex.CSV
 import           Graphex.LookingGlass
 
@@ -32,6 +30,7 @@ data Command
     | Why { fromModule :: Text, toModule :: Text, showAll :: Bool }
     | AllPaths Text Text
     | Rankings
+    | FindLongest
     | Select Text
     | ToCSV Bool
     deriving stock Show
@@ -67,6 +66,7 @@ graphOptions = GraphOptions
         command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
         command "all-paths" (info allPathsCmd (progDesc "Show all ways a module depends on another module")),
         command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
+        command "longest" (info (pure FindLongest) (progDesc "Show the longest shortest path between two modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
         command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi"))
         ])
@@ -102,10 +102,11 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
           else
             let explainer = if optReverse then " imports " else " imported by "
             in printStrs $ [fromModule] <> ((explainer <>) <$> why graph fromModule toModule)
-        AllPaths from to -> BL.putStr . encode . graphToDep $ allPathsTo graph from to
+        AllPaths from to -> BL.putStr . encode . graphToDep . (setAttribute from "note" "start" . setAttribute to "note" "end") $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
-        Rankings         -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
+        Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph
+        FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
   CabalCmd CabalOptions{} -> do

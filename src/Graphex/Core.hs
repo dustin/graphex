@@ -9,20 +9,26 @@ import qualified Data.Set        as Set
 import           Data.String     (IsString)
 import           Data.Text       (Text)
 
-newtype Graph a = Graph { unGraph :: Map a (Set a) }
+data Graph a = Graph {
+  unGraph    :: Map a (Set a),
+  attributes :: Map a (Map Text Text)
+  }
   deriving stock Eq
 
 instance Ord a => Semigroup (Graph a) where
-  Graph x <> Graph y = Graph (Map.unionWith (<>) x y)
+  Graph x xa <> Graph y ya = Graph (Map.unionWith (<>) x y) (Map.unionWith (<>) xa ya)
 
 instance Ord a => Monoid (Graph a) where
-  mempty = Graph mempty
+  mempty = Graph mempty mempty
 
 singletonGraph :: Ord a => a -> a -> Graph a
 singletonGraph k = mkGraph k . pure
 
 mkGraph :: Ord a => a -> [a] -> Graph a
-mkGraph k = Graph . Map.singleton k . Set.fromList
+mkGraph k links = Graph (Map.singleton k (Set.fromList links)) mempty
+
+setAttribute :: Ord a => a -> Text -> Text -> Graph a -> Graph a
+setAttribute k attr val g@(Graph _ attrs) = g{attributes = Map.insertWith (<>) k (Map.singleton attr val) attrs}
 
 -- Haskell
 data Import = Import
@@ -51,4 +57,5 @@ mkModuleGraph = mkGraph
 -- | Convert a Graph of type @a@ to a Graph of type @b@.
 -- This is like a functor, but it can't be a functor because of laws and stuff.
 convertGraph :: Ord b => (a -> b) -> Graph a -> Graph b
-convertGraph f = foldMap (\(k, vs) -> Graph (Map.singleton (f k) (Set.map f vs))) . Map.assocs . unGraph
+convertGraph f (Graph m attrs) = g{attributes = Map.mapKeys f attrs}
+    where g = foldMap (\(k, vs) -> Graph (Map.singleton (f k) (Set.map f vs)) mempty) (Map.assocs m)
