@@ -14,12 +14,9 @@ import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command,
-                                       customExecParser, fullDesc, help, helper,
-                                       hsubparser, info, long, metavar, prefs,
-                                       progDesc, short, showDefault,
-                                       showHelpOnError, some, str, strOption,
-                                       switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
+                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
+                                       str, strOption, switch, value, (<**>))
 
 import           Graphex
 import           Graphex.Cabal
@@ -32,6 +29,7 @@ data Command
     | Why { fromModule :: Text, toModule :: Text, showAll :: Bool }
     | AllPaths Text Text
     | Rankings
+    | FindLongest
     | Select Text
     | ToCSV Bool
     deriving stock Show
@@ -67,6 +65,7 @@ graphOptions = GraphOptions
         command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
         command "all-paths" (info allPathsCmd (progDesc "Show all ways a module depends on another module")),
         command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
+        command "longest" (info (pure FindLongest) (progDesc "Show the longest shortest path between two modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
         command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi"))
         ])
@@ -106,6 +105,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
         Rankings         -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
+        FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
   CabalCmd CabalOptions{} -> do

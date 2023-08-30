@@ -181,6 +181,13 @@ prop_treeDepsEmptiness :: Graph Text -> Property
 prop_treeDepsEmptiness g = counterexample (Tree.drawTree (T.unpack <$> t)) $ t === Tree.Node "non-existent-key" []
     where t = graphToTree "non-existent-key" g
 
+prop_longestPath :: ConnectedGraph -> Property
+prop_longestPath (ConnectedGraph _ _ g) =
+    counterexample ("longest: " <> show (longest g)) $
+    property $ case longest g of
+        [] -> False
+        xs -> not . null $ why g (head xs) (last xs)
+
 instance Arbitrary ModuleName where
     arbitrary = ModuleName <$> elements someStrings
 

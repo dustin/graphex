@@ -5,14 +5,16 @@ module Graphex (
     -- * Working from an individual node in the graph.
     reverseEdges, directDepsOn, allDepsOn, why,
     -- * Working on the graph as a whole.
-    rankings, allPathsTo, restrictTo, mapMaybeWithKey,
+    rankings, longest, allPathsTo, restrictTo, mapMaybeWithKey,
     graphToDep, depToGraph, graphToTree) where
 
 import           Control.Monad               (ap)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
+import           Data.Foldable               (maximumBy)
 import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
-import           Data.Maybe                  (fromMaybe, mapMaybe)
+import           Data.Maybe                  (fromMaybe, listToMaybe, mapMaybe)
+import           Data.Ord                    (comparing)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
@@ -21,7 +23,7 @@ import qualified Data.Tree                   as Tree
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
-import           Graphex.Search              (bfsOn, findFirst, flood)
+import           Graphex.Search              (bfsOn, dfsWith, findFirst, flood)
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph Text
@@ -83,4 +85,15 @@ graphToTree startingAt (Graph rels) = go mempty startingAt
   where
     go seen node =
       let children = Set.toList $ Map.findWithDefault mempty node rels
-      in Tree.Node node $ if (Set.member node seen) then [] else fmap (go (Set.insert node seen)) children
+      in Tree.Node node $ if Set.member node seen then [] else fmap (go (Set.insert node seen)) children
+
+-- | Find the longest path in a Graph.
+longest :: (NFData a, Ord a) => Graph a -> [a]
+longest g = reverse . snd . maximumOn (length . snd) $ mapMaybeWithKey one g
+  where
+    one = Just . fmap fst . maximumOn length . dfsWith store seen (\ks -> (:ks) . (, succ . snd . head $ ks) <$> foldMap (Set.toList . directDepsOn g . fst) (listToMaybe ks)) . (:[]) . (,1::Int)
+    -- store and head cannot be called with empty lists.
+    store (head -> (k,l)) = Map.insert k l
+    seen (head -> (k,l)) = maybe False (< l) . Map.lookup k
+    maximumOn :: Ord b => (a -> b) -> [a] -> a
+    maximumOn f = maximumBy (comparing f)
