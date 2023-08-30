@@ -1,22 +1,23 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE StrictData #-}</span><span>
 </span><span id="line-2"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Graphex.LookingGlass</span><span> </span><span class="hs-keyword">where</span><span>
 </span><span id="line-3"></span><span>
-</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span>      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Ae</span></span><span>
-</span><span id="line-5"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
-</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span>        </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
-</span><span id="line-8"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.String</span></span><span>     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">IsString</span></span><span class="hs-special">)</span><span>
-</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
-</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span>
-</span><span id="line-11"></span><span>
-</span><span id="line-12"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Graphex.Core.html"><span class="hs-identifier">Graphex.Core</span></a></span><span>
-</span><span id="line-13"></span><span>
-</span><span id="line-14"></span><span class="hs-keyword">data</span><span> </span><span id="Node"><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-var">Node</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Node"><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-var">Node</span></a></span></span><span>
-</span><span id="line-15"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="label"><span class="annot"><span class="annottext">Node -&gt; NodeId
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">withObject</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.!=)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.:)</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(.:?)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Aeson</span></span><span>      </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Ae</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Map</span></span><span>        </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Map</span></span><span class="hs-special">)</span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Map.Strict</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Map</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Set</span></span><span>        </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">Set</span></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.String</span></span><span>     </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">IsString</span></span><span class="hs-special">)</span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>       </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">GHC.Generics</span></span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Graphex.Core.html"><span class="hs-identifier">Graphex.Core</span></a></span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">data</span><span> </span><span id="Node"><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-var">Node</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Node"><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-var">Node</span></a></span></span><span>
+</span><span id="line-16"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="label"><span class="annot"><span class="annottext">Node -&gt; NodeId
 </span><a href="Graphex.LookingGlass.html#label"><span class="hs-keyword hs-var hs-var">label</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-16"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="color"><span class="annot"><span class="annottext">Node -&gt; Maybe NodeId
+</span><span id="line-17"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="color"><span class="annot"><span class="annottext">Node -&gt; Maybe NodeId
 </span><a href="Graphex.LookingGlass.html#color"><span class="hs-identifier hs-var hs-var">color</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Maybe</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-17"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117251"><span id="local-6989586621679117259"><span id="local-6989586621679117263"><span class="annot"><span class="annottext">Int -&gt; Node -&gt; ShowS
+</span><span id="line-18"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117539"><span id="local-6989586621679117547"><span id="local-6989586621679117551"><span class="annot"><span class="annottext">Int -&gt; Node -&gt; ShowS
 [Node] -&gt; ShowS
 Node -&gt; String
 (Int -&gt; Node -&gt; ShowS)
@@ -29,7 +30,7 @@ $cshow :: Node -&gt; String
 show :: Node -&gt; String
 $cshowList :: [Node] -&gt; ShowS
 showList :: [Node] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117267"><span id="local-6989586621679117269"><span class="annot"><span class="annottext">(forall x. Node -&gt; Rep Node x)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117555"><span id="local-6989586621679117557"><span class="annot"><span class="annottext">(forall x. Node -&gt; Rep Node x)
 -&gt; (forall x. Rep Node x -&gt; Node) -&gt; Generic Node
 forall x. Rep Node x -&gt; Node
 forall x. Node -&gt; Rep Node x
@@ -40,7 +41,7 @@ from :: forall x. Node -&gt; Rep Node x
 $cto :: forall x. Rep Node x -&gt; Node
 to :: forall x. Rep Node x -&gt; Node
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-18"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117273"><span id="local-6989586621679117280"><span class="annot"><span class="annottext">Value -&gt; Parser [Node]
+</span><span id="line-19"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117561"><span id="local-6989586621679117568"><span class="annot"><span class="annottext">Value -&gt; Parser [Node]
 Value -&gt; Parser Node
 (Value -&gt; Parser Node) -&gt; (Value -&gt; Parser [Node]) -&gt; FromJSON Node
 forall a.
@@ -49,7 +50,7 @@ $cparseJSON :: Value -&gt; Parser Node
 parseJSON :: Value -&gt; Parser Node
 $cparseJSONList :: Value -&gt; Parser [Node]
 parseJSONList :: Value -&gt; Parser [Node]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Ae.FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117364"><span id="local-6989586621679117371"><span id="local-6989586621679117374"><span id="local-6989586621679117377"><span class="annot"><span class="annottext">[Node] -&gt; Encoding
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Ae.FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117652"><span id="local-6989586621679117659"><span id="local-6989586621679117662"><span id="local-6989586621679117665"><span class="annot"><span class="annottext">[Node] -&gt; Encoding
 [Node] -&gt; Value
 Node -&gt; Encoding
 Node -&gt; Value
@@ -73,14 +74,14 @@ toJSONList :: [Node] -&gt; Value
 $ctoEncodingList :: [Node] -&gt; Encoding
 toEncodingList :: [Node] -&gt; Encoding
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ae.ToJSON</span></span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span class="hs-keyword">type</span><span> </span><span id="NodeId"><span class="annot"><a href="Graphex.LookingGlass.html#NodeId"><span class="hs-identifier hs-var">NodeId</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">data</span><span> </span><span id="Edge"><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-var">Edge</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Edge"><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-var">Edge</span></a></span></span><span>
-</span><span id="line-22"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="from"><span class="annot"><span class="annottext">Edge -&gt; NodeId
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">type</span><span> </span><span id="NodeId"><span class="annot"><a href="Graphex.LookingGlass.html#NodeId"><span class="hs-identifier hs-var">NodeId</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">data</span><span> </span><span id="Edge"><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-var">Edge</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Edge"><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-var">Edge</span></a></span></span><span>
+</span><span id="line-23"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="from"><span class="annot"><span class="annottext">Edge -&gt; NodeId
 </span><a href="Graphex.LookingGlass.html#from"><span class="hs-identifier hs-var hs-var">from</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#NodeId"><span class="hs-identifier hs-type">NodeId</span></a></span><span>
-</span><span id="line-23"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="to"><span class="annot"><span class="annottext">Edge -&gt; NodeId
+</span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="to"><span class="annot"><span class="annottext">Edge -&gt; NodeId
 </span><a href="Graphex.LookingGlass.html#to"><span class="hs-identifier hs-var hs-var">to</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#NodeId"><span class="hs-identifier hs-type">NodeId</span></a></span><span>
-</span><span id="line-24"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117466"><span id="local-6989586621679117471"><span id="local-6989586621679117475"><span class="annot"><span class="annottext">Int -&gt; Edge -&gt; ShowS
+</span><span id="line-25"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117754"><span id="local-6989586621679117759"><span id="local-6989586621679117763"><span class="annot"><span class="annottext">Int -&gt; Edge -&gt; ShowS
 [Edge] -&gt; ShowS
 Edge -&gt; String
 (Int -&gt; Edge -&gt; ShowS)
@@ -93,7 +94,7 @@ $cshow :: Edge -&gt; String
 show :: Edge -&gt; String
 $cshowList :: [Edge] -&gt; ShowS
 showList :: [Edge] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117478"><span id="local-6989586621679117480"><span class="annot"><span class="annottext">(forall x. Edge -&gt; Rep Edge x)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117766"><span id="local-6989586621679117768"><span class="annot"><span class="annottext">(forall x. Edge -&gt; Rep Edge x)
 -&gt; (forall x. Rep Edge x -&gt; Edge) -&gt; Generic Edge
 forall x. Rep Edge x -&gt; Edge
 forall x. Edge -&gt; Rep Edge x
@@ -104,7 +105,7 @@ from :: forall x. Edge -&gt; Rep Edge x
 $cto :: forall x. Rep Edge x -&gt; Edge
 to :: forall x. Rep Edge x -&gt; Edge
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-25"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117483"><span id="local-6989586621679117490"><span class="annot"><span class="annottext">Value -&gt; Parser [Edge]
+</span><span id="line-26"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117771"><span id="local-6989586621679117778"><span class="annot"><span class="annottext">Value -&gt; Parser [Edge]
 Value -&gt; Parser Edge
 (Value -&gt; Parser Edge) -&gt; (Value -&gt; Parser [Edge]) -&gt; FromJSON Edge
 forall a.
@@ -113,7 +114,7 @@ $cparseJSON :: Value -&gt; Parser Edge
 parseJSON :: Value -&gt; Parser Edge
 $cparseJSONList :: Value -&gt; Parser [Edge]
 parseJSONList :: Value -&gt; Parser [Edge]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Ae.FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117539"><span id="local-6989586621679117546"><span id="local-6989586621679117549"><span id="local-6989586621679117552"><span class="annot"><span class="annottext">[Edge] -&gt; Encoding
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Ae.FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117827"><span id="local-6989586621679117834"><span id="local-6989586621679117837"><span id="local-6989586621679117840"><span class="annot"><span class="annottext">[Edge] -&gt; Encoding
 [Edge] -&gt; Value
 Edge -&gt; Encoding
 Edge -&gt; Value
@@ -137,15 +138,17 @@ toJSONList :: [Edge] -&gt; Value
 $ctoEncodingList :: [Edge] -&gt; Encoding
 toEncodingList :: [Edge] -&gt; Encoding
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ae.ToJSON</span></span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-26"></span><span>
-</span><span id="line-27"></span><span class="hs-keyword">data</span><span> </span><span id="GraphDef"><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-var">GraphDef</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="GraphDef"><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-var">GraphDef</span></a></span></span><span>
-</span><span id="line-28"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="title"><span class="annot"><span class="annottext">GraphDef -&gt; NodeId
+</span><span id="line-27"></span><span>
+</span><span id="line-28"></span><span class="hs-keyword">data</span><span> </span><span id="GraphDef"><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-var">GraphDef</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="GraphDef"><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-var">GraphDef</span></a></span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="title"><span class="annot"><span class="annottext">GraphDef -&gt; NodeId
 </span><a href="Graphex.LookingGlass.html#title"><span class="hs-identifier hs-var hs-var">title</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-29"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="nodes"><span class="annot"><span class="annottext">GraphDef -&gt; Map NodeId Node
+</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="nodes"><span class="annot"><span class="annottext">GraphDef -&gt; Map NodeId Node
 </span><a href="Graphex.LookingGlass.html#nodes"><span class="hs-identifier hs-var hs-var">nodes</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#NodeId"><span class="hs-identifier hs-type">NodeId</span></a></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span>
-</span><span id="line-30"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="edges"><span class="annot"><span class="annottext">GraphDef -&gt; [Edge]
+</span><span id="line-31"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="edges"><span class="annot"><span class="annottext">GraphDef -&gt; [Edge]
 </span><a href="Graphex.LookingGlass.html#edges"><span class="hs-identifier hs-var hs-var">edges</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-type">Edge</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-31"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117616"><span id="local-6989586621679117626"><span id="local-6989586621679117630"><span class="annot"><span class="annottext">Int -&gt; GraphDef -&gt; ShowS
+</span><span id="line-32"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="attrs"><span class="annot"><span class="annottext">GraphDef -&gt; Map NodeId (Map NodeId NodeId)
+</span><a href="Graphex.LookingGlass.html#attrs"><span class="hs-identifier hs-var hs-var">attrs</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#NodeId"><span class="hs-identifier hs-type">NodeId</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span class="hs-special">)</span><span>
+</span><span id="line-33"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117905"><span id="local-6989586621679117917"><span id="local-6989586621679117921"><span class="annot"><span class="annottext">Int -&gt; GraphDef -&gt; ShowS
 [GraphDef] -&gt; ShowS
 GraphDef -&gt; String
 (Int -&gt; GraphDef -&gt; ShowS)
@@ -158,7 +161,7 @@ $cshow :: GraphDef -&gt; String
 show :: GraphDef -&gt; String
 $cshowList :: [GraphDef] -&gt; ShowS
 showList :: [GraphDef] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117633"><span id="local-6989586621679117635"><span class="annot"><span class="annottext">(forall x. GraphDef -&gt; Rep GraphDef x)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117924"><span id="local-6989586621679117926"><span class="annot"><span class="annottext">(forall x. GraphDef -&gt; Rep GraphDef x)
 -&gt; (forall x. Rep GraphDef x -&gt; GraphDef) -&gt; Generic GraphDef
 forall x. Rep GraphDef x -&gt; GraphDef
 forall x. GraphDef -&gt; Rep GraphDef x
@@ -169,17 +172,7 @@ from :: forall x. GraphDef -&gt; Rep GraphDef x
 $cto :: forall x. Rep GraphDef x -&gt; GraphDef
 to :: forall x. Rep GraphDef x -&gt; GraphDef
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-32"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117638"><span id="local-6989586621679117645"><span class="annot"><span class="annottext">Value -&gt; Parser [GraphDef]
-Value -&gt; Parser GraphDef
-(Value -&gt; Parser GraphDef)
--&gt; (Value -&gt; Parser [GraphDef]) -&gt; FromJSON GraphDef
-forall a.
-(Value -&gt; Parser a) -&gt; (Value -&gt; Parser [a]) -&gt; FromJSON a
-$cparseJSON :: Value -&gt; Parser GraphDef
-parseJSON :: Value -&gt; Parser GraphDef
-$cparseJSONList :: Value -&gt; Parser [GraphDef]
-parseJSONList :: Value -&gt; Parser [GraphDef]
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Ae.FromJSON</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117712"><span id="local-6989586621679117719"><span id="local-6989586621679117722"><span id="local-6989586621679117725"><span class="annot"><span class="annottext">[GraphDef] -&gt; Encoding
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span id="local-6989586621679117929"><span id="local-6989586621679117936"><span id="local-6989586621679117939"><span id="local-6989586621679117942"><span class="annot"><span class="annottext">[GraphDef] -&gt; Encoding
 [GraphDef] -&gt; Value
 GraphDef -&gt; Encoding
 GraphDef -&gt; Value
@@ -202,18 +195,75 @@ $ctoJSONList :: [GraphDef] -&gt; Value
 toJSONList :: [GraphDef] -&gt; Value
 $ctoEncodingList :: [GraphDef] -&gt; Encoding
 toEncodingList :: [GraphDef] -&gt; Encoding
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ae.ToJSON</span></span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-33"></span><span>
-</span><span id="line-34"></span><span class="hs-keyword">newtype</span><span> </span><span id="Color"><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-var">Color</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Color"><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-var">Color</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unColor"><span class="annot"><span class="annottext">Color -&gt; NodeId
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ae.ToJSON</span></span></span></span></span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">instance</span><span> </span><span id="local-6989586621679118046"><span class="annot"><span class="hs-identifier hs-type">Ae.FromJSON</span></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-37"></span><span>  </span><span id="local-6989586621679118073"><span class="annot"><span class="annottext">parseJSON :: Value -&gt; Parser GraphDef
+</span><a href="#local-6989586621679118073"><span class="hs-identifier hs-var hs-var hs-var hs-var">parseJSON</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; (Object -&gt; Parser GraphDef) -&gt; Value -&gt; Parser GraphDef
+forall a. String -&gt; (Object -&gt; Parser a) -&gt; Value -&gt; Parser a
+</span><span class="hs-identifier hs-var">withObject</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;GraphDef&quot;</span></span><span> </span><span class="annot"><span class="annottext">((Object -&gt; Parser GraphDef) -&gt; Value -&gt; Parser GraphDef)
+-&gt; (Object -&gt; Parser GraphDef) -&gt; Value -&gt; Parser GraphDef
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679118075"><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679118075"><span class="hs-identifier hs-var">o</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-38"></span><span>    </span><span id="local-6989586621679118076"><span class="annot"><span class="annottext">NodeId
+</span><a href="#local-6989586621679118076"><span class="hs-identifier hs-var">title</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679118075"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Key -&gt; Parser NodeId
+forall a. FromJSON a =&gt; Object -&gt; Key -&gt; Parser a
+</span><span class="hs-operator hs-var">.:</span></span><span> </span><span class="annot"><span class="annottext">Key
+</span><span class="hs-string">&quot;title&quot;</span></span><span>
+</span><span id="line-39"></span><span>    </span><span id="local-6989586621679118077"><span class="annot"><span class="annottext">Map NodeId Node
+</span><a href="#local-6989586621679118077"><span class="hs-identifier hs-var">nodes</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679118075"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Key -&gt; Parser (Map NodeId Node)
+forall a. FromJSON a =&gt; Object -&gt; Key -&gt; Parser a
+</span><span class="hs-operator hs-var">.:</span></span><span> </span><span class="annot"><span class="annottext">Key
+</span><span class="hs-string">&quot;nodes&quot;</span></span><span>
+</span><span id="line-40"></span><span>    </span><span id="local-6989586621679118078"><span class="annot"><span class="annottext">[Edge]
+</span><a href="#local-6989586621679118078"><span class="hs-identifier hs-var">edges</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679118075"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Key -&gt; Parser [Edge]
+forall a. FromJSON a =&gt; Object -&gt; Key -&gt; Parser a
+</span><span class="hs-operator hs-var">.:</span></span><span> </span><span class="annot"><span class="annottext">Key
+</span><span class="hs-string">&quot;edges&quot;</span></span><span>
+</span><span id="line-41"></span><span>    </span><span id="local-6989586621679118079"><span class="annot"><span class="annottext">Map NodeId (Map NodeId NodeId)
+</span><a href="#local-6989586621679118079"><span class="hs-identifier hs-var">attrs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Object
+</span><a href="#local-6989586621679118075"><span class="hs-identifier hs-var">o</span></a></span><span> </span><span class="annot"><span class="annottext">Object -&gt; Key -&gt; Parser (Maybe (Map NodeId (Map NodeId NodeId)))
+forall a. FromJSON a =&gt; Object -&gt; Key -&gt; Parser (Maybe a)
+</span><span class="hs-operator hs-var">.:?</span></span><span> </span><span class="annot"><span class="annottext">Key
+</span><span class="hs-string">&quot;attrs&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser (Maybe (Map NodeId (Map NodeId NodeId)))
+-&gt; Map NodeId (Map NodeId NodeId)
+-&gt; Parser (Map NodeId (Map NodeId NodeId))
+forall a. Parser (Maybe a) -&gt; a -&gt; Parser a
+</span><span class="hs-operator hs-var">.!=</span></span><span> </span><span class="annot"><span class="annottext">Map NodeId (Map NodeId NodeId)
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span>
+</span><span id="line-42"></span><span>    </span><span class="annot"><span class="annottext">GraphDef -&gt; Parser GraphDef
+forall a. a -&gt; Parser a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">[Edge]
+Map NodeId (Map NodeId NodeId)
+Map NodeId Node
+NodeId
+title :: NodeId
+nodes :: Map NodeId Node
+edges :: [Edge]
+attrs :: Map NodeId (Map NodeId NodeId)
+title :: NodeId
+nodes :: Map NodeId Node
+edges :: [Edge]
+attrs :: Map NodeId (Map NodeId NodeId)
+</span><a href="Graphex.LookingGlass.html#title"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-43"></span><span>
+</span><span id="line-44"></span><span class="hs-keyword">newtype</span><span> </span><span id="Color"><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-var">Color</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Color"><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-var">Color</span></a></span></span><span> </span><span class="hs-special">{</span><span> </span><span id="unColor"><span class="annot"><span class="annottext">Color -&gt; NodeId
 </span><a href="Graphex.LookingGlass.html#unColor"><span class="hs-identifier hs-var hs-var">unColor</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-special">}</span><span>
-</span><span id="line-35"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117812"><span id="local-6989586621679117816"><span class="annot"><span class="annottext">Color -&gt; Color -&gt; Bool
+</span><span id="line-45"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679118083"><span id="local-6989586621679118087"><span class="annot"><span class="annottext">Color -&gt; Color -&gt; Bool
 (Color -&gt; Color -&gt; Bool) -&gt; (Color -&gt; Color -&gt; Bool) -&gt; Eq Color
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c== :: Color -&gt; Color -&gt; Bool
 == :: Color -&gt; Color -&gt; Bool
 $c/= :: Color -&gt; Color -&gt; Bool
 /= :: Color -&gt; Color -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117823"><span id="local-6989586621679117826"><span id="local-6989586621679117829"><span id="local-6989586621679117833"><span id="local-6989586621679117836"><span id="local-6989586621679117839"><span id="local-6989586621679117842"><span class="annot"><span class="annottext">Eq Color
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118094"><span id="local-6989586621679118097"><span id="local-6989586621679118100"><span id="local-6989586621679118104"><span id="local-6989586621679118107"><span id="local-6989586621679118110"><span id="local-6989586621679118113"><span class="annot"><span class="annottext">Eq Color
 Eq Color
 -&gt; (Color -&gt; Color -&gt; Ordering)
 -&gt; (Color -&gt; Color -&gt; Bool)
@@ -250,7 +300,7 @@ $cmax :: Color -&gt; Color -&gt; Color
 max :: Color -&gt; Color -&gt; Color
 $cmin :: Color -&gt; Color -&gt; Color
 min :: Color -&gt; Color -&gt; Color
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117846"><span id="local-6989586621679117850"><span id="local-6989586621679117854"><span class="annot"><span class="annottext">Int -&gt; Color -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118117"><span id="local-6989586621679118121"><span id="local-6989586621679118125"><span class="annot"><span class="annottext">Int -&gt; Color -&gt; ShowS
 [Color] -&gt; ShowS
 Color -&gt; String
 (Int -&gt; Color -&gt; ShowS)
@@ -264,63 +314,66 @@ show :: Color -&gt; String
 $cshowList :: [Color] -&gt; ShowS
 showList :: [Color] -&gt; ShowS
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-36"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117857"><span class="annot"><span class="annottext">String -&gt; Color
+</span><span id="line-46"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">newtype</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679118128"><span class="annot"><span class="annottext">String -&gt; Color
 (String -&gt; Color) -&gt; IsString Color
 forall a. (String -&gt; a) -&gt; IsString a
 $cfromString :: String -&gt; Color
 fromString :: String -&gt; Color
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var">IsString</span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-37"></span><span>
-</span><span id="line-38"></span><span class="annot"><a href="Graphex.LookingGlass.html#red"><span class="hs-identifier hs-type">red</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-type">Color</span></a></span><span>
-</span><span id="line-39"></span><span id="red"><span class="annot"><span class="annottext">red :: Color
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Graphex.LookingGlass.html#red"><span class="hs-identifier hs-type">red</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-type">Color</span></a></span><span>
+</span><span id="line-49"></span><span id="red"><span class="annot"><span class="annottext">red :: Color
 </span><a href="Graphex.LookingGlass.html#red"><span class="hs-identifier hs-var hs-var">red</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color
 </span><span class="hs-string">&quot;red&quot;</span></span><span>
-</span><span id="line-40"></span><span>
-</span><span id="line-41"></span><span class="annot"><a href="Graphex.LookingGlass.html#black"><span class="hs-identifier hs-type">black</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-type">Color</span></a></span><span>
-</span><span id="line-42"></span><span id="black"><span class="annot"><span class="annottext">black :: Color
+</span><span id="line-50"></span><span>
+</span><span id="line-51"></span><span class="annot"><a href="Graphex.LookingGlass.html#black"><span class="hs-identifier hs-type">black</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-type">Color</span></a></span><span>
+</span><span id="line-52"></span><span id="black"><span class="annot"><span class="annottext">black :: Color
 </span><a href="Graphex.LookingGlass.html#black"><span class="hs-identifier hs-var hs-var">black</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color
 </span><span class="hs-string">&quot;black&quot;</span></span><span>
-</span><span id="line-43"></span><span>
-</span><span id="line-44"></span><span class="annot"><a href="Graphex.LookingGlass.html#toLookingGlass"><span class="hs-identifier hs-type">toLookingGlass</span></a></span><span>
-</span><span id="line-45"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><span class="hs-comment">-- ^ title</span></span><span>
-</span><span id="line-46"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-type">Color</span></a></span><span> </span><span class="annot"><span class="hs-comment">-- ^ Optionally re-color any nodes (black default)</span></span><span>
-</span><span id="line-47"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
-</span><span id="line-48"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span>
-</span><span id="line-49"></span><span id="toLookingGlass"><span class="annot"><span class="annottext">toLookingGlass :: NodeId -&gt; Map ModuleName Color -&gt; ModuleGraph -&gt; GraphDef
-</span><a href="Graphex.LookingGlass.html#toLookingGlass"><span class="hs-identifier hs-var hs-var">toLookingGlass</span></a></span></span><span> </span><span id="local-6989586621679117865"><span class="annot"><span class="annottext">NodeId
-</span><a href="#local-6989586621679117865"><span class="hs-identifier hs-var">title</span></a></span></span><span> </span><span id="local-6989586621679117866"><span class="annot"><span class="annottext">Map ModuleName Color
-</span><a href="#local-6989586621679117866"><span class="hs-identifier hs-var">colors</span></a></span></span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span class="hs-special">{</span><span id="local-6989586621679117868"><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName)
+</span><span id="line-53"></span><span>
+</span><span id="line-54"></span><span class="annot"><a href="Graphex.LookingGlass.html#toLookingGlass"><span class="hs-identifier hs-type">toLookingGlass</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="annot"><span class="hs-comment">-- ^ title</span></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Color"><span class="hs-identifier hs-type">Color</span></a></span><span> </span><span class="annot"><span class="hs-comment">-- ^ Optionally re-color any nodes (black default)</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span>
+</span><span id="line-59"></span><span id="toLookingGlass"><span class="annot"><span class="annottext">toLookingGlass :: NodeId -&gt; Map ModuleName Color -&gt; ModuleGraph -&gt; GraphDef
+</span><a href="Graphex.LookingGlass.html#toLookingGlass"><span class="hs-identifier hs-var hs-var">toLookingGlass</span></a></span></span><span> </span><span id="local-6989586621679118136"><span class="annot"><span class="annottext">NodeId
+</span><a href="#local-6989586621679118136"><span class="hs-identifier hs-var">title</span></a></span></span><span> </span><span id="local-6989586621679118137"><span class="annot"><span class="annottext">Map ModuleName Color
+</span><a href="#local-6989586621679118137"><span class="hs-identifier hs-var">colors</span></a></span></span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118139"><span id="local-6989586621679118140"><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName)
+Map ModuleName (Map NodeId NodeId)
 unGraph :: Map ModuleName (Set ModuleName)
+attributes :: Map ModuleName (Map NodeId NodeId)
 unGraph :: forall a. Graph a -&gt; Map a (Set a)
-</span><a href="#local-6989586621679117868"><span class="hs-glyph hs-var hs-var">..</span></a></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-50"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679117870"><span class="annot"><span class="annottext">mkNodeId :: ModuleName -&gt; NodeId
-</span><a href="#local-6989586621679117870"><span class="hs-identifier hs-var hs-var">mkNodeId</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span id="local-6989586621679117872"><span class="annot"><span class="annottext">NodeId
-</span><a href="#local-6989586621679117872"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeId
-</span><a href="#local-6989586621679117872"><span class="hs-identifier hs-var">m</span></a></span><span>
-</span><span id="line-51"></span><span>      </span><span id="local-6989586621679117877"><span class="annot"><span class="annottext">mkNode :: ModuleName -&gt; (NodeId, Node)
-</span><a href="#local-6989586621679117877"><span class="hs-identifier hs-var hs-var">mkNode</span></a></span></span><span> </span><span id="local-6989586621679117878"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117878"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-52"></span><span>        </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; NodeId
-</span><a href="#local-6989586621679117870"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117878"><span class="hs-identifier hs-var">m</span></a></span><span>
-</span><span id="line-53"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span>
-</span><span id="line-54"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">color :: Maybe NodeId
+attributes :: forall a. Graph a -&gt; Map a (Map NodeId NodeId)
+</span><a href="#local-6989586621679118139"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-60"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118143"><span class="annot"><span class="annottext">mkNodeId :: ModuleName -&gt; NodeId
+</span><a href="#local-6989586621679118143"><span class="hs-identifier hs-var hs-var">mkNodeId</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Core.html#ModuleName"><span class="hs-identifier hs-type">ModuleName</span></a></span><span> </span><span id="local-6989586621679118145"><span class="annot"><span class="annottext">NodeId
+</span><a href="#local-6989586621679118145"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">NodeId
+</span><a href="#local-6989586621679118145"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-61"></span><span>      </span><span id="local-6989586621679118150"><span class="annot"><span class="annottext">mkNode :: ModuleName -&gt; (NodeId, Node)
+</span><a href="#local-6989586621679118150"><span class="hs-identifier hs-var hs-var">mkNode</span></a></span></span><span> </span><span id="local-6989586621679118151"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118151"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-62"></span><span>        </span><span class="hs-special">(</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; NodeId
+</span><a href="#local-6989586621679118143"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118151"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-63"></span><span>        </span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Node"><span class="hs-identifier hs-type">Node</span></a></span><span>
+</span><span id="line-64"></span><span>          </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">color :: Maybe NodeId
 </span><a href="Graphex.LookingGlass.html#color"><span class="hs-identifier hs-var">color</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Color -&gt; NodeId
 </span><a href="Graphex.LookingGlass.html#unColor"><span class="hs-identifier hs-var">unColor</span></a></span><span> </span><span class="annot"><span class="annottext">(Color -&gt; NodeId) -&gt; Maybe Color -&gt; Maybe NodeId
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; Map ModuleName Color -&gt; Maybe Color
 forall k a. Ord k =&gt; k -&gt; Map k a -&gt; Maybe a
 </span><span class="hs-identifier hs-var">Map.lookup</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117878"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Map ModuleName Color
-</span><a href="#local-6989586621679117866"><span class="hs-identifier hs-var">colors</span></a></span><span>
-</span><span id="line-55"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">label :: NodeId
+</span><a href="#local-6989586621679118151"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Map ModuleName Color
+</span><a href="#local-6989586621679118137"><span class="hs-identifier hs-var">colors</span></a></span><span>
+</span><span id="line-65"></span><span>          </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">label :: NodeId
 </span><a href="Graphex.LookingGlass.html#label"><span class="hs-keyword hs-var">label</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; NodeId
-</span><a href="#local-6989586621679117870"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117878"><span class="hs-identifier hs-var">m</span></a></span><span>
-</span><span id="line-56"></span><span>          </span><span class="hs-special">}</span><span>
-</span><span id="line-57"></span><span>        </span><span class="hs-special">)</span><span>
-</span><span id="line-58"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span>
-</span><span id="line-59"></span><span>     </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">nodes :: Map NodeId Node
+</span><a href="#local-6989586621679118143"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118151"><span class="hs-identifier hs-var">m</span></a></span><span>
+</span><span id="line-66"></span><span>          </span><span class="hs-special">}</span><span>
+</span><span id="line-67"></span><span>        </span><span class="hs-special">)</span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-keyword">in</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#GraphDef"><span class="hs-identifier hs-type">GraphDef</span></a></span><span>
+</span><span id="line-69"></span><span>     </span><span class="hs-special">{</span><span> </span><span class="annot"><span class="annottext">nodes :: Map NodeId Node
 </span><a href="Graphex.LookingGlass.html#nodes"><span class="hs-identifier hs-var">nodes</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(NodeId, Node)] -&gt; Map NodeId Node
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(NodeId, Node)] -&gt; Map NodeId Node)
@@ -330,46 +383,50 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 -&gt; [(ModuleName, Set ModuleName)] -&gt; [(NodeId, Node)]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679117882"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117882"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Set ModuleName
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679118155"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118155"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Set ModuleName
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; (NodeId, Node)
-</span><a href="#local-6989586621679117877"><span class="hs-identifier hs-var">mkNode</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117882"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([(ModuleName, Set ModuleName)] -&gt; [(NodeId, Node)])
+</span><a href="#local-6989586621679118150"><span class="hs-identifier hs-var">mkNode</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118155"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([(ModuleName, Set ModuleName)] -&gt; [(NodeId, Node)])
 -&gt; [(ModuleName, Set ModuleName)] -&gt; [(NodeId, Node)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName) -&gt; [(ModuleName, Set ModuleName)]
 forall k a. Map k a -&gt; [(k, a)]
 </span><span class="hs-identifier hs-var">Map.toList</span></span><span> </span><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName)
-</span><a href="#local-6989586621679117868"><span class="hs-identifier hs-var">unGraph</span></a></span><span>
-</span><span id="line-60"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">edges :: [Edge]
+</span><a href="#local-6989586621679118139"><span class="hs-identifier hs-var">unGraph</span></a></span><span>
+</span><span id="line-70"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">edges :: [Edge]
 </span><a href="Graphex.LookingGlass.html#edges"><span class="hs-identifier hs-var">edges</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName) -&gt; [(ModuleName, Set ModuleName)]
 forall k a. Map k a -&gt; [(k, a)]
 </span><span class="hs-identifier hs-var">Map.toList</span></span><span> </span><span class="annot"><span class="annottext">Map ModuleName (Set ModuleName)
-</span><a href="#local-6989586621679117868"><span class="hs-identifier hs-var">unGraph</span></a></span><span> </span><span class="annot"><span class="annottext">[(ModuleName, Set ModuleName)]
+</span><a href="#local-6989586621679118139"><span class="hs-identifier hs-var">unGraph</span></a></span><span> </span><span class="annot"><span class="annottext">[(ModuleName, Set ModuleName)]
 -&gt; ((ModuleName, Set ModuleName) -&gt; [Edge]) -&gt; [Edge]
 forall a b. [a] -&gt; (a -&gt; [b]) -&gt; [b]
 forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
-</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679117884"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117884"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117885"><span class="annot"><span class="annottext">Set ModuleName
-</span><a href="#local-6989586621679117885"><span class="hs-identifier hs-var">children</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(ModuleName -&gt; Edge) -&gt; [ModuleName] -&gt; [Edge]
+</span><span class="hs-operator hs-var">&gt;&gt;=</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679118157"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118157"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118158"><span class="annot"><span class="annottext">Set ModuleName
+</span><a href="#local-6989586621679118158"><span class="hs-identifier hs-var">children</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(ModuleName -&gt; Edge) -&gt; [ModuleName] -&gt; [Edge]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679117886"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117886"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-type">Edge</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">from :: NodeId
+</span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679118159"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118159"><span class="hs-identifier hs-var">c</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.LookingGlass.html#Edge"><span class="hs-identifier hs-type">Edge</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">from :: NodeId
 </span><a href="Graphex.LookingGlass.html#from"><span class="hs-identifier hs-var">from</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; NodeId
-</span><a href="#local-6989586621679117870"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117886"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">to :: NodeId
+</span><a href="#local-6989586621679118143"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118159"><span class="hs-identifier hs-var">c</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">to :: NodeId
 </span><a href="Graphex.LookingGlass.html#to"><span class="hs-identifier hs-var">to</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; NodeId
-</span><a href="#local-6989586621679117870"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679117884"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([ModuleName] -&gt; [Edge]) -&gt; [ModuleName] -&gt; [Edge]
+</span><a href="#local-6989586621679118143"><span class="hs-identifier hs-var">mkNodeId</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118157"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">([ModuleName] -&gt; [Edge]) -&gt; [ModuleName] -&gt; [Edge]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Set ModuleName -&gt; [ModuleName]
 forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">Set ModuleName
-</span><a href="#local-6989586621679117885"><span class="hs-identifier hs-var">children</span></a></span><span>
-</span><span id="line-61"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">NodeId
+</span><a href="#local-6989586621679118158"><span class="hs-identifier hs-var">children</span></a></span><span>
+</span><span id="line-71"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">attrs :: Map NodeId (Map NodeId NodeId)
+</span><a href="Graphex.LookingGlass.html#attrs"><span class="hs-identifier hs-var">attrs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map NodeId (Map NodeId NodeId)
+forall a. Monoid a =&gt; a
+</span><span class="hs-identifier hs-var">mempty</span></span><span>
+</span><span id="line-72"></span><span>     </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">NodeId
 title :: NodeId
 title :: NodeId
 </span><a href="Graphex.LookingGlass.html#title"><span class="hs-glyph hs-var hs-var">..</span></a></span><span>
-</span><span id="line-62"></span><span>     </span><span class="hs-special">}</span><span>
-</span><span id="line-63"></span></pre></body></html>
+</span><span id="line-73"></span><span>     </span><span class="hs-special">}</span><span>
+</span><span id="line-74"></span></pre></body></html>

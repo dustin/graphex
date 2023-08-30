@@ -8,11 +8,13 @@
 @version 0.1.0.0
 
 module Graphex.Core
-newtype Graph a
-Graph :: Map a (Set a) -> Graph a
+data Graph a
+Graph :: Map a (Set a) -> Map a (Map Text Text) -> Graph a
 [unGraph] :: Graph a -> Map a (Set a)
+[attributes] :: Graph a -> Map a (Map Text Text)
 singletonGraph :: Ord a => a -> a -> Graph a
 mkGraph :: Ord a => a -> [a] -> Graph a
+setAttribute :: Ord a => a -> Text -> Text -> Graph a -> Graph a
 data Import
 Import :: ModuleName -> Maybe Text -> Import
 [module_] :: Import -> ModuleName
@@ -66,10 +68,11 @@ Edge :: NodeId -> NodeId -> Edge
 [from] :: Edge -> NodeId
 [to] :: Edge -> NodeId
 data GraphDef
-GraphDef :: Text -> Map NodeId Node -> [Edge] -> GraphDef
+GraphDef :: Text -> Map NodeId Node -> [Edge] -> Map NodeId (Map Text Text) -> GraphDef
 [title] :: GraphDef -> Text
 [nodes] :: GraphDef -> Map NodeId Node
 [edges] :: GraphDef -> [Edge]
+[attrs] :: GraphDef -> Map NodeId (Map Text Text)
 newtype Color
 Color :: Text -> Color
 [unColor] :: Color -> Text
@@ -85,13 +88,13 @@ instance Data.Aeson.Types.FromJSON.FromJSON Graphex.LookingGlass.Edge
 instance GHC.Generics.Generic Graphex.LookingGlass.Edge
 instance GHC.Show.Show Graphex.LookingGlass.Edge
 instance Data.Aeson.Types.ToJSON.ToJSON Graphex.LookingGlass.GraphDef
-instance Data.Aeson.Types.FromJSON.FromJSON Graphex.LookingGlass.GraphDef
 instance GHC.Generics.Generic Graphex.LookingGlass.GraphDef
 instance GHC.Show.Show Graphex.LookingGlass.GraphDef
 instance Data.String.IsString Graphex.LookingGlass.Color
 instance GHC.Show.Show Graphex.LookingGlass.Color
 instance GHC.Classes.Ord Graphex.LookingGlass.Color
 instance GHC.Classes.Eq Graphex.LookingGlass.Color
+instance Data.Aeson.Types.FromJSON.FromJSON Graphex.LookingGlass.GraphDef
 
 
 -- | Implements a very crude Haskell import parser.
@@ -138,9 +141,10 @@ findFirst :: Ord r => SearchFunction r a -> (a -> r) -> (a -> [a]) -> a -> (a ->
 flood :: Ord a => (a -> Set a) -> a -> Set a
 
 module Graphex
-newtype Graph a
-Graph :: Map a (Set a) -> Graph a
+data Graph a
+Graph :: Map a (Set a) -> Map a (Map Text Text) -> Graph a
 [unGraph] :: Graph a -> Map a (Set a)
+[attributes] :: Graph a -> Map a (Map Text Text)
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Ord a => Graph a -> Graph a

@@ -20,65 +20,76 @@ span.spaces    { background: white }
 <span class="lineno">    1 </span>{-# LANGUAGE StrictData #-}
 <span class="lineno">    2 </span>module Graphex.LookingGlass where
 <span class="lineno">    3 </span>
-<span class="lineno">    4 </span>import qualified Data.Aeson      as Ae
-<span class="lineno">    5 </span>import           Data.Map        (Map)
-<span class="lineno">    6 </span>import qualified Data.Map.Strict as Map
-<span class="lineno">    7 </span>import qualified Data.Set        as Set
-<span class="lineno">    8 </span>import           Data.String     (IsString)
-<span class="lineno">    9 </span>import           Data.Text       (Text)
-<span class="lineno">   10 </span>import           GHC.Generics
-<span class="lineno">   11 </span>
-<span class="lineno">   12 </span>import           Graphex.Core
-<span class="lineno">   13 </span>
-<span class="lineno">   14 </span>data Node = Node
-<span class="lineno">   15 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">label</span></span></span> :: Text
-<span class="lineno">   16 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">color</span></span></span> :: Maybe Text
-<span class="lineno">   17 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
-<span class="lineno">   18 </span>  deriving anyclass (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.FromJSON</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>)
-<span class="lineno">   19 </span>
-<span class="lineno">   20 </span>type NodeId = Text
-<span class="lineno">   21 </span>data Edge = Edge
-<span class="lineno">   22 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">from</span></span></span> :: NodeId
-<span class="lineno">   23 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">to</span></span></span>   :: NodeId
-<span class="lineno">   24 </span>  } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
-<span class="lineno">   25 </span>  deriving anyclass (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.FromJSON</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>)
-<span class="lineno">   26 </span>
-<span class="lineno">   27 </span>data GraphDef = GraphDef
-<span class="lineno">   28 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">title</span></span></span> :: Text
-<span class="lineno">   29 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">nodes</span></span></span> :: Map NodeId Node
-<span class="lineno">   30 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">edges</span></span></span> :: [Edge]
-<span class="lineno">   31 </span>  } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
-<span class="lineno">   32 </span>  deriving anyclass (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.FromJSON</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>)
-<span class="lineno">   33 </span>
-<span class="lineno">   34 </span>newtype Color = Color { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unColor</span></span></span> :: Text }
-<span class="lineno">   35 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
-<span class="lineno">   36 </span>  deriving newtype (<span class="decl"><span class="nottickedoff">IsString</span></span>)
-<span class="lineno">   37 </span>
-<span class="lineno">   38 </span>red :: Color
-<span class="lineno">   39 </span><span class="decl"><span class="nottickedoff">red = &quot;red&quot;</span></span>
-<span class="lineno">   40 </span>
-<span class="lineno">   41 </span>black :: Color
-<span class="lineno">   42 </span><span class="decl"><span class="nottickedoff">black = &quot;black&quot;</span></span>
+<span class="lineno">    4 </span>import           Data.Aeson      (withObject, (.!=), (.:), (.:?))
+<span class="lineno">    5 </span>import qualified Data.Aeson      as Ae
+<span class="lineno">    6 </span>import           Data.Map        (Map)
+<span class="lineno">    7 </span>import qualified Data.Map.Strict as Map
+<span class="lineno">    8 </span>import qualified Data.Set        as Set
+<span class="lineno">    9 </span>import           Data.String     (IsString)
+<span class="lineno">   10 </span>import           Data.Text       (Text)
+<span class="lineno">   11 </span>import           GHC.Generics
+<span class="lineno">   12 </span>
+<span class="lineno">   13 </span>import           Graphex.Core
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span>data Node = Node
+<span class="lineno">   16 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">label</span></span></span> :: Text
+<span class="lineno">   17 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">color</span></span></span> :: Maybe Text
+<span class="lineno">   18 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
+<span class="lineno">   19 </span>  deriving anyclass (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.FromJSON</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>)
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>type NodeId = Text
+<span class="lineno">   22 </span>data Edge = Edge
+<span class="lineno">   23 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">from</span></span></span> :: NodeId
+<span class="lineno">   24 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">to</span></span></span>   :: NodeId
+<span class="lineno">   25 </span>  } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
+<span class="lineno">   26 </span>  deriving anyclass (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.FromJSON</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>)
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span>data GraphDef = GraphDef
+<span class="lineno">   29 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">title</span></span></span> :: Text
+<span class="lineno">   30 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">nodes</span></span></span> :: Map NodeId Node
+<span class="lineno">   31 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">edges</span></span></span> :: [Edge]
+<span class="lineno">   32 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">attrs</span></span></span> :: Map NodeId (Map Text Text)
+<span class="lineno">   33 </span>  } deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Generic</span></span></span></span>)
+<span class="lineno">   34 </span>  deriving anyclass <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ae.ToJSON</span></span></span></span></span></span></span></span>
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>instance <span class="decl"><span class="nottickedoff">Ae.FromJSON GraphDef</span></span> where
+<span class="lineno">   37 </span>  <span class="decl"><span class="nottickedoff">parseJSON = withObject &quot;GraphDef&quot; $ \o -&gt; do</span>
+<span class="lineno">   38 </span><span class="spaces">    </span><span class="nottickedoff">title &lt;- o .: &quot;title&quot;</span>
+<span class="lineno">   39 </span><span class="spaces">    </span><span class="nottickedoff">nodes &lt;- o .: &quot;nodes&quot;</span>
+<span class="lineno">   40 </span><span class="spaces">    </span><span class="nottickedoff">edges &lt;- o .: &quot;edges&quot;</span>
+<span class="lineno">   41 </span><span class="spaces">    </span><span class="nottickedoff">attrs &lt;- o .:? &quot;attrs&quot; .!= mempty</span>
+<span class="lineno">   42 </span><span class="spaces">    </span><span class="nottickedoff">pure GraphDef{..}</span></span>
 <span class="lineno">   43 </span>
-<span class="lineno">   44 </span>toLookingGlass
-<span class="lineno">   45 </span>  :: Text -- ^ title
-<span class="lineno">   46 </span>  -&gt; Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
-<span class="lineno">   47 </span>  -&gt; ModuleGraph
-<span class="lineno">   48 </span>  -&gt; GraphDef
-<span class="lineno">   49 </span><span class="decl"><span class="nottickedoff">toLookingGlass title colors Graph{..} =</span>
-<span class="lineno">   50 </span><span class="spaces">  </span><span class="nottickedoff">let mkNodeId (ModuleName m) = m</span>
-<span class="lineno">   51 </span><span class="spaces">      </span><span class="nottickedoff">mkNode m =</span>
-<span class="lineno">   52 </span><span class="spaces">        </span><span class="nottickedoff">( mkNodeId m</span>
-<span class="lineno">   53 </span><span class="spaces">        </span><span class="nottickedoff">, Node</span>
-<span class="lineno">   54 </span><span class="spaces">          </span><span class="nottickedoff">{ color = unColor &lt;$&gt; Map.lookup m colors</span>
-<span class="lineno">   55 </span><span class="spaces">          </span><span class="nottickedoff">, label = mkNodeId m</span>
-<span class="lineno">   56 </span><span class="spaces">          </span><span class="nottickedoff">}</span>
-<span class="lineno">   57 </span><span class="spaces">        </span><span class="nottickedoff">)</span>
-<span class="lineno">   58 </span><span class="spaces">  </span><span class="nottickedoff">in GraphDef</span>
-<span class="lineno">   59 </span><span class="spaces">     </span><span class="nottickedoff">{ nodes = Map.fromList $ fmap (\(m, _) -&gt; mkNode m) $ Map.toList unGraph</span>
-<span class="lineno">   60 </span><span class="spaces">     </span><span class="nottickedoff">, edges = Map.toList unGraph &gt;&gt;= \(m, children) -&gt; fmap (\c -&gt; Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children</span>
-<span class="lineno">   61 </span><span class="spaces">     </span><span class="nottickedoff">, ..</span>
-<span class="lineno">   62 </span><span class="spaces">     </span><span class="nottickedoff">}</span></span>
+<span class="lineno">   44 </span>newtype Color = Color { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unColor</span></span></span> :: Text }
+<span class="lineno">   45 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
+<span class="lineno">   46 </span>  deriving newtype (<span class="decl"><span class="nottickedoff">IsString</span></span>)
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>red :: Color
+<span class="lineno">   49 </span><span class="decl"><span class="nottickedoff">red = &quot;red&quot;</span></span>
+<span class="lineno">   50 </span>
+<span class="lineno">   51 </span>black :: Color
+<span class="lineno">   52 </span><span class="decl"><span class="nottickedoff">black = &quot;black&quot;</span></span>
+<span class="lineno">   53 </span>
+<span class="lineno">   54 </span>toLookingGlass
+<span class="lineno">   55 </span>  :: Text -- ^ title
+<span class="lineno">   56 </span>  -&gt; Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
+<span class="lineno">   57 </span>  -&gt; ModuleGraph
+<span class="lineno">   58 </span>  -&gt; GraphDef
+<span class="lineno">   59 </span><span class="decl"><span class="nottickedoff">toLookingGlass title colors Graph{..} =</span>
+<span class="lineno">   60 </span><span class="spaces">  </span><span class="nottickedoff">let mkNodeId (ModuleName m) = m</span>
+<span class="lineno">   61 </span><span class="spaces">      </span><span class="nottickedoff">mkNode m =</span>
+<span class="lineno">   62 </span><span class="spaces">        </span><span class="nottickedoff">( mkNodeId m</span>
+<span class="lineno">   63 </span><span class="spaces">        </span><span class="nottickedoff">, Node</span>
+<span class="lineno">   64 </span><span class="spaces">          </span><span class="nottickedoff">{ color = unColor &lt;$&gt; Map.lookup m colors</span>
+<span class="lineno">   65 </span><span class="spaces">          </span><span class="nottickedoff">, label = mkNodeId m</span>
+<span class="lineno">   66 </span><span class="spaces">          </span><span class="nottickedoff">}</span>
+<span class="lineno">   67 </span><span class="spaces">        </span><span class="nottickedoff">)</span>
+<span class="lineno">   68 </span><span class="spaces">  </span><span class="nottickedoff">in GraphDef</span>
+<span class="lineno">   69 </span><span class="spaces">     </span><span class="nottickedoff">{ nodes = Map.fromList $ fmap (\(m, _) -&gt; mkNode m) $ Map.toList unGraph</span>
+<span class="lineno">   70 </span><span class="spaces">     </span><span class="nottickedoff">, edges = Map.toList unGraph &gt;&gt;= \(m, children) -&gt; fmap (\c -&gt; Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children</span>
+<span class="lineno">   71 </span><span class="spaces">     </span><span class="nottickedoff">, attrs = mempty</span>
+<span class="lineno">   72 </span><span class="spaces">     </span><span class="nottickedoff">, ..</span>
+<span class="lineno">   73 </span><span class="spaces">     </span><span class="nottickedoff">}</span></span>
 
 </pre>
 </body>
