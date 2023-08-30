@@ -96,28 +96,26 @@ span.spaces    { background: white }
 <span class="lineno">   77 </span>-- | Restrict a graph to only the given set of modules.
 <span class="lineno">   78 </span>restrictTo :: Ord a =&gt; Graph a -&gt; Set a -&gt; Graph a
 <span class="lineno">   79 </span><span class="decl"><span class="istickedoff">restrictTo (Graph m) keep = Graph . flip Map.mapMaybeWithKey m $ \k' v -&gt;</span>
-<span class="lineno">   80 </span><span class="spaces">  </span><span class="istickedoff">(if Set.notMember k' keep then Nothing else nonNullSet (Set.intersection keep v))</span>
-<span class="lineno">   81 </span><span class="spaces">    </span><span class="istickedoff">where</span>
-<span class="lineno">   82 </span><span class="spaces">        </span><span class="istickedoff">nonNullSet v = if Set.null v then Nothing else Just v</span></span>
-<span class="lineno">   83 </span>
-<span class="lineno">   84 </span>-- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.
-<span class="lineno">   85 </span>graphToTree :: Ord a =&gt; a -&gt; Graph a -&gt; Tree a
-<span class="lineno">   86 </span><span class="decl"><span class="istickedoff">graphToTree startingAt (Graph rels) = go mempty startingAt</span>
-<span class="lineno">   87 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   88 </span><span class="spaces">    </span><span class="istickedoff">go seen node =</span>
-<span class="lineno">   89 </span><span class="spaces">      </span><span class="istickedoff">let children = Set.toList $ Map.findWithDefault mempty node rels</span>
-<span class="lineno">   90 </span><span class="spaces">      </span><span class="istickedoff">in Tree.Node node $ if Set.member node seen then [] else fmap (go (Set.insert node seen)) children</span></span>
-<span class="lineno">   91 </span>
-<span class="lineno">   92 </span>-- | Find the longest path in a Graph.
-<span class="lineno">   93 </span>longest :: (NFData a, Ord a) =&gt; Graph a -&gt; [a]
-<span class="lineno">   94 </span><span class="decl"><span class="istickedoff">longest g = reverse . snd . maximumOn (length . snd) $ mapMaybeWithKey one g</span>
-<span class="lineno">   95 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">   96 </span><span class="spaces">    </span><span class="istickedoff">one = Just . fmap fst . maximumOn length . dfsWith store seen (\ks -&gt; (:ks) . (, succ . snd . head $ ks) &lt;$&gt; foldMap (Set.toList . directDepsOn g . fst) (listToMaybe ks)) . (:[]) . (,1::Int)</span>
-<span class="lineno">   97 </span><span class="spaces">    </span><span class="istickedoff">-- store and head cannot be called with empty lists.</span>
-<span class="lineno">   98 </span><span class="spaces">    </span><span class="istickedoff">store (head -&gt; (k,l)) = Map.insert k l</span>
-<span class="lineno">   99 </span><span class="spaces">    </span><span class="istickedoff">seen (head -&gt; (k,l)) = maybe False (&lt; l) . Map.lookup k</span>
-<span class="lineno">  100 </span><span class="spaces">    </span><span class="istickedoff">maximumOn :: Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; a</span>
-<span class="lineno">  101 </span><span class="spaces">    </span><span class="istickedoff">maximumOn f = maximumBy (comparing f)</span></span>
+<span class="lineno">   80 </span><span class="spaces">  </span><span class="istickedoff">if Set.notMember k' keep then Nothing else Just (Set.intersection keep v)</span></span>
+<span class="lineno">   81 </span>
+<span class="lineno">   82 </span>-- | Convert a Graph to a Tree. If there is a cycle, treat the cycle point as a leaf.
+<span class="lineno">   83 </span>graphToTree :: Ord a =&gt; a -&gt; Graph a -&gt; Tree a
+<span class="lineno">   84 </span><span class="decl"><span class="istickedoff">graphToTree startingAt (Graph rels) = go mempty startingAt</span>
+<span class="lineno">   85 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   86 </span><span class="spaces">    </span><span class="istickedoff">go seen node =</span>
+<span class="lineno">   87 </span><span class="spaces">      </span><span class="istickedoff">let children = Set.toList $ Map.findWithDefault mempty node rels</span>
+<span class="lineno">   88 </span><span class="spaces">      </span><span class="istickedoff">in Tree.Node node $ if Set.member node seen then [] else fmap (go (Set.insert node seen)) children</span></span>
+<span class="lineno">   89 </span>
+<span class="lineno">   90 </span>-- | Find the longest path in a Graph.
+<span class="lineno">   91 </span>longest :: (NFData a, Ord a) =&gt; Graph a -&gt; [a]
+<span class="lineno">   92 </span><span class="decl"><span class="istickedoff">longest g = reverse . snd . maximumOn (length . snd) $ mapMaybeWithKey one g</span>
+<span class="lineno">   93 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">   94 </span><span class="spaces">    </span><span class="istickedoff">one = Just . fmap fst . maximumOn length . dfsWith store seen (\ks -&gt; (:ks) . (, succ . snd . head $ ks) &lt;$&gt; foldMap (Set.toList . directDepsOn g . fst) (listToMaybe ks)) . (:[]) . (,1::Int)</span>
+<span class="lineno">   95 </span><span class="spaces">    </span><span class="istickedoff">-- store and head cannot be called with empty lists.</span>
+<span class="lineno">   96 </span><span class="spaces">    </span><span class="istickedoff">store (head -&gt; (k,l)) = Map.insert k l</span>
+<span class="lineno">   97 </span><span class="spaces">    </span><span class="istickedoff">seen (head -&gt; (k,l)) = maybe False (&lt; l) . Map.lookup k</span>
+<span class="lineno">   98 </span><span class="spaces">    </span><span class="istickedoff">maximumOn :: Ord b =&gt; (a -&gt; b) -&gt; [a] -&gt; a</span>
+<span class="lineno">   99 </span><span class="spaces">    </span><span class="istickedoff">maximumOn f = maximumBy (comparing f)</span></span>
 
 </pre>
 </body>
