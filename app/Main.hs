@@ -5,11 +5,8 @@ import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
 import           Data.Foldable
-import           Data.List            (sortOn)
 import           Data.List.NonEmpty   (NonEmpty)
 import qualified Data.List.NonEmpty   as NE
-import qualified Data.Map.Strict      as Map
-import           Data.Ord             (Down (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
@@ -104,7 +101,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         AllPaths from to -> BL.putStr . encode . graphToDep $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
-        Rankings         -> printStrs $ fmap (\(m,n) -> m <> " - " <> (T.pack . show) n) . sortOn (Down . snd) . Map.assocs $ rankings graph
+        Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph

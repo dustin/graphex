@@ -10,16 +10,18 @@ module Graphex (
 
 import           Control.Monad               (ap)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
+import           Data.Bifunctor              (first)
 import           Data.Foldable               (maximumBy)
-import           Data.Map                    (Map)
+import           Data.List                   (sortOn)
 import qualified Data.Map.Strict             as Map
 import           Data.Maybe                  (fromMaybe, listToMaybe, mapMaybe)
-import           Data.Ord                    (comparing)
+import           Data.Ord                    (Down (..), comparing)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Data.Text                   (Text)
 import           Data.Tree                   (Tree)
 import qualified Data.Tree                   as Tree
+import           Data.Tuple                  (swap)
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
@@ -65,8 +67,8 @@ allPathsTo :: Ord a => Graph a -> a -> a -> Graph a
 allPathsTo m from to = restrictTo m $ allDepsOn m from `Set.intersection` allDepsOn (reverseEdges m) to
 
 -- | Count the number of transitive dependencies for each module.
-rankings :: (NFData a, Ord a) => Graph a -> Map a Int
-rankings g = Map.fromList $ mapMaybeWithKey (Just . length . allDepsOn g) g
+rankings :: (NFData a, Ord a) => Graph a -> [(Int, a)]
+rankings g = sortOn (first Down) . fmap swap $ mapMaybeWithKey (Just . length . allDepsOn g) g
 
 -- | Visit each node in the graph and apply a function to it.
 mapMaybeWithKey :: (NFData a, NFData g) => (g -> Maybe a) -> Graph g -> [(g, a)]

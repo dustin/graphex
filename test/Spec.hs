@@ -11,6 +11,7 @@ import qualified Data.Set                 as Set
 import           Data.Text                (Text)
 import qualified Data.Text                as T
 import qualified Data.Tree                as Tree
+import           Data.Tuple               (swap)
 import           GHC.Generics             (Generic)
 
 import           Test.QuickCheck.Checkers
@@ -118,7 +119,8 @@ prop_allDepsContainsSelfDeps :: GraphWithKey -> Bool
 prop_allDepsContainsSelfDeps (GraphWithKey k g) = directDepsOn g k `Set.isSubsetOf` allDepsOn g k
 
 prop_ranking :: GraphWithKey -> Bool
-prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rankings g Map.! k
+prop_ranking (GraphWithKey k g) = length (allDepsOn g k) == rmap Map.! k
+    where rmap = Map.fromList . fmap swap $ rankings g
 
 prop_restrictedGraphHasSameDeps :: GraphWithKey -> Bool
 prop_restrictedGraphHasSameDeps (GraphWithKey k g) = allDepsOn g k == allDepsOn (restrictTo g (allDepsOn g k)) k
