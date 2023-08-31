@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE ExplicitForAll #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -19,7 +20,7 @@ import Data.Either (rights)
 
 import Text.Megaparsec
 import Text.Megaparsec.Char
-import Replace.Megaparsec (sepCap)
+import Replace.Megaparsec (sepCap, streamEdit)
 
 import Graphex.Core
 
@@ -29,7 +30,9 @@ importParser
   => IsString (Tokens s)
   => m Import
 importParser = do
-  -- This newline helps us avoid the word "import" in comments
+  -- This newline helps us avoid the word "import" in comments or identifiers.
+  -- Basically, we insist imports are at the beginning of a line (which Haskell does
+  -- too I think)
   _ <- newline
   _ <- string "import"
   space1
@@ -48,15 +51,29 @@ importParser = do
     }
 
 importsParser
-  :: MonadParsec e s m
+  :: forall e s m
+   . MonadParsec e s m
   => Token s ~ Char
   => IsString (Tokens s)
   => m [Import]
 importsParser = rights <$> sepCap importParser
+
+removeBlockComments :: String -> String
+removeBlockComments = streamEdit (blockCommentParser @Void) (\_ -> "")
+
+blockCommentParser
+  :: forall e s m
+   . MonadParsec e s m
+  => Token s ~ Char
+  => IsString (Tokens s)
+  => m String
+blockCommentParser = do
+  _ <- string "{-"
+  manyTill anySingle (string "-}")
   
 parseFileImports :: FilePath -> IO [Import]
 parseFileImports fp = do
-  contents <- readFile fp
+  contents <- removeBlockComments <$> readFile fp
   case runParser (importsParser @Void) fp contents of
     Left err -> error $ unlines $ [mconcat ["Failed to parse ", fp, ":"], errorBundlePretty err]
     Right x -> pure x
