@@ -86,6 +86,15 @@ discoverCabalModules cabalFile = do
 
   filterM (doesFileExist . (.path)) candidateModules
 
+discoverCabalPackageDescription :: IO PackageDescription
+discoverCabalPackageDescription = do
+  fs <- getDirectoryContents "." -- XXX
+  let cabalFile = case filter ((".cabal" ==) . takeExtension) fs of
+        path : _ -> path
+        _ -> error "No cabal file found"
+  gpd <- readGenericPackageDescription silent cabalFile
+  pure $ flattenPackageDescription gpd
+
 discoverCabalModuleGraph :: IO ModuleGraph
 discoverCabalModuleGraph = do
   fs <- getDirectoryContents "." -- XXX
