@@ -1,7 +1,5 @@
 module Main where
 
-import           Debug.Trace
-
 import           Control.Applicative  ((<|>))
 import           Data.Aeson           (eitherDecode, encode)
 import           Data.Bool            (bool)
