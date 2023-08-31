@@ -100,8 +100,8 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
             $ graphToTree fromModule
             $ allPathsTo graph fromModule toModule
           else
-            let explainer = if optReverse then " imports " else " imported by "
-            in printStrs $ [fromModule] <> ((explainer <>) <$> why graph fromModule toModule)
+            let explainer = if optReverse then " imported by " else " imports "
+            in printStrs $ zipWith (<>) ("" : repeat explainer) (why graph fromModule toModule)
         AllPaths from to -> BL.putStr . encode . graphToDep . (setAttribute from "note" "start" . setAttribute to "note" "end") $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
