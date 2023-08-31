@@ -14,8 +14,9 @@ import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
 import           Data.Bifunctor              (first)
 import           Data.Foldable               (maximumBy)
 import           Data.List                   (sortOn)
+import           Data.List.NonEmpty          (NonEmpty, nonEmpty)
 import qualified Data.Map.Strict             as Map
-import           Data.Maybe                  (fromMaybe, listToMaybe, mapMaybe)
+import           Data.Maybe                  (listToMaybe, mapMaybe)
 import           Data.Ord                    (Down (..), comparing)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
@@ -60,9 +61,9 @@ allDepsOn = flood . directDepsOn
 
 -- | Find an example path between two modules.
 --
--- This is a short path, but the important part is that it represents how connectivy works.
-why :: Ord a => Graph a -> a -> a -> [a]
-why m from to = fromMaybe [] $ findFirst bfsOn head (\ks -> (:ks) <$> (Set.toList . directDepsOn m . head) ks) [from] ((== to) . head)
+-- This is a short path, but the important part is that it represents how connectivity works.
+why :: Ord a => Graph a -> a -> a -> Maybe (NonEmpty a)
+why m from to = nonEmpty =<< findFirst bfsOn head (\ks -> (:ks) <$> (Set.toList . directDepsOn m . head) ks) [from] ((== to) . head)
 
 -- | Find all paths between two modules as a restricted graph of the intersection of
 -- reachable nodes from the start and to the end.

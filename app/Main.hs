@@ -1,12 +1,16 @@
 module Main where
 
+import           Debug.Trace
+
+import           Control.Applicative  ((<|>))
 import           Data.Aeson           (eitherDecode, encode)
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
 import           Data.Foldable
-import           Data.List.NonEmpty   (NonEmpty)
+import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
+import           Data.Maybe           (fromMaybe)
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
@@ -101,7 +105,9 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
             $ allPathsTo graph fromModule toModule
           else
             let explainer = if optReverse then " imported by " else " imports "
-            in printStrs $ zipWith (<>) ("" : repeat explainer) (why graph fromModule toModule)
+                mkWhy rev = uncurry (why graph) $ if rev then (toModule, fromModule) else (fromModule, toModule)
+                renderWhy rev = NE.zipWith (<>) ("" :| repeat explainer) <$> mkWhy rev
+            in printStrs $ fromMaybe (pure "No path found") $ renderWhy True <|> renderWhy False
         AllPaths from to -> BL.putStr . encode . graphToDep . (setAttribute from "note" "start" . setAttribute to "note" "end") $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
         AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
