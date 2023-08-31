@@ -106,7 +106,9 @@ instance Data.Aeson.Types.FromJSON.FromJSON Graphex.LookingGlass.GraphDef
 --   graphex, this makes sense in a way - those are all still dependencies.
 module Graphex.Parser
 importParser :: MonadParsec e s m => Token s ~ Char => IsString (Tokens s) => m Import
-importsParser :: MonadParsec e s m => Token s ~ Char => IsString (Tokens s) => m [Import]
+importsParser :: forall e s m. MonadParsec e s m => Token s ~ Char => IsString (Tokens s) => m [Import]
+removeBlockComments :: String -> String
+blockCommentParser :: forall e s m. MonadParsec e s m => Token s ~ Char => IsString (Tokens s) => m String
 parseFileImports :: FilePath -> IO [Import]
 
 module Graphex.Cabal

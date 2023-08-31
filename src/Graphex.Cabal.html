@@ -54,14 +54,14 @@ forall from to. SymbolicPath from to -&gt; FilePath
 </span><span>
 </span><span id="line-52"></span><span class="annot"><a href="Graphex.Cabal.html#discoverCabalModules"><span class="hs-identifier hs-type">discoverCabalModules</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Graphex.Core.html#Module"><span class="hs-identifier hs-type">Module</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-53"></span><span id="discoverCabalModules"><span class="annot"><span class="annottext">discoverCabalModules :: FilePath -&gt; IO [Module]
-</span><a href="Graphex.Cabal.html#discoverCabalModules"><span class="hs-identifier hs-var hs-var">discoverCabalModules</span></a></span></span><span> </span><span id="local-6989586621679118576"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679118576"><span class="hs-identifier hs-var">cabalFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-54"></span><span>  </span><span id="local-6989586621679118577"><span class="annot"><span class="annottext">GenericPackageDescription
-</span><a href="#local-6989586621679118577"><span class="hs-identifier hs-var">gpd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Verbosity -&gt; FilePath -&gt; IO GenericPackageDescription
+</span><a href="Graphex.Cabal.html#discoverCabalModules"><span class="hs-identifier hs-var hs-var">discoverCabalModules</span></a></span></span><span> </span><span id="local-6989586621679118794"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679118794"><span class="hs-identifier hs-var">cabalFile</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-54"></span><span>  </span><span id="local-6989586621679118795"><span class="annot"><span class="annottext">GenericPackageDescription
+</span><a href="#local-6989586621679118795"><span class="hs-identifier hs-var">gpd</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Verbosity -&gt; FilePath -&gt; IO GenericPackageDescription
 </span><span class="hs-identifier hs-var">readGenericPackageDescription</span></span><span> </span><span class="annot"><span class="annottext">Verbosity
 </span><span class="hs-identifier hs-var">silent</span></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679118576"><span class="hs-identifier hs-var">cabalFile</span></a></span><span>
-</span><span id="line-55"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PackageDescription</span></span><span class="hs-special">{</span><span id="local-6989586621679118579"><span id="local-6989586621679118580"><span id="local-6989586621679118581"><span id="local-6989586621679118582"><span id="local-6989586621679118583"><span id="local-6989586621679118584"><span id="local-6989586621679118585"><span id="local-6989586621679118586"><span id="local-6989586621679118587"><span id="local-6989586621679118588"><span id="local-6989586621679118589"><span id="local-6989586621679118590"><span id="local-6989586621679118591"><span id="local-6989586621679118592"><span id="local-6989586621679118593"><span id="local-6989586621679118594"><span id="local-6989586621679118595"><span id="local-6989586621679118596"><span id="local-6989586621679118597"><span id="local-6989586621679118598"><span id="local-6989586621679118599"><span id="local-6989586621679118600"><span id="local-6989586621679118601"><span id="local-6989586621679118602"><span id="local-6989586621679118603"><span id="local-6989586621679118604"><span id="local-6989586621679118605"><span id="local-6989586621679118606"><span id="local-6989586621679118607"><span id="local-6989586621679118608"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679118794"><span class="hs-identifier hs-var">cabalFile</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span class="annot"><span class="hs-identifier hs-type">PackageDescription</span></span><span class="hs-special">{</span><span id="local-6989586621679118797"><span id="local-6989586621679118798"><span id="local-6989586621679118799"><span id="local-6989586621679118800"><span id="local-6989586621679118801"><span id="local-6989586621679118802"><span id="local-6989586621679118803"><span id="local-6989586621679118804"><span id="local-6989586621679118805"><span id="local-6989586621679118806"><span id="local-6989586621679118807"><span id="local-6989586621679118808"><span id="local-6989586621679118809"><span id="local-6989586621679118810"><span id="local-6989586621679118811"><span id="local-6989586621679118812"><span id="local-6989586621679118813"><span id="local-6989586621679118814"><span id="local-6989586621679118815"><span id="local-6989586621679118816"><span id="local-6989586621679118817"><span id="local-6989586621679118818"><span id="local-6989586621679118819"><span id="local-6989586621679118820"><span id="local-6989586621679118821"><span id="local-6989586621679118822"><span id="local-6989586621679118823"><span id="local-6989586621679118824"><span id="local-6989586621679118825"><span id="local-6989586621679118826"><span class="annot"><span class="annottext">FilePath
 [FilePath]
 [(FilePath, FilePath)]
 [(CompilerFlavor, VersionRange)]
@@ -139,15 +139,15 @@ dataDir :: PackageDescription -&gt; FilePath
 extraSrcFiles :: PackageDescription -&gt; [FilePath]
 extraTmpFiles :: PackageDescription -&gt; [FilePath]
 extraDocFiles :: PackageDescription -&gt; [FilePath]
-</span><a href="#local-6989586621679118579"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">GenericPackageDescription -&gt; PackageDescription
+</span><a href="#local-6989586621679118797"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">GenericPackageDescription -&gt; PackageDescription
 </span><span class="hs-identifier hs-var">flattenPackageDescription</span></span><span> </span><span class="annot"><span class="annottext">GenericPackageDescription
-</span><a href="#local-6989586621679118577"><span class="hs-identifier hs-var">gpd</span></a></span><span>
-</span><span id="line-56"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118650"><span class="annot"><span class="annottext">candidateModules :: [Module]
-</span><a href="#local-6989586621679118650"><span class="hs-identifier hs-var hs-var">candidateModules</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[Module]] -&gt; [Module]
+</span><a href="#local-6989586621679118795"><span class="hs-identifier hs-var">gpd</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118868"><span class="annot"><span class="annottext">candidateModules :: [Module]
+</span><a href="#local-6989586621679118868"><span class="hs-identifier hs-var hs-var">candidateModules</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[[Module]] -&gt; [Module]
 forall a. Monoid a =&gt; [a] -&gt; a
 </span><span class="hs-identifier hs-var">mconcat</span></span><span>
 </span><span id="line-57"></span><span>        </span><span class="hs-special">[</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-58"></span><span>            </span><span class="annot"><span class="hs-identifier hs-type">Library</span></span><span class="hs-special">{</span><span id="local-6989586621679118652"><span id="local-6989586621679118653"><span id="local-6989586621679118654"><span id="local-6989586621679118655"><span id="local-6989586621679118656"><span id="local-6989586621679118657"><span id="local-6989586621679118658"><span class="annot"><span class="annottext">Bool
+</span><span id="line-58"></span><span>            </span><span class="annot"><span class="hs-identifier hs-type">Library</span></span><span class="hs-special">{</span><span id="local-6989586621679118870"><span id="local-6989586621679118871"><span id="local-6989586621679118872"><span id="local-6989586621679118873"><span id="local-6989586621679118874"><span id="local-6989586621679118875"><span id="local-6989586621679118876"><span class="annot"><span class="annottext">Bool
 [ModuleName]
 [ModuleReexport]
 LibraryName
@@ -167,17 +167,17 @@ signatures :: Library -&gt; [ModuleName]
 libExposed :: Library -&gt; Bool
 libVisibility :: Library -&gt; LibraryVisibility
 libBuildInfo :: Library -&gt; BuildInfo
-</span><a href="#local-6989586621679118652"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe Library -&gt; [Library]
+</span><a href="#local-6989586621679118870"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe Library -&gt; [Library]
 forall a. Maybe a -&gt; [a]
 </span><span class="hs-identifier hs-var">maybeToList</span></span><span> </span><span class="annot"><span class="annottext">Maybe Library
-</span><a href="#local-6989586621679118598"><span class="hs-identifier hs-var">library</span></a></span><span>
-</span><span id="line-59"></span><span>            </span><span id="local-6989586621679118666"><span class="annot"><span class="annottext">SymbolicPath PackageDir SourceDir
-</span><a href="#local-6989586621679118666"><span class="hs-identifier hs-var">srcDir</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">BuildInfo -&gt; [SymbolicPath PackageDir SourceDir]
+</span><a href="#local-6989586621679118816"><span class="hs-identifier hs-var">library</span></a></span><span>
+</span><span id="line-59"></span><span>            </span><span id="local-6989586621679118884"><span class="annot"><span class="annottext">SymbolicPath PackageDir SourceDir
+</span><a href="#local-6989586621679118884"><span class="hs-identifier hs-var">srcDir</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">BuildInfo -&gt; [SymbolicPath PackageDir SourceDir]
 </span><span class="hs-identifier hs-var">hsSourceDirs</span></span><span> </span><span class="annot"><span class="annottext">BuildInfo
-</span><a href="#local-6989586621679118658"><span class="hs-identifier hs-var">libBuildInfo</span></a></span><span>
-</span><span id="line-60"></span><span>            </span><span id="local-6989586621679118668"><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679118668"><span class="hs-identifier hs-var">exMod</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[ModuleName]
-</span><a href="#local-6989586621679118653"><span class="hs-identifier hs-var">exposedModules</span></a></span><span>
+</span><a href="#local-6989586621679118876"><span class="hs-identifier hs-var">libBuildInfo</span></a></span><span>
+</span><span id="line-60"></span><span>            </span><span id="local-6989586621679118886"><span class="annot"><span class="annottext">ModuleName
+</span><a href="#local-6989586621679118886"><span class="hs-identifier hs-var">exMod</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[ModuleName]
+</span><a href="#local-6989586621679118871"><span class="hs-identifier hs-var">exposedModules</span></a></span><span>
 </span><span id="line-61"></span><span>            </span><span class="annot"><span class="annottext">Module -&gt; [Module]
 forall a. a -&gt; [a]
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
@@ -198,14 +198,14 @@ forall a. a -&gt; [a] -&gt; [a]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; [FilePath]
 </span><span class="hs-identifier hs-var">Cabal.components</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679118668"><span class="hs-identifier hs-var">exMod</span></a></span><span>
+</span><a href="#local-6989586621679118886"><span class="hs-identifier hs-var">exMod</span></a></span><span>
 </span><span id="line-63"></span><span>              </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">path :: FilePath
 </span><a href="Graphex.Core.html#path"><span class="hs-identifier hs-var">path</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SymbolicPath PackageDir SourceDir -&gt; FilePath
 </span><a href="Graphex.Cabal.html#sourceDirToFilePath"><span class="hs-identifier hs-var">sourceDirToFilePath</span></a></span><span> </span><span class="annot"><span class="annottext">SymbolicPath PackageDir SourceDir
-</span><a href="#local-6989586621679118666"><span class="hs-identifier hs-var">srcDir</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+</span><a href="#local-6989586621679118884"><span class="hs-identifier hs-var">srcDir</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
 </span><span class="hs-operator hs-var">&lt;/&gt;</span></span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; FilePath
 </span><span class="hs-identifier hs-var">Cabal.toFilePath</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679118668"><span class="hs-identifier hs-var">exMod</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
+</span><a href="#local-6989586621679118886"><span class="hs-identifier hs-var">exMod</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; FilePath
 </span><span class="hs-operator hs-var">&lt;.&gt;</span></span><span> </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;.hs&quot;</span></span><span>
 </span><span id="line-64"></span><span>              </span><span class="hs-special">}</span><span>
@@ -219,17 +219,17 @@ Applicative m =&gt;
 </span><span class="hs-identifier hs-var">doesFileExist</span></span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; IO Bool) -&gt; (Module -&gt; FilePath) -&gt; Module -&gt; IO Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="hs-special">(</span><span class="hs-operator">.</span><span class="hs-identifier">path</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Module]
-</span><a href="#local-6989586621679118650"><span class="hs-identifier hs-var">candidateModules</span></a></span><span>
+</span><a href="#local-6989586621679118868"><span class="hs-identifier hs-var">candidateModules</span></a></span><span>
 </span><span id="line-68"></span><span>
 </span><span id="line-69"></span><span class="annot"><a href="Graphex.Cabal.html#discoverCabalModuleGraph"><span class="hs-identifier hs-type">discoverCabalModuleGraph</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><a href="Graphex.Core.html#ModuleGraph"><span class="hs-identifier hs-type">ModuleGraph</span></a></span><span>
 </span><span id="line-70"></span><span id="discoverCabalModuleGraph"><span class="annot"><span class="annottext">discoverCabalModuleGraph :: IO ModuleGraph
 </span><a href="Graphex.Cabal.html#discoverCabalModuleGraph"><span class="hs-identifier hs-var hs-var">discoverCabalModuleGraph</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-71"></span><span>  </span><span id="local-6989586621679118675"><span class="annot"><span class="annottext">[FilePath]
-</span><a href="#local-6989586621679118675"><span class="hs-identifier hs-var">fs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO [FilePath]
+</span><span id="line-71"></span><span>  </span><span id="local-6989586621679118893"><span class="annot"><span class="annottext">[FilePath]
+</span><a href="#local-6989586621679118893"><span class="hs-identifier hs-var">fs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO [FilePath]
 </span><span class="hs-identifier hs-var">getDirectoryContents</span></span><span> </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;.&quot;</span></span><span> </span><span class="hs-comment">-- XXX</span><span>
-</span><span id="line-72"></span><span>  </span><span id="local-6989586621679118676"><span class="annot"><span class="annottext">[Module]
-</span><a href="#local-6989586621679118676"><span class="hs-identifier hs-var">mods</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; Bool) -&gt; [FilePath] -&gt; [FilePath]
+</span><span id="line-72"></span><span>  </span><span id="local-6989586621679118894"><span class="annot"><span class="annottext">[Module]
+</span><a href="#local-6989586621679118894"><span class="hs-identifier hs-var">mods</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">(FilePath -&gt; Bool) -&gt; [FilePath] -&gt; [FilePath]
 forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;.cabal&quot;</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath -&gt; Bool
@@ -238,20 +238,20 @@ forall a. Eq a =&gt; a -&gt; a -&gt; Bool
 forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; FilePath
 </span><span class="hs-identifier hs-var">takeExtension</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[FilePath]
-</span><a href="#local-6989586621679118675"><span class="hs-identifier hs-var">fs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-73"></span><span>    </span><span id="local-6989586621679118677"><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679118677"><span class="hs-identifier hs-var">path</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[FilePath]
+</span><a href="#local-6989586621679118893"><span class="hs-identifier hs-var">fs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-73"></span><span>    </span><span id="local-6989586621679118895"><span class="annot"><span class="annottext">FilePath
+</span><a href="#local-6989586621679118895"><span class="hs-identifier hs-var">path</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">[FilePath]
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO [Module]
 </span><a href="Graphex.Cabal.html#discoverCabalModules"><span class="hs-identifier hs-var">discoverCabalModules</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679118677"><span class="hs-identifier hs-var">path</span></a></span><span>
+</span><a href="#local-6989586621679118895"><span class="hs-identifier hs-var">path</span></a></span><span>
 </span><span id="line-74"></span><span>    </span><span class="annot"><span class="annottext">[FilePath]
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO [Module]
 forall a. HasCallStack =&gt; FilePath -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">FilePath
 </span><span class="hs-string">&quot;No cabal file found&quot;</span></span><span>
 </span><span id="line-75"></span><span>
-</span><span id="line-76"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118682"><span class="annot"><span class="annottext">modSet :: Set ModuleName
-</span><a href="#local-6989586621679118682"><span class="hs-identifier hs-var hs-var">modSet</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ModuleName] -&gt; Set ModuleName
+</span><span id="line-76"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118900"><span class="annot"><span class="annottext">modSet :: Set ModuleName
+</span><a href="#local-6989586621679118900"><span class="hs-identifier hs-var hs-var">modSet</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ModuleName] -&gt; Set ModuleName
 forall a. Ord a =&gt; [a] -&gt; Set a
 </span><span class="hs-identifier hs-var">Set.fromList</span></span><span> </span><span class="annot"><span class="annottext">([ModuleName] -&gt; Set ModuleName) -&gt; [ModuleName] -&gt; Set ModuleName
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -259,42 +259,42 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-operator">.</span><span class="hs-identifier">name</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Module]
-</span><a href="#local-6989586621679118676"><span class="hs-identifier hs-var">mods</span></a></span><span>
-</span><span id="line-77"></span><span>  </span><span id="local-6989586621679118684"><span class="annot"><span class="annottext">[ModuleGraph]
-</span><a href="#local-6989586621679118684"><span class="hs-identifier hs-var">gs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[Module] -&gt; (Module -&gt; IO ModuleGraph) -&gt; IO [ModuleGraph]
+</span><a href="#local-6989586621679118894"><span class="hs-identifier hs-var">mods</span></a></span><span>
+</span><span id="line-77"></span><span>  </span><span id="local-6989586621679118902"><span class="annot"><span class="annottext">[ModuleGraph]
+</span><a href="#local-6989586621679118902"><span class="hs-identifier hs-var">gs</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">[Module] -&gt; (Module -&gt; IO ModuleGraph) -&gt; IO [ModuleGraph]
 forall (t :: * -&gt; *) (f :: * -&gt; *) a b.
 (Traversable t, Applicative f) =&gt;
 t a -&gt; (a -&gt; f b) -&gt; f (t b)
 </span><span class="hs-identifier hs-var">for</span></span><span> </span><span class="annot"><span class="annottext">[Module]
-</span><a href="#local-6989586621679118676"><span class="hs-identifier hs-var">mods</span></a></span><span> </span><span class="annot"><span class="annottext">((Module -&gt; IO ModuleGraph) -&gt; IO [ModuleGraph])
+</span><a href="#local-6989586621679118894"><span class="hs-identifier hs-var">mods</span></a></span><span> </span><span class="annot"><span class="annottext">((Module -&gt; IO ModuleGraph) -&gt; IO [ModuleGraph])
 -&gt; (Module -&gt; IO ModuleGraph) -&gt; IO [ModuleGraph]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="annot"><a href="Graphex.Core.html#Module"><span class="hs-identifier hs-type">Module</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118685"><span id="local-6989586621679118686"><span class="annot"><span class="annottext">FilePath
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="annot"><a href="Graphex.Core.html#Module"><span class="hs-identifier hs-type">Module</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118903"><span id="local-6989586621679118904"><span class="annot"><span class="annottext">FilePath
 ModuleName
 name :: Module -&gt; ModuleName
 path :: Module -&gt; FilePath
 name :: ModuleName
 path :: FilePath
 </span><a href="Graphex.Core.html#name"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-78"></span><span>    </span><span id="local-6989586621679118687"><span class="annot"><span class="annottext">[Import]
-</span><a href="#local-6989586621679118687"><span class="hs-identifier hs-var">imps</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO [Import]
+</span><span id="line-78"></span><span>    </span><span id="local-6989586621679118905"><span class="annot"><span class="annottext">[Import]
+</span><a href="#local-6989586621679118905"><span class="hs-identifier hs-var">imps</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">FilePath -&gt; IO [Import]
 </span><a href="Graphex.Parser.html#parseFileImports"><span class="hs-identifier hs-var">parseFileImports</span></a></span><span> </span><span class="annot"><span class="annottext">FilePath
-</span><a href="#local-6989586621679118686"><span class="hs-identifier hs-var">path</span></a></span><span>
-</span><span id="line-79"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118690"><span class="annot"><span class="annottext">internalImps :: [Import]
-</span><a href="#local-6989586621679118690"><span class="hs-identifier hs-var hs-var">internalImps</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Import -&gt; Bool) -&gt; [Import] -&gt; [Import]
+</span><a href="#local-6989586621679118904"><span class="hs-identifier hs-var">path</span></a></span><span>
+</span><span id="line-79"></span><span>    </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679118908"><span class="annot"><span class="annottext">internalImps :: [Import]
+</span><a href="#local-6989586621679118908"><span class="hs-identifier hs-var hs-var">internalImps</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Import -&gt; Bool) -&gt; [Import] -&gt; [Import]
 forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
-</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118692"><span id="local-6989586621679118693"><span class="annot"><span class="annottext">Maybe Text
+</span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span><span class="hs-special">{</span><span id="local-6989586621679118910"><span id="local-6989586621679118911"><span class="annot"><span class="annottext">Maybe Text
 ModuleName
 module_ :: ModuleName
 package :: Maybe Text
 module_ :: Import -&gt; ModuleName
 package :: Import -&gt; Maybe Text
-</span><a href="#local-6989586621679118692"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; Set ModuleName -&gt; Bool
+</span><a href="#local-6989586621679118910"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; Set ModuleName -&gt; Bool
 forall a. Ord a =&gt; a -&gt; Set a -&gt; Bool
 </span><span class="hs-identifier hs-var">Set.member</span></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679118692"><span class="hs-identifier hs-var">module_</span></a></span><span> </span><span class="annot"><span class="annottext">Set ModuleName
-</span><a href="#local-6989586621679118682"><span class="hs-identifier hs-var">modSet</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Import]
-</span><a href="#local-6989586621679118687"><span class="hs-identifier hs-var">imps</span></a></span><span>
+</span><a href="#local-6989586621679118910"><span class="hs-identifier hs-var">module_</span></a></span><span> </span><span class="annot"><span class="annottext">Set ModuleName
+</span><a href="#local-6989586621679118900"><span class="hs-identifier hs-var">modSet</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Import]
+</span><a href="#local-6989586621679118905"><span class="hs-identifier hs-var">imps</span></a></span><span>
 </span><span id="line-80"></span><span>    </span><span class="annot"><span class="annottext">ModuleGraph -&gt; IO ModuleGraph
 forall a. a -&gt; IO a
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
@@ -302,13 +302,13 @@ forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
 </span><a href="Graphex.Core.html#mkModuleGraph"><span class="hs-identifier hs-var">mkModuleGraph</span></a></span><span> </span><span class="annot"><span class="annottext">ModuleName
-</span><a href="#local-6989586621679118685"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">([ModuleName] -&gt; ModuleGraph) -&gt; [ModuleName] -&gt; ModuleGraph
+</span><a href="#local-6989586621679118903"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">([ModuleName] -&gt; ModuleGraph) -&gt; [ModuleName] -&gt; ModuleGraph
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">(Import -&gt; ModuleName) -&gt; [Import] -&gt; [ModuleName]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="hs-operator">.</span><span class="hs-identifier">module_</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Import]
-</span><a href="#local-6989586621679118690"><span class="hs-identifier hs-var">internalImps</span></a></span><span>
+</span><a href="#local-6989586621679118908"><span class="hs-identifier hs-var">internalImps</span></a></span><span>
 </span><span id="line-81"></span><span>  </span><span class="annot"><span class="annottext">ModuleGraph -&gt; IO ModuleGraph
 forall a. a -&gt; IO a
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
@@ -317,5 +317,5 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[ModuleGraph] -&gt; ModuleGraph
 forall a. Monoid a =&gt; [a] -&gt; a
 </span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="annot"><span class="annottext">[ModuleGraph]
-</span><a href="#local-6989586621679118684"><span class="hs-identifier hs-var">gs</span></a></span><span>
+</span><a href="#local-6989586621679118902"><span class="hs-identifier hs-var">gs</span></a></span><span>
 </span><span id="line-82"></span></pre></body></html>
