@@ -3,8 +3,9 @@ module Graphex (
     -- * The Graph
     Graph(..),
     -- * Working from an individual node in the graph.
-    reverseEdges, directDepsOn, allDepsOn, why,
+    directDepsOn, allDepsOn, why,
     -- * Working on the graph as a whole.
+    reverseEdges,
     rankings, longest, allPathsTo, restrictTo, mapMaybeWithKey,
     graphToDep, depToGraph, graphToTree) where
 
