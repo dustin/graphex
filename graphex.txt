@@ -146,9 +146,6 @@ Graph :: Map a (Set a) -> Map a (Map Text Text) -> Graph a
 [unGraph] :: Graph a -> Map a (Set a)
 [attributes] :: Graph a -> Map a (Map Text Text)
 
--- | Reverse all the arrows in the graphs.
-reverseEdges :: Ord a => Graph a -> Graph a
-
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Ord a => Graph a -> a -> Set a
 
@@ -161,6 +158,9 @@ allDepsOn :: Ord a => Graph a -> a -> Set a
 --   This is a short path, but the important part is that it represents how
 --   connectivy works.
 why :: Ord a => Graph a -> a -> a -> [a]
+
+-- | Reverse all the arrows in the graphs.
+reverseEdges :: Ord a => Graph a -> Graph a
 
 -- | Count the number of transitive dependencies for each module.
 rankings :: (NFData a, Ord a) => Graph a -> [(Int, a)]
