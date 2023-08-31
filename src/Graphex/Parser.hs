@@ -1,7 +1,8 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE ExplicitForAll #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ExplicitForAll   #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies     #-}
+{-# LANGUAGE TypeOperators    #-}
 
 -- | Implements a very crude Haskell import parser.
 --
@@ -12,17 +13,16 @@
 -- graphex, this makes sense in a way - those are all still dependencies.
 module Graphex.Parser where
 
-import Data.Text qualified as T
-import Data.Void
-import Data.String (IsString)
-import Data.Maybe (isJust)
-import Data.Either (rights)
+import           Data.Either          (rights)
+import           Data.String          (IsString)
+import qualified Data.Text            as T
+import           Data.Void
 
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import Replace.Megaparsec (sepCap, streamEdit)
+import           Replace.Megaparsec   (sepCap, streamEdit)
+import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
-import Graphex.Core
+import           Graphex.Core
 
 importParser
   :: MonadParsec e s m
@@ -37,7 +37,7 @@ importParser = do
   _ <- string "import"
   space1
   -- Handle prefix qualified imports
-  _ <- isJust <$> optional (string "qualified")
+  _ <- optional (string "qualified")
   space
   -- Handle PackageImports
   pkg <- optional $ between (char '"') (char '"') $ some $ alphaNumChar <|> char '-' <|> char '_'
@@ -70,7 +70,7 @@ blockCommentParser
 blockCommentParser = do
   _ <- string "{-"
   manyTill anySingle (string "-}")
-  
+
 parseFileImports :: FilePath -> IO [Import]
 parseFileImports fp = do
   contents <- removeBlockComments <$> readFile fp

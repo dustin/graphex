@@ -37,7 +37,7 @@ getAttribute nodeName aName = (Map.lookup aName <=< Map.lookup nodeName) . attri
 data Import = Import
   { module_ :: ModuleName
   , package :: Maybe Text
-  } deriving stock (Show)
+  } deriving stock (Show, Eq)
 
 newtype ModuleName = ModuleName { unModuleName :: Text }
   deriving newtype (Eq, Ord, IsString)
