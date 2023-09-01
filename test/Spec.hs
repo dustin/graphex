@@ -35,6 +35,10 @@ someStrings =
      "alpha", "beta", "gamma", "delta", "list", "value", "result",
      "input", "output", "function", "variable"]
 
+-- This exists primarily to avoid shrinking, but might as well use it.
+instance Arbitrary Text where
+    arbitrary = elements someStrings
+
 instance Arbitrary (Graph Text) where
     arbitrary = do
         -- We begin with some subset of keys in arbitrary order
@@ -45,7 +49,7 @@ instance Arbitrary (Graph Text) where
         where
             next m k = flip (Map.insert k) m . Set.fromList <$> sublistOf (Map.keys m)
             genAttrs :: Gen (Map Text Text)
-            genAttrs = Map.fromList <$> listOf ((,) <$> elements someStrings <*> elements someStrings)
+            genAttrs = Map.fromList <$> listOf ((,) <$> arbitrary <*> arbitrary)
 
     -- A custom shrink here needs to make sure
     shrink (Graph m attrs) = Graph . Map.fromList <$> keySubs (Map.assocs m) <*> pure attrs
@@ -108,7 +112,7 @@ prop_reachableIsFindable gwk@(ConnectedGraph from to g) = not . null $ why g fro
 prop_negativePathfinding :: Graph Text -> Property
 prop_negativePathfinding g = forAll oneGoodKey (null . uncurry (why g))
     where oneGoodKey = do
-            good <- elements someStrings
+            good <- arbitrary
             let bad = "missingnode"
             elements [ (good, bad), (bad, good) ]
 
@@ -202,7 +206,7 @@ prop_longestPath (ConnectedGraph _ _ g) =
         xs -> not . null $ why g (head xs) (last xs)
 
 instance Arbitrary ModuleName where
-    arbitrary = ModuleName <$> elements someStrings
+    arbitrary = ModuleName <$> arbitrary
 
 prop_moduleSingleton :: ModuleName -> ModuleName -> Bool
 prop_moduleSingleton importer importee = singletonModuleGraph importer importee == mkModuleGraph importer [importee]
@@ -230,5 +234,18 @@ prop_lookingGlass g =  (not.null) (unGraph g) ==>
     counterexample (show lg) $
     g === convertGraph ModuleName (depToGraph lg)
     where
-        lg :: GraphDef
         lg = toLookingGlass "Jabberwocky" (Map.fromList [("alpha", red), ("delta", black)]) g
+
+data AttributeMap = AttributeMap (Map Text Text)
+    deriving stock (Eq, Ord, Show, Generic)
+
+instance Arbitrary AttributeMap where
+    arbitrary = AttributeMap <$> arbitrary
+    shrink (AttributeMap m) = AttributeMap <$> shrink m
+
+prop_testAttributes :: GraphWithKey -> AttributeMap -> Property
+prop_testAttributes (GraphWithKey k og) (AttributeMap attrMap) =
+    counterexample (show (attributes g) <> "\n" <> show attrs) $
+    all (\(ak, av) -> getAttribute k ak g == Just av) (Map.assocs attrMap)
+    where
+        g = Map.foldrWithKey (setAttribute k) og attrMap
