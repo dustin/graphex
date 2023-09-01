@@ -17,31 +17,31 @@ span.spaces    { background: white }
 <span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
 </pre>
 <pre>
-<span class="lineno">    1 </span>{-# LANGUAGE TypeFamilies #-}
-<span class="lineno">    2 </span>{-# LANGUAGE ExplicitForAll #-}
+<span class="lineno">    1 </span>{-# LANGUAGE ExplicitForAll   #-}
+<span class="lineno">    2 </span>{-# LANGUAGE FlexibleContexts #-}
 <span class="lineno">    3 </span>{-# LANGUAGE TypeApplications #-}
-<span class="lineno">    4 </span>{-# LANGUAGE FlexibleContexts #-}
-<span class="lineno">    5 </span>
-<span class="lineno">    6 </span>-- | Implements a very crude Haskell import parser.
-<span class="lineno">    7 </span>--
-<span class="lineno">    8 </span>-- All it does is parse full module names that are imported in a file,
-<span class="lineno">    9 </span>-- ignoring false positives.
-<span class="lineno">   10 </span>--
-<span class="lineno">   11 </span>-- It does not use CPP, so all conditional imports are parsed out. For
-<span class="lineno">   12 </span>-- graphex, this makes sense in a way - those are all still dependencies.
-<span class="lineno">   13 </span>module Graphex.Parser where
-<span class="lineno">   14 </span>
-<span class="lineno">   15 </span>import Data.Text qualified as T
-<span class="lineno">   16 </span>import Data.Void
-<span class="lineno">   17 </span>import Data.String (IsString)
-<span class="lineno">   18 </span>import Data.Maybe (isJust)
-<span class="lineno">   19 </span>import Data.Either (rights)
+<span class="lineno">    4 </span>{-# LANGUAGE TypeFamilies     #-}
+<span class="lineno">    5 </span>{-# LANGUAGE TypeOperators    #-}
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>-- | Implements a very crude Haskell import parser.
+<span class="lineno">    8 </span>--
+<span class="lineno">    9 </span>-- All it does is parse full module names that are imported in a file,
+<span class="lineno">   10 </span>-- ignoring false positives.
+<span class="lineno">   11 </span>--
+<span class="lineno">   12 </span>-- It does not use CPP, so all conditional imports are parsed out. For
+<span class="lineno">   13 </span>-- graphex, this makes sense in a way - those are all still dependencies.
+<span class="lineno">   14 </span>module Graphex.Parser where
+<span class="lineno">   15 </span>
+<span class="lineno">   16 </span>import           Data.Either          (rights)
+<span class="lineno">   17 </span>import           Data.String          (IsString)
+<span class="lineno">   18 </span>import qualified Data.Text            as T
+<span class="lineno">   19 </span>import           Data.Void
 <span class="lineno">   20 </span>
-<span class="lineno">   21 </span>import Text.Megaparsec
-<span class="lineno">   22 </span>import Text.Megaparsec.Char
-<span class="lineno">   23 </span>import Replace.Megaparsec (sepCap, streamEdit)
+<span class="lineno">   21 </span>import           Replace.Megaparsec   (sepCap, streamEdit)
+<span class="lineno">   22 </span>import           Text.Megaparsec
+<span class="lineno">   23 </span>import           Text.Megaparsec.Char
 <span class="lineno">   24 </span>
-<span class="lineno">   25 </span>import Graphex.Core
+<span class="lineno">   25 </span>import           Graphex.Core
 <span class="lineno">   26 </span>
 <span class="lineno">   27 </span>importParser
 <span class="lineno">   28 </span>  :: MonadParsec e s m
@@ -56,17 +56,17 @@ span.spaces    { background: white }
 <span class="lineno">   37 </span><span class="spaces">  </span><span class="istickedoff">_ &lt;- string &quot;import&quot;</span>
 <span class="lineno">   38 </span><span class="spaces">  </span><span class="istickedoff">space1</span>
 <span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">-- Handle prefix qualified imports</span>
-<span class="lineno">   40 </span><span class="spaces">  </span><span class="istickedoff">_ &lt;- <span class="nottickedoff">isJust</span> &lt;$&gt; optional (string &quot;qualified&quot;)</span>
+<span class="lineno">   40 </span><span class="spaces">  </span><span class="istickedoff">_ &lt;- optional (string &quot;qualified&quot;)</span>
 <span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">space</span>
 <span class="lineno">   42 </span><span class="spaces">  </span><span class="istickedoff">-- Handle PackageImports</span>
-<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">pkg &lt;- optional $ between (char '&quot;') <span class="nottickedoff">(char '&quot;')</span> $ <span class="nottickedoff">some $ alphaNumChar &lt;|&gt; char '-' &lt;|&gt; char '_'</span></span>
+<span class="lineno">   43 </span><span class="spaces">  </span><span class="istickedoff">pkg &lt;- optional $ between (char '&quot;') (char '&quot;') $ some $ alphaNumChar &lt;|&gt; char '-' &lt;|&gt; char '_'</span>
 <span class="lineno">   44 </span><span class="spaces">  </span><span class="istickedoff">space</span>
 <span class="lineno">   45 </span><span class="spaces"></span><span class="istickedoff"></span>
 <span class="lineno">   46 </span><span class="spaces">  </span><span class="istickedoff">modid &lt;- some $ alphaNumChar &lt;|&gt; char '.' &lt;|&gt; char '_'</span>
 <span class="lineno">   47 </span><span class="spaces"></span><span class="istickedoff"></span>
 <span class="lineno">   48 </span><span class="spaces">  </span><span class="istickedoff">pure Import</span>
 <span class="lineno">   49 </span><span class="spaces">    </span><span class="istickedoff">{ module_ = ModuleName $ T.pack modid</span>
-<span class="lineno">   50 </span><span class="spaces">    </span><span class="istickedoff">, package = <span class="nottickedoff">T.pack</span> &lt;$&gt; pkg</span>
+<span class="lineno">   50 </span><span class="spaces">    </span><span class="istickedoff">, package = T.pack &lt;$&gt; pkg</span>
 <span class="lineno">   51 </span><span class="spaces">    </span><span class="istickedoff">}</span></span>
 <span class="lineno">   52 </span>
 <span class="lineno">   53 </span>importsParser
@@ -89,7 +89,7 @@ span.spaces    { background: white }
 <span class="lineno">   70 </span><span class="decl"><span class="istickedoff">blockCommentParser = do</span>
 <span class="lineno">   71 </span><span class="spaces">  </span><span class="istickedoff">_ &lt;- string &quot;{-&quot;</span>
 <span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">manyTill anySingle (string &quot;-}&quot;)</span></span>
-<span class="lineno">   73 </span>  
+<span class="lineno">   73 </span>
 <span class="lineno">   74 </span>parseFileImports :: FilePath -&gt; IO [Import]
 <span class="lineno">   75 </span><span class="decl"><span class="istickedoff">parseFileImports fp = do</span>
 <span class="lineno">   76 </span><span class="spaces">  </span><span class="istickedoff">contents &lt;- removeBlockComments &lt;$&gt; readFile fp</span>

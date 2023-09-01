@@ -1,34 +1,34 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE TypeFamilies #-}</span><span>
-</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE ExplicitForAll #-}</span><span>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE ExplicitForAll   #-}</span><span>
+</span><span id="line-2"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts #-}</span><span>
 </span><span id="line-3"></span><span class="hs-pragma">{-# LANGUAGE TypeApplications #-}</span><span>
-</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE FlexibleContexts #-}</span><span>
-</span><span id="line-5"></span><span>
-</span><span id="line-6"></span><span class="hs-comment">-- | Implements a very crude Haskell import parser.</span><span>
-</span><span id="line-7"></span><span class="hs-comment">--</span><span>
-</span><span id="line-8"></span><span class="hs-comment">-- All it does is parse full module names that are imported in a file,</span><span>
-</span><span id="line-9"></span><span class="hs-comment">-- ignoring false positives.</span><span>
-</span><span id="line-10"></span><span class="hs-comment">--</span><span>
-</span><span id="line-11"></span><span class="hs-comment">-- It does not use CPP, so all conditional imports are parsed out. For</span><span>
-</span><span id="line-12"></span><span class="hs-comment">-- graphex, this makes sense in a way - those are all still dependencies.</span><span>
-</span><span id="line-13"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Graphex.Parser</span><span> </span><span class="hs-keyword">where</span><span>
-</span><span id="line-14"></span><span>
-</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
-</span><span id="line-16"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Void</span></span><span>
-</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.String</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">IsString</span></span><span class="hs-special">)</span><span>
-</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">isJust</span></span><span class="hs-special">)</span><span>
-</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Data.Either</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">rights</span></span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span class="hs-pragma">{-# LANGUAGE TypeFamilies     #-}</span><span>
+</span><span id="line-5"></span><span class="hs-pragma">{-# LANGUAGE TypeOperators    #-}</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-comment">-- | Implements a very crude Haskell import parser.</span><span>
+</span><span id="line-8"></span><span class="hs-comment">--</span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- All it does is parse full module names that are imported in a file,</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- ignoring false positives.</span><span>
+</span><span id="line-11"></span><span class="hs-comment">--</span><span>
+</span><span id="line-12"></span><span class="hs-comment">-- It does not use CPP, so all conditional imports are parsed out. For</span><span>
+</span><span id="line-13"></span><span class="hs-comment">-- graphex, this makes sense in a way - those are all still dependencies.</span><span>
+</span><span id="line-14"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Graphex.Parser</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Either</span></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">rights</span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.String</span></span><span>          </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">IsString</span></span><span class="hs-special">)</span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Text</span></span><span>            </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">T</span></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Data.Void</span></span><span>
 </span><span id="line-20"></span><span>
-</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Megaparsec</span></span><span>
-</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Text.Megaparsec.Char</span></span><span>
-</span><span id="line-23"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Replace.Megaparsec</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">sepCap</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">streamEdit</span></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Replace.Megaparsec</span></span><span>   </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">sepCap</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier">streamEdit</span></span><span class="hs-special">)</span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Megaparsec</span></span><span>
+</span><span id="line-23"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><span class="hs-identifier">Text.Megaparsec.Char</span></span><span>
 </span><span id="line-24"></span><span>
-</span><span id="line-25"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="Graphex.Core.html"><span class="hs-identifier">Graphex.Core</span></a></span><span>
+</span><span id="line-25"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Graphex.Core.html"><span class="hs-identifier">Graphex.Core</span></a></span><span>
 </span><span id="line-26"></span><span>
-</span><span id="line-27"></span><span id="local-6989586621679118700"><span id="local-6989586621679118701"><span id="local-6989586621679118702"><span class="annot"><a href="Graphex.Parser.html#importParser"><span class="hs-identifier hs-type">importParser</span></a></span><span>
-</span><span id="line-28"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadParsec</span></span><span> </span><span class="annot"><a href="#local-6989586621679118700"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118701"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118702"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-29"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Token</span></span><span> </span><span class="annot"><a href="#local-6989586621679118701"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
-</span><span id="line-30"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tokens</span></span><span> </span><span class="annot"><a href="#local-6989586621679118701"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-31"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118702"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span></span></span></span><span>
+</span><span id="line-27"></span><span id="local-6989586621679118750"><span id="local-6989586621679118751"><span id="local-6989586621679118752"><span class="annot"><a href="Graphex.Parser.html#importParser"><span class="hs-identifier hs-type">importParser</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadParsec</span></span><span> </span><span class="annot"><a href="#local-6989586621679118750"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118751"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118752"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Token</span></span><span> </span><span class="annot"><a href="#local-6989586621679118751"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-30"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tokens</span></span><span> </span><span class="annot"><a href="#local-6989586621679118751"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-31"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118752"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span></span></span></span><span>
 </span><span id="line-32"></span><span id="importParser"><span class="annot"><span class="annottext">importParser :: forall e s (m :: * -&gt; *).
 (MonadParsec e s m, Token s ~ Char, IsString (Tokens s)) =&gt;
 m Import
@@ -56,12 +56,8 @@ forall e s (m :: * -&gt; *).
 m ()
 </span><span class="hs-identifier hs-var">space1</span></span><span>
 </span><span id="line-39"></span><span>  </span><span class="hs-comment">-- Handle prefix qualified imports</span><span>
-</span><span id="line-40"></span><span>  </span><span class="annot"><span class="annottext">Bool
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Maybe (Tokens s) -&gt; Bool
-forall a. Maybe a -&gt; Bool
-</span><span class="hs-identifier hs-var">isJust</span></span><span> </span><span class="annot"><span class="annottext">(Maybe (Tokens s) -&gt; Bool) -&gt; m (Maybe (Tokens s)) -&gt; m Bool
-forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
-</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">m (Tokens s) -&gt; m (Maybe (Tokens s))
+</span><span id="line-40"></span><span>  </span><span class="annot"><span class="annottext">Maybe (Tokens s)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m (Tokens s) -&gt; m (Maybe (Tokens s))
 forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f (Maybe a)
 </span><span class="hs-identifier hs-var">optional</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Tokens s -&gt; m (Tokens s)
 forall e s (m :: * -&gt; *).
@@ -75,8 +71,8 @@ forall e s (m :: * -&gt; *).
 m ()
 </span><span class="hs-identifier hs-var">space</span></span><span>
 </span><span id="line-42"></span><span>  </span><span class="hs-comment">-- Handle PackageImports</span><span>
-</span><span id="line-43"></span><span>  </span><span id="local-6989586621679118895"><span class="annot"><span class="annottext">Maybe String
-</span><a href="#local-6989586621679118895"><span class="hs-identifier hs-var">pkg</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m String -&gt; m (Maybe String)
+</span><span id="line-43"></span><span>  </span><span id="local-6989586621679118939"><span class="annot"><span class="annottext">Maybe String
+</span><a href="#local-6989586621679118939"><span class="hs-identifier hs-var">pkg</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m String -&gt; m (Maybe String)
 forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f (Maybe a)
 </span><span class="hs-identifier hs-var">optional</span></span><span> </span><span class="annot"><span class="annottext">(m String -&gt; m (Maybe String)) -&gt; m String -&gt; m (Maybe String)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -132,8 +128,8 @@ forall e s (m :: * -&gt; *).
 m ()
 </span><span class="hs-identifier hs-var">space</span></span><span>
 </span><span id="line-45"></span><span>
-</span><span id="line-46"></span><span>  </span><span id="local-6989586621679118901"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118901"><span class="hs-identifier hs-var">modid</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m Char -&gt; m String
+</span><span id="line-46"></span><span>  </span><span id="local-6989586621679118945"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679118945"><span class="hs-identifier hs-var">modid</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">m Char -&gt; m String
 forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
 </span><span class="hs-identifier hs-var">some</span></span><span> </span><span class="annot"><span class="annottext">(m Char -&gt; m String) -&gt; m Char -&gt; m String
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -172,21 +168,21 @@ forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
 </span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118901"><span class="hs-identifier hs-var">modid</span></a></span><span>
+</span><a href="#local-6989586621679118945"><span class="hs-identifier hs-var">modid</span></a></span><span>
 </span><span id="line-50"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">package :: Maybe Text
 </span><a href="Graphex.Core.html#package"><span class="hs-identifier hs-var">package</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
 </span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; Maybe String -&gt; Maybe Text
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Maybe String
-</span><a href="#local-6989586621679118895"><span class="hs-identifier hs-var">pkg</span></a></span><span>
+</span><a href="#local-6989586621679118939"><span class="hs-identifier hs-var">pkg</span></a></span><span>
 </span><span id="line-51"></span><span>    </span><span class="hs-special">}</span><span>
 </span><span id="line-52"></span><span>
 </span><span id="line-53"></span><span class="annot"><a href="Graphex.Parser.html#importsParser"><span class="hs-identifier hs-type">importsParser</span></a></span><span>
-</span><span id="line-54"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679118746"><span class="annot"><a href="#local-6989586621679118746"><span class="hs-identifier hs-type">e</span></a></span></span><span> </span><span id="local-6989586621679118747"><span class="annot"><a href="#local-6989586621679118747"><span class="hs-identifier hs-type">s</span></a></span></span><span> </span><span id="local-6989586621679118748"><span class="annot"><a href="#local-6989586621679118748"><span class="hs-identifier hs-type">m</span></a></span></span><span>
-</span><span id="line-55"></span><span>   </span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadParsec</span></span><span> </span><span class="annot"><a href="#local-6989586621679118746"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118747"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118748"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-56"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Token</span></span><span> </span><span class="annot"><a href="#local-6989586621679118747"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
-</span><span id="line-57"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tokens</span></span><span> </span><span class="annot"><a href="#local-6989586621679118747"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-58"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118748"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-54"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679118795"><span class="annot"><a href="#local-6989586621679118795"><span class="hs-identifier hs-type">e</span></a></span></span><span> </span><span id="local-6989586621679118796"><span class="annot"><a href="#local-6989586621679118796"><span class="hs-identifier hs-type">s</span></a></span></span><span> </span><span id="local-6989586621679118797"><span class="annot"><a href="#local-6989586621679118797"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-55"></span><span>   </span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadParsec</span></span><span> </span><span class="annot"><a href="#local-6989586621679118795"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118796"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118797"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Token</span></span><span> </span><span class="annot"><a href="#local-6989586621679118796"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-57"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tokens</span></span><span> </span><span class="annot"><a href="#local-6989586621679118796"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-58"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118797"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-59"></span><span id="importsParser"><span class="annot"><span class="annottext">importsParser :: forall e s (m :: * -&gt; *).
 (MonadParsec e s m, Token s ~ Char, IsString (Tokens s)) =&gt;
 m [Import]
@@ -219,11 +215,11 @@ m String
 </span><span class="hs-string">&quot;&quot;</span></span><span class="hs-special">)</span><span>
 </span><span id="line-63"></span><span>
 </span><span id="line-64"></span><span class="annot"><a href="Graphex.Parser.html#blockCommentParser"><span class="hs-identifier hs-type">blockCommentParser</span></a></span><span>
-</span><span id="line-65"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679118762"><span class="annot"><a href="#local-6989586621679118762"><span class="hs-identifier hs-type">e</span></a></span></span><span> </span><span id="local-6989586621679118763"><span class="annot"><a href="#local-6989586621679118763"><span class="hs-identifier hs-type">s</span></a></span></span><span> </span><span id="local-6989586621679118764"><span class="annot"><a href="#local-6989586621679118764"><span class="hs-identifier hs-type">m</span></a></span></span><span>
-</span><span id="line-66"></span><span>   </span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadParsec</span></span><span> </span><span class="annot"><a href="#local-6989586621679118762"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118763"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118764"><span class="hs-identifier hs-type">m</span></a></span><span>
-</span><span id="line-67"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Token</span></span><span> </span><span class="annot"><a href="#local-6989586621679118763"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
-</span><span id="line-68"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tokens</span></span><span> </span><span class="annot"><a href="#local-6989586621679118763"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-69"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118764"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-65"></span><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-keyword">forall</span><span> </span><span id="local-6989586621679118811"><span class="annot"><a href="#local-6989586621679118811"><span class="hs-identifier hs-type">e</span></a></span></span><span> </span><span id="local-6989586621679118812"><span class="annot"><a href="#local-6989586621679118812"><span class="hs-identifier hs-type">s</span></a></span></span><span> </span><span id="local-6989586621679118813"><span class="annot"><a href="#local-6989586621679118813"><span class="hs-identifier hs-type">m</span></a></span></span><span>
+</span><span id="line-66"></span><span>   </span><span class="hs-operator">.</span><span> </span><span class="annot"><span class="hs-identifier hs-type">MonadParsec</span></span><span> </span><span class="annot"><a href="#local-6989586621679118811"><span class="hs-identifier hs-type">e</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118812"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679118813"><span class="hs-identifier hs-type">m</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Token</span></span><span> </span><span class="annot"><a href="#local-6989586621679118812"><span class="hs-identifier hs-type">s</span></a></span><span> </span><span class="annot"><span class="hs-operator hs-type">~</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Char</span></span><span>
+</span><span id="line-68"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IsString</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Tokens</span></span><span> </span><span class="annot"><a href="#local-6989586621679118812"><span class="hs-identifier hs-type">s</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679118813"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
 </span><span id="line-70"></span><span id="blockCommentParser"><span class="annot"><span class="annottext">blockCommentParser :: forall e s (m :: * -&gt; *).
 (MonadParsec e s m, Token s ~ Char, IsString (Tokens s)) =&gt;
 m String
@@ -246,18 +242,18 @@ MonadParsec e s m =&gt;
 Tokens s -&gt; m (Tokens s)
 </span><span class="hs-identifier hs-var">string</span></span><span> </span><span class="annot"><span class="annottext">Tokens s
 </span><span class="hs-string">&quot;-}&quot;</span></span><span class="hs-special">)</span><span>
-</span><span id="line-73"></span><span>  </span><span>
+</span><span id="line-73"></span><span>
 </span><span id="line-74"></span><span class="annot"><a href="Graphex.Parser.html#parseFileImports"><span class="hs-identifier hs-type">parseFileImports</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">FilePath</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Graphex.Core.html#Import"><span class="hs-identifier hs-type">Import</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-75"></span><span id="parseFileImports"><span class="annot"><span class="annottext">parseFileImports :: String -&gt; IO [Import]
-</span><a href="Graphex.Parser.html#parseFileImports"><span class="hs-identifier hs-var hs-var">parseFileImports</span></a></span></span><span> </span><span id="local-6989586621679118940"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118940"><span class="hs-identifier hs-var">fp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-76"></span><span>  </span><span id="local-6989586621679118941"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118941"><span class="hs-identifier hs-var">contents</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
+</span><a href="Graphex.Parser.html#parseFileImports"><span class="hs-identifier hs-var hs-var">parseFileImports</span></a></span></span><span> </span><span id="local-6989586621679118986"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679118986"><span class="hs-identifier hs-var">fp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-76"></span><span>  </span><span id="local-6989586621679118987"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679118987"><span class="hs-identifier hs-var">contents</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; String
 </span><a href="Graphex.Parser.html#removeBlockComments"><span class="hs-identifier hs-var">removeBlockComments</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; String) -&gt; IO String -&gt; IO String
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO String
 </span><span class="hs-identifier hs-var">readFile</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118940"><span class="hs-identifier hs-var">fp</span></a></span><span>
+</span><a href="#local-6989586621679118986"><span class="hs-identifier hs-var">fp</span></a></span><span>
 </span><span id="line-77"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Parsec Void String [Import]
 -&gt; String
 -&gt; String
@@ -268,10 +264,10 @@ Parsec e s a -&gt; String -&gt; s -&gt; Either (ParseErrorBundle s e) a
 (MonadParsec e s m, Token s ~ Char, IsString (Tokens s)) =&gt;
 m [Import]
 </span><a href="Graphex.Parser.html#importsParser"><span class="hs-identifier hs-var">importsParser</span></a></span><span> </span><span class="hs-glyph">@</span><span class="annot"><span class="hs-identifier hs-type">Void</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118940"><span class="hs-identifier hs-var">fp</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118941"><span class="hs-identifier hs-var">contents</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-78"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679118944"><span class="annot"><span class="annottext">ParseErrorBundle String Void
-</span><a href="#local-6989586621679118944"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO [Import]
+</span><a href="#local-6989586621679118986"><span class="hs-identifier hs-var">fp</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679118987"><span class="hs-identifier hs-var">contents</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-78"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679118990"><span class="annot"><span class="annottext">ParseErrorBundle String Void
+</span><a href="#local-6989586621679118990"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO [Import]
 forall a. HasCallStack =&gt; String -&gt; a
 </span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO [Import]) -&gt; String -&gt; IO [Import]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -282,17 +278,17 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall a. Monoid a =&gt; [a] -&gt; a
 </span><span class="hs-identifier hs-var">mconcat</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Failed to parse &quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679118940"><span class="hs-identifier hs-var">fp</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679118986"><span class="hs-identifier hs-var">fp</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;:&quot;</span></span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParseErrorBundle String Void -&gt; String
 forall s e.
 (VisualStream s, TraversableStream s, ShowErrorComponent e) =&gt;
 ParseErrorBundle s e -&gt; String
 </span><span class="hs-identifier hs-var">errorBundlePretty</span></span><span> </span><span class="annot"><span class="annottext">ParseErrorBundle String Void
-</span><a href="#local-6989586621679118944"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">]</span><span>
-</span><span id="line-79"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679118948"><span class="annot"><span class="annottext">[Import]
-</span><a href="#local-6989586621679118948"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Import] -&gt; IO [Import]
+</span><a href="#local-6989586621679118990"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-79"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679118994"><span class="annot"><span class="annottext">[Import]
+</span><a href="#local-6989586621679118994"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Import] -&gt; IO [Import]
 forall a. a -&gt; IO a
 forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
 </span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="annot"><span class="annottext">[Import]
-</span><a href="#local-6989586621679118948"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><a href="#local-6989586621679118994"><span class="hs-identifier hs-var">x</span></a></span><span>
 </span><span id="line-80"></span></pre></body></html>

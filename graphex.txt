@@ -40,6 +40,7 @@ instance GHC.Show.Show Graphex.Core.ModuleName
 instance Data.String.IsString Graphex.Core.ModuleName
 instance GHC.Classes.Ord Graphex.Core.ModuleName
 instance GHC.Classes.Eq Graphex.Core.ModuleName
+instance GHC.Classes.Eq Graphex.Core.Import
 instance GHC.Show.Show Graphex.Core.Import
 instance GHC.Classes.Eq Graphex.Core.Module
 instance GHC.Show.Show Graphex.Core.Module
