@@ -1,41 +1,39 @@
-{-# language CPP #-}
-{-# language OverloadedStrings #-}
-{-# language OverloadedRecordDot #-}
+{-# LANGUAGE CPP                 #-}
+{-# LANGUAGE OverloadedRecordDot #-}
+{-# LANGUAGE OverloadedStrings   #-}
 
 -- Cribbed from graphmod's 'Graphmod.CabalSupport'
 module Graphex.Cabal (discoverCabalModules, discoverCabalModuleGraph) where
 
-import Graphex.Core
-import Graphex.Parser
+import           Graphex.Core
+import           Graphex.Parser
 
-import Control.Monad (filterM)
-import Data.String (fromString)
-import Data.List (intersperse)
-import Data.Maybe(maybeToList)
-import Data.Set qualified as Set
-import Data.Traversable (for)
-import System.FilePath((</>), (<.>), takeExtension)
-import System.Directory (doesFileExist, getDirectoryContents)
+import           Control.Monad                                 (filterM)
+import           Data.Foldable                                 (fold)
+import           Data.List                                     (intersperse)
+import           Data.Maybe                                    (maybeToList)
+import qualified Data.Set                                      as Set
+import           Data.String                                   (fromString)
+import           Data.Traversable                              (for)
+import           System.Directory                              (doesFileExist, getDirectoryContents)
+import           System.FilePath                               (takeExtension, (<.>), (</>))
 
 -- Interface to cabal.
-import Distribution.Verbosity(silent)
-import Distribution.PackageDescription
-        ( PackageDescription(..)
-        , Library(..), Executable(..)
-        , BuildInfo(..) )
-import Distribution.PackageDescription.Configuration (flattenPackageDescription)
-import Distribution.ModuleName qualified as Cabal
+import qualified Distribution.ModuleName                       as Cabal
+import           Distribution.PackageDescription               (BuildInfo (..), Library (..), PackageDescription (..))
+import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
+import           Distribution.Verbosity                        (silent)
 
 #if MIN_VERSION_Cabal(3,6,0)
-import Distribution.Utils.Path (SymbolicPath, PackageDir, SourceDir, getSymbolicPath)
+import           Distribution.Utils.Path                       (PackageDir, SourceDir, SymbolicPath, getSymbolicPath)
 #endif
 
 #if MIN_VERSION_Cabal(3,8,1)
-import Distribution.Simple.PackageDescription(readGenericPackageDescription)
+import           Distribution.Simple.PackageDescription        (readGenericPackageDescription)
 #elif MIN_VERSION_Cabal(2,2,0)
-import Distribution.PackageDescription.Parsec(readGenericPackageDescription)
+import           Distribution.PackageDescription.Parsec        (readGenericPackageDescription)
 #else
-import Distribution.PackageDescription.Parse(readGenericPackageDescription)
+import           Distribution.PackageDescription.Parse         (readGenericPackageDescription)
 #endif
 
 -- Note that this isn't nested under the above #if because we need
@@ -69,13 +67,10 @@ discoverCabalModules cabalFile = do
 discoverCabalModuleGraph :: IO ModuleGraph
 discoverCabalModuleGraph = do
   fs <- getDirectoryContents "." -- XXX
-  mods <- case filter ((".cabal" ==) . takeExtension) fs of
-    path : _ -> discoverCabalModules path
-    _ -> error "No cabal file found"
+  mods <- fmap fold . traverse discoverCabalModules . filter ((".cabal" ==) . takeExtension) $ fs
 
-  let modSet = Set.fromList $ fmap (.name) mods
+  let modSet = foldMap (Set.singleton . name) mods
   gs <- for mods $ \Module{..} -> do
-    imps <- parseFileImports path
-    let internalImps = filter (\Import{..} -> Set.member module_ modSet) imps
-    pure $ mkModuleGraph name $ fmap (.module_) internalImps
-  pure $ mconcat gs
+    internalImps <- filter (\Import{..} -> Set.member module_ modSet) <$> parseFileImports path
+    pure $ mkModuleGraph name $ fmap module_ internalImps
+  pure $ fold gs
