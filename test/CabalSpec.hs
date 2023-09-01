@@ -12,6 +12,8 @@ import           Graphex
 import           Graphex.Cabal
 import           Graphex.Core
 
+import           TestInstances    ()
+
 myModules :: [Module]
 myModules = [Module "Graphex" "src/Graphex.hs",
              Module "Graphex.Cabal" "src/Graphex/Cabal.hs",

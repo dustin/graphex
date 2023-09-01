@@ -28,6 +28,8 @@ import           Graphex.Core
 import           Graphex.LookingGlass
 import           Graphex.Search
 
+import           TestInstances              ()
+
 -- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
 someStrings :: [Text]
 someStrings =
@@ -236,7 +238,7 @@ prop_lookingGlass g =  (not.null) (unGraph g) ==>
     where
         lg = toLookingGlass "Jabberwocky" (Map.fromList [("alpha", red), ("delta", black)]) g
 
-data AttributeMap = AttributeMap (Map Text Text)
+newtype AttributeMap = AttributeMap (Map Text Text)
     deriving stock (Eq, Ord, Show, Generic)
 
 instance Arbitrary AttributeMap where

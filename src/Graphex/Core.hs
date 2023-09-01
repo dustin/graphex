@@ -1,9 +1,7 @@
-{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE StrictData          #-}
 module Graphex.Core where
 
 import           Control.Monad   ((<=<))
-import           Data.Foldable   (fold)
 import           Data.Map        (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Set        (Set)
@@ -22,10 +20,6 @@ instance Ord a => Semigroup (Graph a) where
 
 instance Ord a => Monoid (Graph a) where
   mempty = Graph mempty mempty
-
--- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
-instance Show t => Show (Graph t) where
-    show (Graph m attrs) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m] <> " attrs=" <> show attrs
 
 singletonGraph :: Ord a => a -> a -> Graph a
 singletonGraph k = mkGraph k . pure
