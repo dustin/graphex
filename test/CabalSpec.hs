@@ -24,9 +24,6 @@ myModules = [Module "Graphex" "src/Graphex.hs",
 unit_myCabalModules :: IO ()
 unit_myCabalModules = assertEqual "" myModules =<< discoverCabalModules "graphex.cabal"
 
-instance Show (Graph ModuleName) where
-    show (Graph m _) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
-
 unit_discoverModules :: IO ()
 unit_discoverModules = do
     g <- discoverCabalModuleGraph

@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedRecordDot #-}
 module Graphex (
     -- * The Graph
-    Graph(..),
+    Graph(..), getInput,
     -- * Working from an individual node in the graph.
     directDepsOn, allDepsOn, why,
     -- * Working on the graph as a whole.
@@ -11,7 +11,9 @@ module Graphex (
 
 import           Control.Monad               (ap)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
+import           Data.Aeson                  (eitherDecode)
 import           Data.Bifunctor              (first)
+import qualified Data.ByteString.Lazy        as BL
 import           Data.Foldable               (maximumBy)
 import           Data.List                   (sortOn)
 import           Data.List.NonEmpty          (NonEmpty, nonEmpty)
@@ -46,6 +48,10 @@ graphToDep (Graph m attrs) = GraphDef {
     nodes = Map.fromList [ (k, Node k Nothing) | k <- Map.keys m ],
     attrs = Map.fromList [ (k, v) | k <- Map.keys m, v <- maybe [] pure (Map.lookup k attrs)]
     }
+
+-- | Load a graph from a lookingglass JSON representation.
+getInput :: FilePath -> IO (Graph Text)
+getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Ord a => Graph a -> Graph a

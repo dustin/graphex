@@ -2,34 +2,31 @@
 
 module Spec where
 
-import           Control.Monad            (foldM, guard)
-import           Data.Foldable            (fold)
-import           Data.Map                 (Map)
-import qualified Data.Map.Strict          as Map
-import           Data.Set                 (Set)
-import qualified Data.Set                 as Set
-import           Data.Text                (Text)
-import qualified Data.Text                as T
-import qualified Data.Tree                as Tree
-import           Data.Tuple               (swap)
-import           GHC.Generics             (Generic)
+import           Control.Monad              (foldM, guard)
+import           Data.Aeson                 (encode)
+import qualified Data.ByteString.Lazy.Char8 as BC
+import           Data.Foldable              (fold)
+import           Data.Map                   (Map)
+import qualified Data.Map.Strict            as Map
+import           Data.Maybe                 (isJust)
+import           Data.Set                   (Set)
+import qualified Data.Set                   as Set
+import           Data.Text                  (Text)
+import qualified Data.Text                  as T
+import qualified Data.Tree                  as Tree
+import           Data.Tuple                 (swap)
+import           GHC.Generics               (Generic)
 
 import           Test.QuickCheck.Checkers
 import           Test.QuickCheck.Classes
 import           Test.Tasty
 import           Test.Tasty.HUnit
-import           Test.Tasty.QuickCheck    as QC
+import           Test.Tasty.QuickCheck      as QC
 
 import           Graphex
 import           Graphex.Core
+import           Graphex.LookingGlass
 import           Graphex.Search
-
--- It's usually a terrible idea to write your own Show instance, but this is just for debugging.
-instance Show (Graph Text) where
-    show (Graph m _) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
-
-instance Show (Graph ModuleName) where
-    show (Graph m _) = fold [show k <> " -> " <> show (Set.toList vs) <> ", " | (k, vs) <- Map.assocs m]
 
 -- I asked ChatGPT to make me a list of arbitrary strings in Haskell format.
 someStrings :: [Text]
@@ -214,9 +211,24 @@ instance EqProp ModuleGraph where (=-=) = eq
 
 instance Arbitrary ModuleGraph where
     arbitrary = convertGraph ModuleName <$> arbitrary
+    shrink g = convertGraph ModuleName <$> shrink (convertGraph unModuleName g)
 
 test_Instances :: [TestTree]
 test_Instances = [
   testProperties "semigroup" (unbatch $ semigroup (undefined :: ModuleGraph, undefined :: Int)),
   testProperties "monoid" (unbatch $ monoid (undefined :: ModuleGraph))
   ]
+
+unit_fromJSON :: IO ()
+unit_fromJSON = do
+    g <- getInput "test/ex.json"
+    -- TODO:  This graph is backwards
+    assertBool (show g) . isJust $ why g "Graphex.Core" "Graphex"
+
+prop_lookingGlass :: ModuleGraph -> Property
+prop_lookingGlass g =  (not.null) (unGraph g) ==>
+    counterexample (show lg) $
+    g === convertGraph ModuleName (depToGraph lg)
+    where
+        lg :: GraphDef
+        lg = toLookingGlass "Jabberwocky" (Map.fromList [("alpha", red), ("delta", black)]) g

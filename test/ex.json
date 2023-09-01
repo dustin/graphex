@@ -1,0 +1,67 @@
+{
+  "edges": [
+    {
+      "from": "Graphex.Core",
+      "to": "Graphex"
+    },
+    {
+      "from": "Graphex.LookingGlass",
+      "to": "Graphex"
+    },
+    {
+      "from": "Graphex.Search",
+      "to": "Graphex"
+    },
+    {
+      "from": "Graphex.Core",
+      "to": "Graphex.CSV"
+    },
+    {
+      "from": "Graphex.Core",
+      "to": "Graphex.Cabal"
+    },
+    {
+      "from": "Graphex.Parser",
+      "to": "Graphex.Cabal"
+    },
+    {
+      "from": "Graphex.Core",
+      "to": "Graphex.LookingGlass"
+    },
+    {
+      "from": "Graphex.Core",
+      "to": "Graphex.Parser"
+    }
+  ],
+  "nodes": {
+    "Graphex": {
+      "color": null,
+      "label": "Graphex"
+    },
+    "Graphex.CSV": {
+      "color": null,
+      "label": "Graphex.CSV"
+    },
+    "Graphex.Cabal": {
+      "color": null,
+      "label": "Graphex.Cabal"
+    },
+    "Graphex.Core": {
+      "color": null,
+      "label": "Graphex.Core"
+    },
+    "Graphex.LookingGlass": {
+      "color": null,
+      "label": "Graphex.LookingGlass"
+    },
+    "Graphex.Parser": {
+      "color": null,
+      "label": "Graphex.Parser"
+    },
+    "Graphex.Search": {
+      "color": null,
+      "label": "Graphex.Search"
+    }
+  },
+  "title": "Internal Package Dependencies"
+}

@@ -1,7 +1,7 @@
 module Main where
 
 import           Control.Applicative  ((<|>))
-import           Data.Aeson           (eitherDecode, encode)
+import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
@@ -13,12 +13,9 @@ import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command,
-                                       customExecParser, fullDesc, help, helper,
-                                       hsubparser, info, long, metavar, prefs,
-                                       progDesc, short, showDefault,
-                                       showHelpOnError, some, str, strOption,
-                                       switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
+                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
+                                       str, strOption, switch, value, (<**>))
 
 import           Graphex
 import           Graphex.Cabal
@@ -84,9 +81,6 @@ graphOptions = GraphOptions
 
 printStrs :: Foldable f => f Text -> IO ()
 printStrs = traverse_ TIO.putStrLn
-
-getInput :: FilePath -> IO (Graph Text)
-getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnError) opts >>= \case
