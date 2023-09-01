@@ -44,7 +44,7 @@ data Module = Module
   { name :: ModuleName
   , path :: FilePath
   }
-  deriving stock (Show)
+  deriving stock (Show, Eq)
 
 type ModuleGraph = Graph ModuleName
 
