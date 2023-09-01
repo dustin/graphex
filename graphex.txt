@@ -15,6 +15,7 @@ Graph :: Map a (Set a) -> Map a (Map Text Text) -> Graph a
 singletonGraph :: Ord a => a -> a -> Graph a
 mkGraph :: Ord a => a -> [a] -> Graph a
 setAttribute :: Ord a => a -> Text -> Text -> Graph a -> Graph a
+getAttribute :: Ord a => a -> Text -> Graph a -> Maybe Text
 data Import
 Import :: ModuleName -> Maybe Text -> Import
 [module_] :: Import -> ModuleName
@@ -40,6 +41,7 @@ instance Data.String.IsString Graphex.Core.ModuleName
 instance GHC.Classes.Ord Graphex.Core.ModuleName
 instance GHC.Classes.Eq Graphex.Core.ModuleName
 instance GHC.Show.Show Graphex.Core.Import
+instance GHC.Classes.Eq Graphex.Core.Module
 instance GHC.Show.Show Graphex.Core.Module
 instance GHC.Classes.Ord a => GHC.Base.Semigroup (Graphex.Core.Graph a)
 instance GHC.Classes.Ord a => GHC.Base.Monoid (Graphex.Core.Graph a)
@@ -147,6 +149,9 @@ data Graph a
 Graph :: Map a (Set a) -> Map a (Map Text Text) -> Graph a
 [unGraph] :: Graph a -> Map a (Set a)
 [attributes] :: Graph a -> Map a (Map Text Text)
+
+-- | Load a graph from a lookingglass JSON representation.
+getInput :: FilePath -> IO (Graph Text)
 
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Ord a => Graph a -> a -> Set a

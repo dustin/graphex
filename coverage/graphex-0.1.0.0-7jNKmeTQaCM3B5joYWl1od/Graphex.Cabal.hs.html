@@ -1,0 +1,99 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-# LANGUAGE CPP                 #-}
+<span class="lineno">    2 </span>{-# LANGUAGE OverloadedRecordDot #-}
+<span class="lineno">    3 </span>{-# LANGUAGE OverloadedStrings   #-}
+<span class="lineno">    4 </span>
+<span class="lineno">    5 </span>-- Cribbed from graphmod's 'Graphmod.CabalSupport'
+<span class="lineno">    6 </span>module Graphex.Cabal (discoverCabalModules, discoverCabalModuleGraph) where
+<span class="lineno">    7 </span>
+<span class="lineno">    8 </span>import           Graphex.Core
+<span class="lineno">    9 </span>import           Graphex.Parser
+<span class="lineno">   10 </span>
+<span class="lineno">   11 </span>import           Control.Monad                                 (filterM)
+<span class="lineno">   12 </span>import           Data.Foldable                                 (fold)
+<span class="lineno">   13 </span>import           Data.List                                     (intersperse)
+<span class="lineno">   14 </span>import           Data.Maybe                                    (maybeToList)
+<span class="lineno">   15 </span>import qualified Data.Set                                      as Set
+<span class="lineno">   16 </span>import           Data.String                                   (fromString)
+<span class="lineno">   17 </span>import           Data.Traversable                              (for)
+<span class="lineno">   18 </span>import           System.Directory                              (doesFileExist, getDirectoryContents)
+<span class="lineno">   19 </span>import           System.FilePath                               (takeExtension, (&lt;.&gt;), (&lt;/&gt;))
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>-- Interface to cabal.
+<span class="lineno">   22 </span>import qualified Distribution.ModuleName                       as Cabal
+<span class="lineno">   23 </span>import           Distribution.PackageDescription               (BuildInfo (..), Library (..), PackageDescription (..))
+<span class="lineno">   24 </span>import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
+<span class="lineno">   25 </span>import           Distribution.Verbosity                        (silent)
+<span class="lineno">   26 </span>
+<span class="lineno">   27 </span>#if MIN_VERSION_Cabal(3,6,0)
+<span class="lineno">   28 </span>import           Distribution.Utils.Path                       (PackageDir, SourceDir, SymbolicPath, getSymbolicPath)
+<span class="lineno">   29 </span>#endif
+<span class="lineno">   30 </span>
+<span class="lineno">   31 </span>#if MIN_VERSION_Cabal(3,8,1)
+<span class="lineno">   32 </span>import           Distribution.Simple.PackageDescription        (readGenericPackageDescription)
+<span class="lineno">   33 </span>#elif MIN_VERSION_Cabal(2,2,0)
+<span class="lineno">   34 </span>import           Distribution.PackageDescription.Parsec        (readGenericPackageDescription)
+<span class="lineno">   35 </span>#else
+<span class="lineno">   36 </span>import           Distribution.PackageDescription.Parse         (readGenericPackageDescription)
+<span class="lineno">   37 </span>#endif
+<span class="lineno">   38 </span>
+<span class="lineno">   39 </span>-- Note that this isn't nested under the above #if because we need
+<span class="lineno">   40 </span>-- the backwards-compatible version to be available for all Cabal
+<span class="lineno">   41 </span>-- versions prior to 3.6
+<span class="lineno">   42 </span>#if MIN_VERSION_Cabal(3,6,0)
+<span class="lineno">   43 </span>sourceDirToFilePath :: SymbolicPath PackageDir SourceDir -&gt; FilePath
+<span class="lineno">   44 </span><span class="decl"><span class="istickedoff">sourceDirToFilePath = getSymbolicPath</span></span>
+<span class="lineno">   45 </span>#else
+<span class="lineno">   46 </span>sourceDirToFilePath :: FilePath -&gt; FilePath
+<span class="lineno">   47 </span>sourceDirToFilePath = id
+<span class="lineno">   48 </span>#endif
+<span class="lineno">   49 </span>
+<span class="lineno">   50 </span>discoverCabalModules :: FilePath -&gt; IO [Module]
+<span class="lineno">   51 </span><span class="decl"><span class="istickedoff">discoverCabalModules cabalFile = do</span>
+<span class="lineno">   52 </span><span class="spaces">  </span><span class="istickedoff">gpd &lt;- readGenericPackageDescription silent cabalFile</span>
+<span class="lineno">   53 </span><span class="spaces">  </span><span class="istickedoff">let PackageDescription{..} = flattenPackageDescription gpd</span>
+<span class="lineno">   54 </span><span class="spaces">  </span><span class="istickedoff">let candidateModules = mconcat</span>
+<span class="lineno">   55 </span><span class="spaces">        </span><span class="istickedoff">[ do</span>
+<span class="lineno">   56 </span><span class="spaces">            </span><span class="istickedoff">Library{..} &lt;- maybeToList library</span>
+<span class="lineno">   57 </span><span class="spaces">            </span><span class="istickedoff">srcDir &lt;- hsSourceDirs libBuildInfo</span>
+<span class="lineno">   58 </span><span class="spaces">            </span><span class="istickedoff">exMod &lt;- exposedModules</span>
+<span class="lineno">   59 </span><span class="spaces">            </span><span class="istickedoff">pure Module</span>
+<span class="lineno">   60 </span><span class="spaces">              </span><span class="istickedoff">{ name = fromString $ mconcat $ intersperse &quot;.&quot; $ Cabal.components exMod</span>
+<span class="lineno">   61 </span><span class="spaces">              </span><span class="istickedoff">, path = sourceDirToFilePath srcDir &lt;/&gt; Cabal.toFilePath exMod &lt;.&gt; &quot;.hs&quot;</span>
+<span class="lineno">   62 </span><span class="spaces">              </span><span class="istickedoff">}</span>
+<span class="lineno">   63 </span><span class="spaces">        </span><span class="istickedoff">] -- TODO: exes + other-modules</span>
+<span class="lineno">   64 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">   65 </span><span class="spaces">  </span><span class="istickedoff">filterM (doesFileExist . (.path)) candidateModules</span></span>
+<span class="lineno">   66 </span>
+<span class="lineno">   67 </span>discoverCabalModuleGraph :: IO ModuleGraph
+<span class="lineno">   68 </span><span class="decl"><span class="istickedoff">discoverCabalModuleGraph = do</span>
+<span class="lineno">   69 </span><span class="spaces">  </span><span class="istickedoff">fs &lt;- getDirectoryContents &quot;.&quot; -- XXX</span>
+<span class="lineno">   70 </span><span class="spaces">  </span><span class="istickedoff">mods &lt;- fmap fold . traverse discoverCabalModules . filter ((&quot;.cabal&quot; ==) . takeExtension) $ fs</span>
+<span class="lineno">   71 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">let modSet = foldMap (Set.singleton . name) mods</span>
+<span class="lineno">   73 </span><span class="spaces">  </span><span class="istickedoff">gs &lt;- for mods $ \Module{..} -&gt; do</span>
+<span class="lineno">   74 </span><span class="spaces">    </span><span class="istickedoff">internalImps &lt;- filter (\Import{..} -&gt; Set.member module_ modSet) &lt;$&gt; parseFileImports path</span>
+<span class="lineno">   75 </span><span class="spaces">    </span><span class="istickedoff">pure $ mkModuleGraph name $ fmap module_ internalImps</span>
+<span class="lineno">   76 </span><span class="spaces">  </span><span class="istickedoff">pure $ fold gs</span></span>
+
+</pre>
+</body>
+</html>
