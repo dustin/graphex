@@ -83,3 +83,5 @@ tests:
     - tasty-quickcheck
     - tasty-discover
     - checkers
+    build-tools:
+    - tasty-discover
