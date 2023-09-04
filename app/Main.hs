@@ -96,7 +96,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
             $ graphToTree fromModule
             $ allPathsTo graph fromModule toModule
           else
-            let explainer = if optReverse then " imported by " else " imports "
+            let explainer = if optReverse then " imports " else " imported by "
                 mkWhy rev = uncurry (why graph) $ if rev then (toModule, fromModule) else (fromModule, toModule)
                 renderWhy rev = NE.zipWith (<>) ("" :| repeat explainer) <$> mkWhy rev
             in printStrs $ fromMaybe (pure "No path found") $ renderWhy True <|> renderWhy False
