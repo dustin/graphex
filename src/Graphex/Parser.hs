@@ -1,6 +1,8 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ExplicitForAll   #-}
 {-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies     #-}
+{-# LANGUAGE TypeOperators    #-}
 
 -- | Implements a very crude Haskell import parser.
 --
@@ -11,17 +13,16 @@
 -- graphex, this makes sense in a way - those are all still dependencies.
 module Graphex.Parser where
 
-import Data.Text qualified as T
-import Data.Void
-import Data.String (IsString)
-import Data.Maybe (isJust)
-import Data.Either (rights)
+import           Data.Either          (rights)
+import           Data.String          (IsString)
+import qualified Data.Text            as T
+import           Data.Void
 
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import Replace.Megaparsec (sepCap)
+import           Replace.Megaparsec   (sepCap, streamEdit)
+import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
-import Graphex.Core
+import           Graphex.Core
 
 importParser
   :: MonadParsec e s m
@@ -29,12 +30,14 @@ importParser
   => IsString (Tokens s)
   => m Import
 importParser = do
-  -- This newline helps us avoid the word "import" in comments
+  -- This newline helps us avoid the word "import" in comments or identifiers.
+  -- Basically, we insist imports are at the beginning of a line (which Haskell does
+  -- too I think)
   _ <- newline
   _ <- string "import"
   space1
   -- Handle prefix qualified imports
-  _ <- isJust <$> optional (string "qualified")
+  _ <- optional (string "qualified")
   space
   -- Handle PackageImports
   pkg <- optional $ between (char '"') (char '"') $ some $ alphaNumChar <|> char '-' <|> char '_'
@@ -48,15 +51,29 @@ importParser = do
     }
 
 importsParser
-  :: MonadParsec e s m
+  :: forall e s m
+   . MonadParsec e s m
   => Token s ~ Char
   => IsString (Tokens s)
   => m [Import]
 importsParser = rights <$> sepCap importParser
-  
+
+removeBlockComments :: String -> String
+removeBlockComments = streamEdit (blockCommentParser @Void) (\_ -> "")
+
+blockCommentParser
+  :: forall e s m
+   . MonadParsec e s m
+  => Token s ~ Char
+  => IsString (Tokens s)
+  => m String
+blockCommentParser = do
+  _ <- string "{-"
+  manyTill anySingle (string "-}")
+
 parseFileImports :: FilePath -> IO [Import]
 parseFileImports fp = do
-  contents <- readFile fp
+  contents <- removeBlockComments <$> readFile fp
   case runParser (importsParser @Void) fp contents of
     Left err -> error $ unlines $ [mconcat ["Failed to parse ", fp, ":"], errorBundlePretty err]
     Right x -> pure x

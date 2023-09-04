@@ -1,7 +1,7 @@
-{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE StrictData          #-}
 module Graphex.Core where
 
+import           Control.Monad   ((<=<))
 import           Data.Map        (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Set        (Set)
@@ -30,11 +30,14 @@ mkGraph k links = Graph (Map.singleton k (Set.fromList links)) mempty
 setAttribute :: Ord a => a -> Text -> Text -> Graph a -> Graph a
 setAttribute k attr val g@(Graph _ attrs) = g{attributes = Map.insertWith (<>) k (Map.singleton attr val) attrs}
 
+getAttribute :: Ord a => a -> Text -> Graph a -> Maybe Text
+getAttribute nodeName aName = (Map.lookup aName <=< Map.lookup nodeName) . attributes
+
 -- Haskell
 data Import = Import
   { module_ :: ModuleName
   , package :: Maybe Text
-  } deriving stock (Show)
+  } deriving stock (Show, Eq)
 
 newtype ModuleName = ModuleName { unModuleName :: Text }
   deriving newtype (Eq, Ord, IsString)
@@ -44,7 +47,7 @@ data Module = Module
   { name :: ModuleName
   , path :: FilePath
   }
-  deriving stock (Show)
+  deriving stock (Show, Eq)
 
 type ModuleGraph = Graph ModuleName
 

@@ -67,7 +67,7 @@ toLookingGlass title colors Graph{..} =
         )
   in GraphDef
      { nodes = Map.fromList $ fmap (\(m, _) -> mkNode m) $ Map.toList unGraph
-     , edges = Map.toList unGraph >>= \(m, children) -> fmap (\c -> Edge{from = mkNodeId c, to = mkNodeId m}) $ Set.toList children
-     , attrs = mempty
+     , edges = Map.toList unGraph >>= \(m, children) -> fmap (\c -> Edge{to = mkNodeId c, from = mkNodeId m}) $ Set.toList children
+     , attrs = Map.mapKeys unModuleName attributes
      , ..
      }

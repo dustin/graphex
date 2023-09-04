@@ -1,20 +1,24 @@
 {-# LANGUAGE OverloadedRecordDot #-}
 module Graphex (
     -- * The Graph
-    Graph(..),
+    Graph(..), getInput,
     -- * Working from an individual node in the graph.
-    reverseEdges, directDepsOn, allDepsOn, why,
+    directDepsOn, allDepsOn, why,
     -- * Working on the graph as a whole.
+    reverseEdges,
     rankings, longest, allPathsTo, restrictTo, mapMaybeWithKey,
     graphToDep, depToGraph, graphToTree) where
 
 import           Control.Monad               (ap)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
+import           Data.Aeson                  (eitherDecode)
 import           Data.Bifunctor              (first)
+import qualified Data.ByteString.Lazy        as BL
 import           Data.Foldable               (maximumBy)
 import           Data.List                   (sortOn)
+import           Data.List.NonEmpty          (NonEmpty, nonEmpty)
 import qualified Data.Map.Strict             as Map
-import           Data.Maybe                  (fromMaybe, listToMaybe, mapMaybe)
+import           Data.Maybe                  (listToMaybe, mapMaybe)
 import           Data.Ord                    (Down (..), comparing)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
@@ -45,6 +49,10 @@ graphToDep (Graph m attrs) = GraphDef {
     attrs = Map.fromList [ (k, v) | k <- Map.keys m, v <- maybe [] pure (Map.lookup k attrs)]
     }
 
+-- | Load a graph from a lookingglass JSON representation.
+getInput :: FilePath -> IO (Graph Text)
+getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
+
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Ord a => Graph a -> Graph a
 reverseEdges g@(Graph m _) = g{unGraph = Map.fromListWith (<>) [ (v, Set.singleton k) | (k, vs) <- Map.assocs m, v <- Set.toList vs ] <> Map.fromSet (const mempty) (Map.keysSet m)}
@@ -59,9 +67,9 @@ allDepsOn = flood . directDepsOn
 
 -- | Find an example path between two modules.
 --
--- This is a short path, but the important part is that it represents how connectivy works.
-why :: Ord a => Graph a -> a -> a -> [a]
-why m from to = fromMaybe [] $ findFirst bfsOn head (\ks -> (:ks) <$> (Set.toList . directDepsOn m . head) ks) [from] ((== to) . head)
+-- This is a short path, but the important part is that it represents how connectivity works.
+why :: Ord a => Graph a -> a -> a -> Maybe (NonEmpty a)
+why m from to = nonEmpty =<< findFirst bfsOn head (\ks -> (:ks) <$> (Set.toList . directDepsOn m . head) ks) [from] ((== to) . head)
 
 -- | Find all paths between two modules as a restricted graph of the intersection of
 -- reachable nodes from the start and to the end.
