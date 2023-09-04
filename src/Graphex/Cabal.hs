@@ -15,8 +15,10 @@ import           Data.Maybe                                    (maybeToList)
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
 import           Data.Traversable                              (for)
-import           System.Directory                              (doesFileExist, getDirectoryContents)
-import           System.FilePath                               (takeExtension, (<.>), (</>))
+import           System.Directory                              (doesFileExist,
+                                                                getDirectoryContents)
+import           System.FilePath                               (takeExtension,
+                                                                (<.>), (</>))
 
 -- Interface to cabal.
 
@@ -30,7 +32,10 @@ import           Distribution.PackageDescription.Configuration (flattenPackageDe
 import           Distribution.Verbosity                        (silent)
 
 #if MIN_VERSION_Cabal(3,6,0)
-import           Distribution.Utils.Path                       (PackageDir, SourceDir, SymbolicPath, getSymbolicPath)
+import           Distribution.Utils.Path                       (PackageDir,
+                                                                SourceDir,
+                                                                SymbolicPath,
+                                                                getSymbolicPath)
 #endif
 
 #if MIN_VERSION_Cabal(3,8,1)
