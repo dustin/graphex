@@ -18,5 +18,6 @@ test: graphex.cabal
 .PHONY: test
 
 fmt:
-	fd .hs --exec stylish-haskell -i
+	fd .hs src --exec stylish-haskell -i
+	fd .hs test --exec stylish-haskell -i
 .PHONY: fmt

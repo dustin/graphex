@@ -1,4 +1,4 @@
-{-# LANGUAGE StrictData          #-}
+{-# LANGUAGE StrictData #-}
 module Graphex.Core where
 
 import           Control.Monad   ((<=<))
