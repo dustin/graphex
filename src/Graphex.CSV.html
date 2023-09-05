@@ -14,14 +14,14 @@
 </span><a href="Graphex.CSV.html#from"><span class="hs-identifier hs-var hs-var">from</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
 </span><span id="line-14"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="to"><span class="annot"><span class="annottext">Edge -&gt; Text
 </span><a href="Graphex.CSV.html#to"><span class="hs-identifier hs-var hs-var">to</span></a></span></span><span>   </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
-</span><span id="line-15"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117705"><span id="local-6989586621679117710"><span class="annot"><span class="annottext">Edge -&gt; Edge -&gt; Bool
+</span><span id="line-15"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679118787"><span id="local-6989586621679118792"><span class="annot"><span class="annottext">Edge -&gt; Edge -&gt; Bool
 (Edge -&gt; Edge -&gt; Bool) -&gt; (Edge -&gt; Edge -&gt; Bool) -&gt; Eq Edge
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c== :: Edge -&gt; Edge -&gt; Bool
 == :: Edge -&gt; Edge -&gt; Bool
 $c/= :: Edge -&gt; Edge -&gt; Bool
 /= :: Edge -&gt; Edge -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117715"><span id="local-6989586621679117722"><span id="local-6989586621679117726"><span class="annot"><span class="annottext">Int -&gt; Edge -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118797"><span id="local-6989586621679118804"><span id="local-6989586621679118808"><span class="annot"><span class="annottext">Int -&gt; Edge -&gt; ShowS
 [Edge] -&gt; ShowS
 Edge -&gt; String
 (Int -&gt; Edge -&gt; ShowS)
@@ -34,7 +34,7 @@ $cshow :: Edge -&gt; String
 show :: Edge -&gt; String
 $cshowList :: [Edge] -&gt; ShowS
 showList :: [Edge] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117730"><span id="local-6989586621679117732"><span class="annot"><span class="annottext">(forall x. Edge -&gt; Rep Edge x)
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118812"><span id="local-6989586621679118814"><span class="annot"><span class="annottext">(forall x. Edge -&gt; Rep Edge x)
 -&gt; (forall x. Rep Edge x -&gt; Edge) -&gt; Generic Edge
 forall x. Rep Edge x -&gt; Edge
 forall x. Edge -&gt; Rep Edge x
@@ -45,17 +45,17 @@ from :: forall x. Edge -&gt; Rep Edge x
 $cto :: forall x. Rep Edge x -&gt; Edge
 to :: forall x. Rep Edge x -&gt; Edge
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Generic</span></span></span></span><span class="hs-special">)</span><span>
-</span><span id="line-16"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679117736"><span class="annot"><span class="annottext">Edge -&gt; Header
+</span><span id="line-16"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">anyclass</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679118818"><span class="annot"><span class="annottext">Edge -&gt; Header
 (Edge -&gt; Header) -&gt; DefaultOrdered Edge
 forall a. (a -&gt; Header) -&gt; DefaultOrdered a
 $cheaderOrder :: Edge -&gt; Header
 headerOrder :: Edge -&gt; Header
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">CSV.DefaultOrdered</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117769"><span class="annot"><span class="annottext">Edge -&gt; Header
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">CSV.DefaultOrdered</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118851"><span class="annot"><span class="annottext">Edge -&gt; Header
 (Edge -&gt; Header) -&gt; ToRecord Edge
 forall a. (a -&gt; Header) -&gt; ToRecord a
 $ctoRecord :: Edge -&gt; Header
 toRecord :: Edge -&gt; Header
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var">CSV.ToRecord</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117789"><span class="annot"><span class="annottext">Edge -&gt; NamedRecord
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var">CSV.ToRecord</span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118871"><span class="annot"><span class="annottext">Edge -&gt; NamedRecord
 (Edge -&gt; NamedRecord) -&gt; ToNamedRecord Edge
 forall a. (a -&gt; NamedRecord) -&gt; ToNamedRecord a
 $ctoNamedRecord :: Edge -&gt; NamedRecord
@@ -78,15 +78,15 @@ forall a. Graph a -&gt; Map a (Set a)
 forall (m :: * -&gt; *) a b c.
 Monad m =&gt;
 (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; a -&gt; m c
-</span><span class="hs-operator hs-var">&gt;=&gt;</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679117817"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117817"><span class="hs-identifier hs-var">from</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679117818"><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117818"><span class="hs-identifier hs-var">tos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Edge) -&gt; [Text] -&gt; [Edge]
+</span><span class="hs-operator hs-var">&gt;=&gt;</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679118899"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679118899"><span class="hs-identifier hs-var">from</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679118900"><span class="annot"><span class="annottext">Set Text
+</span><a href="#local-6989586621679118900"><span class="hs-identifier hs-var">tos</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">(Text -&gt; Edge) -&gt; [Text] -&gt; [Edge]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
 </span><span class="hs-identifier hs-var">fmap</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Text -&gt; Text -&gt; Edge
 </span><a href="Graphex.CSV.html#Edge"><span class="hs-identifier hs-var">Edge</span></a></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679117817"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
+</span><a href="#local-6989586621679118899"><span class="hs-identifier hs-var">from</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Set Text -&gt; [Text]
 forall a. Set a -&gt; [a]
 </span><span class="hs-identifier hs-var">Set.toList</span></span><span> </span><span class="annot"><span class="annottext">Set Text
-</span><a href="#local-6989586621679117818"><span class="hs-identifier hs-var">tos</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679118900"><span class="hs-identifier hs-var">tos</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-20"></span></pre></body></html>

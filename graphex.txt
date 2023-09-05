@@ -23,10 +23,13 @@ Import :: ModuleName -> Maybe Text -> Import
 newtype ModuleName
 ModuleName :: Text -> ModuleName
 [unModuleName] :: ModuleName -> Text
+data ModulePath
+ModuleNoFile :: ModulePath
+ModuleFile :: FilePath -> ModulePath
 data Module
-Module :: ModuleName -> FilePath -> Module
+Module :: ModuleName -> ModulePath -> Module
 [name] :: Module -> ModuleName
-[path] :: Module -> FilePath
+[path] :: Module -> ModulePath
 type ModuleGraph = Graph ModuleName
 singletonModuleGraph :: ModuleName -> ModuleName -> ModuleGraph
 mkModuleGraph :: ModuleName -> [ModuleName] -> ModuleGraph
@@ -42,8 +45,13 @@ instance GHC.Classes.Ord Graphex.Core.ModuleName
 instance GHC.Classes.Eq Graphex.Core.ModuleName
 instance GHC.Classes.Eq Graphex.Core.Import
 instance GHC.Show.Show Graphex.Core.Import
+instance GHC.Show.Show Graphex.Core.ModulePath
+instance GHC.Classes.Ord Graphex.Core.ModulePath
+instance GHC.Classes.Eq Graphex.Core.ModulePath
+instance GHC.Classes.Ord Graphex.Core.Module
 instance GHC.Classes.Eq Graphex.Core.Module
 instance GHC.Show.Show Graphex.Core.Module
+instance Data.String.IsString Graphex.Core.ModulePath
 instance GHC.Classes.Ord a => GHC.Base.Semigroup (Graphex.Core.Graph a)
 instance GHC.Classes.Ord a => GHC.Base.Monoid (Graphex.Core.Graph a)
 
@@ -115,8 +123,21 @@ blockCommentParser :: forall e s m. MonadParsec e s m => Token s ~ Char => IsStr
 parseFileImports :: FilePath -> IO [Import]
 
 module Graphex.Cabal
-discoverCabalModules :: FilePath -> IO [Module]
-discoverCabalModuleGraph :: IO ModuleGraph
+discoverCabalModules :: CabalDiscoverOpts -> FilePath -> IO [Module]
+discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
+data CabalDiscoverOpts
+CabalDiscoverOpts :: Set CabalModuleType -> Bool -> CabalDiscoverOpts
+[toDiscover] :: CabalDiscoverOpts -> Set CabalModuleType
+[includeExternal] :: CabalDiscoverOpts -> Bool
+data CabalModuleType
+CabalLibraries :: CabalModuleType
+CabalExecutables :: CabalModuleType
+CabalTests :: CabalModuleType
+instance GHC.Classes.Ord Graphex.Cabal.CabalModuleType
+instance GHC.Classes.Eq Graphex.Cabal.CabalModuleType
+instance GHC.Show.Show Graphex.Cabal.CabalModuleType
+instance GHC.Classes.Eq Graphex.Cabal.CabalDiscoverOpts
+instance GHC.Show.Show Graphex.Cabal.CabalDiscoverOpts
 
 module Graphex.Search
 
