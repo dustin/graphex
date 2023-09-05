@@ -6,7 +6,7 @@ import           Data.Map        (Map)
 import qualified Data.Map.Strict as Map
 import           Data.Set        (Set)
 import qualified Data.Set        as Set
-import           Data.String     (IsString)
+import           Data.String     (IsString (..))
 import           Data.Text       (Text)
 
 data Graph a = Graph {
@@ -43,11 +43,17 @@ newtype ModuleName = ModuleName { unModuleName :: Text }
   deriving newtype (Eq, Ord, IsString)
   deriving stock (Show)
 
+data ModulePath = ModuleNoFile | ModuleFile FilePath
+  deriving stock (Eq, Ord, Show)
+
+instance IsString ModulePath where
+  fromString = ModuleFile
+
 data Module = Module
   { name :: ModuleName
-  , path :: FilePath
+  , path :: ModulePath
   }
-  deriving stock (Show, Eq)
+  deriving stock (Show, Eq, Ord)
 
 type ModuleGraph = Graph ModuleName
 

@@ -1,3 +1,4 @@
+{-# LANGUAGE ApplicativeDo #-}
 module Main where
 
 import           Control.Applicative  ((<|>))
@@ -9,13 +10,17 @@ import           Data.Foldable
 import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
 import           Data.Maybe           (fromMaybe)
+import qualified Data.Set             as Set
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
-                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
-                                       str, strOption, switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command,
+                                       customExecParser, fullDesc, help, helper,
+                                       hsubparser, info, long, metavar, prefs,
+                                       progDesc, short, showDefault,
+                                       showHelpOnError, some, str, strOption,
+                                       switch, value, (<**>))
 
 import           Graphex
 import           Graphex.Cabal
@@ -44,16 +49,24 @@ data GraphOptions = GraphOptions {
     optCommand :: Command
     } deriving stock Show
 
-data CabalOptions = CabalOptions deriving stock Show
-
 options :: Parser Options
 options = hsubparser $ fold
   [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
   , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
   ]
 
+data CabalOptions = CabalOptions
+  { optDiscoverExes    :: Bool
+  , optDiscoverTests   :: Bool
+  , optIncludeExternal :: Bool
+  } deriving stock Show
+
 cabalOptions :: Parser CabalOptions
-cabalOptions = pure CabalOptions
+cabalOptions = do
+  optDiscoverExes <- switch (long "discover-exes" <> help "Discover exe import dependencies")
+  optDiscoverTests <- switch (long "discover-tests" <> help "Discover test import dependencies")
+  optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
+  pure CabalOptions{..}
 
 graphOptions :: Parser GraphOptions
 graphOptions = GraphOptions
@@ -107,8 +120,15 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
-  CabalCmd CabalOptions{} -> do
-    mg <- discoverCabalModuleGraph
+  CabalCmd CabalOptions{..} -> do
+    mg <- discoverCabalModuleGraph CabalDiscoverOpts
+      { toDiscover = mconcat
+          [ Set.singleton CabalLibraries
+          , bool mempty (Set.singleton CabalExecutables) optDiscoverExes
+          , bool mempty (Set.singleton CabalTests) optDiscoverTests
+          ]
+      , includeExternal = optIncludeExternal
+      }
     BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

@@ -3,15 +3,21 @@
 {-# LANGUAGE OverloadedStrings   #-}
 
 -- Cribbed from graphmod's 'Graphmod.CabalSupport'
-module Graphex.Cabal (discoverCabalModules, discoverCabalModuleGraph) where
+module Graphex.Cabal
+  ( discoverCabalModules
+  , discoverCabalModuleGraph
+  , CabalDiscoverOpts (..)
+  , CabalModuleType (..)
+  ) where
 
 import           Graphex.Core
 import           Graphex.Parser
 
-import           Control.Monad                                 (filterM)
+import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
 import           Data.Maybe                                    (maybeToList)
+import           Data.Set                                      (Set)
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
 import           Data.Traversable                              (for)
@@ -21,10 +27,14 @@ import           System.FilePath                               (takeExtension,
                                                                 (<.>), (</>))
 
 -- Interface to cabal.
+
 import qualified Distribution.ModuleName                       as Cabal
 import           Distribution.PackageDescription               (BuildInfo (..),
+                                                                Executable (..),
                                                                 Library (..),
-                                                                PackageDescription (..))
+                                                                PackageDescription (..),
+                                                                TestSuite (..),
+                                                                unUnqualComponentName)
 import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import           Distribution.Verbosity                        (silent)
 
@@ -54,30 +64,78 @@ sourceDirToFilePath :: FilePath -> FilePath
 sourceDirToFilePath = id
 #endif
 
-discoverCabalModules :: FilePath -> IO [Module]
-discoverCabalModules cabalFile = do
+discoverCabalModules :: CabalDiscoverOpts -> FilePath -> IO [Module]
+discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
   gpd <- readGenericPackageDescription silent cabalFile
   let PackageDescription{..} = flattenPackageDescription gpd
   let candidateModules = mconcat
         [ do
-            Library{..} <- maybeToList library
+            guard $ Set.member CabalLibraries toDiscover
+            Library{..} <- mconcat [maybeToList library, subLibraries]
             srcDir <- hsSourceDirs libBuildInfo
             exMod <- exposedModules
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
-              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
+              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
-        ] -- TODO: exes + other-modules
+        , do
+            guard $ Set.member CabalExecutables toDiscover
+            Executable{..} <- executables
+            srcDir <- hsSourceDirs buildInfo
+            otherMod <- "Main" : buildInfo.otherModules
+            pure Module
+              { name = fromString $
+                if otherMod == "Main"
+                then unUnqualComponentName exeName ++ "-Main"
+                else mconcat $ intersperse "." $ Cabal.components otherMod
+              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              }
+        , do
+            guard $ Set.member CabalTests toDiscover
+            TestSuite{..} <- testSuites
+            srcDir <- hsSourceDirs testBuildInfo
+            otherMod <- testBuildInfo.otherModules
+            pure Module
+              { name = fromString $ mconcat $ intersperse "." $ Cabal.components otherMod
+              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              }
+        ]
 
-  filterM (doesFileExist . (.path)) candidateModules
+  traverse validateModulePath candidateModules
 
-discoverCabalModuleGraph :: IO ModuleGraph
-discoverCabalModuleGraph = do
+validateModulePath :: Module -> IO Module
+validateModulePath m = do
+  path <- case m.path of
+    ModuleFile fp -> do
+      fileExists <- doesFileExist fp
+      pure $ if fileExists then ModuleFile fp else ModuleNoFile
+    ModuleNoFile -> pure ModuleNoFile
+  pure Module {name = m.name, path = path}
+
+data CabalModuleType =
+  CabalLibraries
+  | CabalExecutables
+  | CabalTests
+  deriving stock (Show, Eq, Ord)
+
+data CabalDiscoverOpts = CabalDiscoverOpts
+  { toDiscover      :: Set CabalModuleType
+  , includeExternal :: Bool
+  } deriving stock (Show, Eq)
+
+discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
+discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
   fs <- getDirectoryContents "." -- XXX
-  mods <- fmap fold . traverse discoverCabalModules . filter ((".cabal" ==) . takeExtension) $ fs
+  mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
   let modSet = foldMap (Set.singleton . name) mods
-  gs <- for mods $ \Module{..} -> do
-    internalImps <- filter (\Import{..} -> Set.member module_ modSet) <$> parseFileImports path
-    pure $ mkModuleGraph name $ fmap module_ internalImps
+  gs <- for mods $ \Module{..} -> case path of
+    ModuleFile modPath -> do
+      allImps <- parseFileImports modPath
+      let filteredImps =
+            if includeExternal
+            then allImps
+            else filter (\Import{..} -> Set.member module_ modSet) allImps
+      pure $ mkModuleGraph name $ fmap module_ filteredImps
+    ModuleNoFile -> pure $ mkModuleGraph name mempty
   pure $ fold gs
