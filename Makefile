@@ -24,6 +24,7 @@ test: graphex.cabal
 fmt:
 	fd .hs src --exec stylish-haskell -i
 	fd .hs test --exec stylish-haskell -i
+	fd .hs app --exec stylish-haskell -i
 .PHONY: fmt
 
 graph.json:

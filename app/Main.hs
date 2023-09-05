@@ -5,19 +5,22 @@ import           Control.Applicative  ((<|>))
 import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
-import qualified Data.Set as Set
 import qualified Data.Csv             as CSV
 import           Data.Foldable
 import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
 import           Data.Maybe           (fromMaybe)
+import qualified Data.Set             as Set
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command, customExecParser, fullDesc, help, helper, hsubparser,
-                                       info, long, metavar, prefs, progDesc, short, showDefault, showHelpOnError, some,
-                                       str, strOption, switch, value, (<**>))
+import           Options.Applicative  (Parser, argument, command,
+                                       customExecParser, fullDesc, help, helper,
+                                       hsubparser, info, long, metavar, prefs,
+                                       progDesc, short, showDefault,
+                                       showHelpOnError, some, str, strOption,
+                                       switch, value, (<**>))
 
 import           Graphex
 import           Graphex.Cabal
@@ -53,8 +56,8 @@ options = hsubparser $ fold
   ]
 
 data CabalOptions = CabalOptions
-  { optDiscoverExes :: Bool
-  , optDiscoverTests :: Bool
+  { optDiscoverExes    :: Bool
+  , optDiscoverTests   :: Bool
   , optIncludeExternal :: Bool
   } deriving stock Show
 
