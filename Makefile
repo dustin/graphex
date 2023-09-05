@@ -6,6 +6,10 @@ exe-repl: graphex.cabal
 	cabal repl exe:graphex
 .PHONY: exe-repl
 
+test-repl: graphex.cabal
+	cabal repl tests
+.PHONY: test-repl
+
 graphex.cabal: package.yaml
 	hpack
 
@@ -14,7 +18,7 @@ install: graphex.cabal
 .PHONY: install
 
 test: graphex.cabal
-	cabal test
+	cabal test --test-show-details=streaming
 .PHONY: test
 
 fmt:
