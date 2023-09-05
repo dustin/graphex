@@ -3,7 +3,12 @@
 {-# LANGUAGE OverloadedStrings   #-}
 
 -- Cribbed from graphmod's 'Graphmod.CabalSupport'
-module Graphex.Cabal (discoverCabalModules, discoverCabalModuleGraph) where
+module Graphex.Cabal
+  ( discoverCabalModules
+  , discoverCabalModuleGraph
+  , CabalDiscoverOpts (..)
+  , CabalModuleType (..)
+  ) where
 
 import           Graphex.Core
 import           Graphex.Parser
@@ -65,7 +70,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
   let PackageDescription{..} = flattenPackageDescription gpd
   let candidateModules = mconcat
         [ do
-            guard $ Set.member Libraries toDiscover
+            guard $ Set.member CabalLibraries toDiscover
             Library{..} <- mconcat [maybeToList library, subLibraries]
             srcDir <- hsSourceDirs libBuildInfo
             exMod <- exposedModules
@@ -74,7 +79,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
               , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
         , do
-            guard $ Set.member Executables toDiscover
+            guard $ Set.member CabalExecutables toDiscover
             Executable{..} <- executables
             srcDir <- hsSourceDirs buildInfo
             otherMod <- "Main" : buildInfo.otherModules
@@ -86,7 +91,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
               , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
               }
         , do
-            guard $ Set.member Tests toDiscover
+            guard $ Set.member CabalTests toDiscover
             TestSuite{..} <- testSuites
             srcDir <- hsSourceDirs testBuildInfo
             otherMod <- testBuildInfo.otherModules
@@ -107,14 +112,14 @@ validateModulePath m = do
     ModuleNoFile -> pure ModuleNoFile
   pure Module {name = m.name, path = path}
 
-data ModuleType =
-    Libraries
-  | Executables
-  | Tests
+data CabalModuleType =
+  CabalLibraries
+  | CabalExecutables
+  | CabalTests
   deriving stock (Show, Eq, Ord)
 
 data CabalDiscoverOpts = CabalDiscoverOpts
-  { toDiscover      :: Set ModuleType
+  { toDiscover      :: Set CabalModuleType
   , includeExternal :: Bool
   } deriving stock (Show, Eq)
 
