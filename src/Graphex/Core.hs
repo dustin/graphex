@@ -43,9 +43,12 @@ newtype ModuleName = ModuleName { unModuleName :: Text }
   deriving newtype (Eq, Ord, IsString)
   deriving stock (Show)
 
+data ModulePath = ModuleNoFile | ModuleFile FilePath
+  deriving stock (Eq, Ord, Show)
+
 data Module = Module
   { name :: ModuleName
-  , path :: FilePath
+  , path :: ModulePath
   }
   deriving stock (Show, Eq)
 

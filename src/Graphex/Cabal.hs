@@ -8,10 +8,11 @@ module Graphex.Cabal (discoverCabalModules, discoverCabalModuleGraph) where
 import           Graphex.Core
 import           Graphex.Parser
 
-import           Control.Monad                                 (filterM)
+import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
 import           Data.Maybe                                    (maybeToList)
+import           Data.Set                                      (Set)
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
 import           Data.Traversable                              (for)
@@ -23,11 +24,12 @@ import           System.FilePath                               (takeExtension,
 -- Interface to cabal.
 
 import qualified Distribution.ModuleName                       as Cabal
-import Distribution.PackageDescription
-        ( PackageDescription(..)
-        , Library(..), Executable(..)
-        , BuildInfo(..), TestSuite(..)
-        , unUnqualComponentName )
+import           Distribution.PackageDescription               (BuildInfo (..),
+                                                                Executable (..),
+                                                                Library (..),
+                                                                PackageDescription (..),
+                                                                TestSuite (..),
+                                                                unUnqualComponentName)
 import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import           Distribution.Verbosity                        (silent)
 
@@ -57,20 +59,22 @@ sourceDirToFilePath :: FilePath -> FilePath
 sourceDirToFilePath = id
 #endif
 
-discoverCabalModules :: FilePath -> IO [Module]
-discoverCabalModules cabalFile = do
+discoverCabalModules :: CabalDiscoverOpts -> FilePath -> IO [Module]
+discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
   gpd <- readGenericPackageDescription silent cabalFile
   let PackageDescription{..} = flattenPackageDescription gpd
   let candidateModules = mconcat
         [ do
+            guard $ Set.member Libraries toDiscover
             Library{..} <- mconcat [maybeToList library, subLibraries]
             srcDir <- hsSourceDirs libBuildInfo
             exMod <- exposedModules
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
-              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
+              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
         , do
+            guard $ Set.member Executables toDiscover
             Executable{..} <- executables
             srcDir <- hsSourceDirs buildInfo
             otherMod <- "Main" : buildInfo.otherModules
@@ -79,36 +83,54 @@ discoverCabalModules cabalFile = do
                 if otherMod == "Main"
                 then unUnqualComponentName exeName ++ "-Main"
                 else mconcat $ intersperse "." $ Cabal.components otherMod
-              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
               }
         , do
+            guard $ Set.member Tests toDiscover
             TestSuite{..} <- testSuites
             srcDir <- hsSourceDirs testBuildInfo
             otherMod <- testBuildInfo.otherModules
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components otherMod
-              , path = sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
               }
         ]
 
-  filterM (doesFileExist . (.path)) candidateModules
+  traverse validateModulePath candidateModules
 
-discoverCabalPackageDescription :: IO PackageDescription
-discoverCabalPackageDescription = do
-  fs <- getDirectoryContents "." -- XXX
-  let cabalFile = case filter ((".cabal" ==) . takeExtension) fs of
-        path : _ -> path
-        _ -> error "No cabal file found"
-  gpd <- readGenericPackageDescription silent cabalFile
-  pure $ flattenPackageDescription gpd
+validateModulePath :: Module -> IO Module
+validateModulePath m = do
+  path <- case m.path of
+    ModuleFile fp -> do
+      fileExists <- doesFileExist fp
+      pure $ if fileExists then ModuleFile fp else ModuleNoFile
+    ModuleNoFile -> pure ModuleNoFile
+  pure Module {name = m.name, path = path}
 
-discoverCabalModuleGraph :: IO ModuleGraph
-discoverCabalModuleGraph = do
+data ModuleType =
+    Libraries
+  | Executables
+  | Tests
+  deriving stock (Show, Eq, Ord)
+
+data CabalDiscoverOpts = CabalDiscoverOpts
+  { toDiscover      :: Set ModuleType
+  , includeExternal :: Bool
+  } deriving stock (Show, Eq)
+
+discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
+discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
   fs <- getDirectoryContents "." -- XXX
-  mods <- fmap fold . traverse discoverCabalModules . filter ((".cabal" ==) . takeExtension) $ fs
+  mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
   let modSet = foldMap (Set.singleton . name) mods
-  gs <- for mods $ \Module{..} -> do
-    internalImps <- filter (\Import{..} -> Set.member module_ modSet) <$> parseFileImports path
-    pure $ mkModuleGraph name $ fmap module_ internalImps
+  gs <- for mods $ \Module{..} -> case path of
+    ModuleFile modPath -> do
+      allImps <- parseFileImports modPath
+      let filteredImps =
+            if includeExternal
+            then allImps
+            else filter (\Import{..} -> Set.member module_ modSet) allImps
+      pure $ mkModuleGraph name $ fmap module_ filteredImps
+    ModuleNoFile -> pure $ mkModuleGraph name mempty
   pure $ fold gs
