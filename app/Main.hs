@@ -1,7 +1,6 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
-
 import           Control.Applicative  ((<|>))
 import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
