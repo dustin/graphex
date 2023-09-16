@@ -1,6 +1,7 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
+
 import           Control.Applicative  ((<|>))
 import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
@@ -10,7 +11,6 @@ import           Data.Foldable
 import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
 import           Data.Maybe           (fromMaybe)
-import qualified Data.Set             as Set
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
@@ -23,10 +23,9 @@ import           Options.Applicative  (Parser, argument, command,
                                        switch, value, (<**>))
 
 import           Graphex
-import           Graphex.Cabal
 import           Graphex.Core
 import qualified Graphex.CSV
-import           Graphex.LookingGlass
+import           Main.Cabal
 
 data Command
     = DirectDepsOn Text
@@ -54,19 +53,6 @@ options = hsubparser $ fold
   [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
   , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
   ]
-
-data CabalOptions = CabalOptions
-  { optDiscoverExes    :: Bool
-  , optDiscoverTests   :: Bool
-  , optIncludeExternal :: Bool
-  } deriving stock Show
-
-cabalOptions :: Parser CabalOptions
-cabalOptions = do
-  optDiscoverExes <- switch (long "discover-exes" <> help "Discover exe import dependencies")
-  optDiscoverTests <- switch (long "discover-tests" <> help "Discover test import dependencies")
-  optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
-  pure CabalOptions{..}
 
 graphOptions :: Parser GraphOptions
 graphOptions = GraphOptions
@@ -120,15 +106,6 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
-  CabalCmd CabalOptions{..} -> do
-    mg <- discoverCabalModuleGraph CabalDiscoverOpts
-      { toDiscover = mconcat
-          [ Set.singleton CabalLibraries
-          , bool mempty (Set.singleton CabalExecutables) optDiscoverExes
-          , bool mempty (Set.singleton CabalTests) optDiscoverTests
-          ]
-      , includeExternal = optIncludeExternal
-      }
-    BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg
+  CabalCmd cabalOpts -> runCabal cabalOpts
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
