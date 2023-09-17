@@ -24,6 +24,7 @@ libModules =
   , Module "Graphex.LookingGlass" "src/Graphex/LookingGlass.hs"
   , Module "Graphex.Parser" "src/Graphex/Parser.hs"
   , Module "Graphex.Search" "src/Graphex/Search.hs"
+  , Module "Graphex.Logger" "src/Graphex/Logger.hs"
   ]
 
 testModules :: [Module]
@@ -39,6 +40,7 @@ exeModules :: [Module]
 exeModules =
   [ Module "Paths_graphex" ModuleNoFile
   , Module "graphex-Main" "app/Main.hs"
+  , Module "Main.Cabal" "app/Main/Cabal.hs"
   ]
 
 
@@ -47,23 +49,23 @@ mkDiscoverCabalModulesUnit (sort -> mods) opts = assertEqual "" mods . sort =<< 
 
 unit_libCabalModules :: IO ()
 unit_libCabalModules = mkDiscoverCabalModulesUnit libModules CabalDiscoverOpts
-  { toDiscover = Set.singleton CabalLibraries
+  { toDiscover = pure $ CabalDiscoverAll CabalLibrary
   , includeExternal = False
   }
 
 unit_exeCabalModules :: IO ()
 unit_exeCabalModules = mkDiscoverCabalModulesUnit exeModules CabalDiscoverOpts
-  { toDiscover = Set.singleton CabalExecutables
+  { toDiscover = pure $ CabalDiscoverAll CabalExecutable
   , includeExternal = False
   }
 
 unit_testCabalModules :: IO ()
 unit_testCabalModules = mkDiscoverCabalModulesUnit testModules CabalDiscoverOpts
-  { toDiscover = Set.singleton CabalTests
+  { toDiscover = pure $ CabalDiscoverAll CabalTests
   , includeExternal = False
   }
 
 unit_discoverModules :: IO ()
 unit_discoverModules = do
-    g <- discoverCabalModuleGraph CabalDiscoverOpts{toDiscover = Set.singleton CabalLibraries, includeExternal = False}
+    g <- discoverCabalModuleGraph CabalDiscoverOpts{toDiscover = pure $ CabalDiscoverAll CabalLibrary, includeExternal = False}
     assertBool (show g) . isJust $ why g "Graphex.Parser" "Graphex.Core"
