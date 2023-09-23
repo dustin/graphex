@@ -20,10 +20,9 @@ import           Data.Maybe                                    (maybeToList)
 import           Data.Set                                      (Set)
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
-import           Data.Traversable                              (for)
 import           System.Directory                              (doesFileExist, getDirectoryContents)
 import           System.FilePath                               (takeExtension, (<.>), (</>))
-import           UnliftIO.Async                                (pooledMapConcurrently)
+import           UnliftIO.Async                                (pooledForConcurrently, pooledMapConcurrently)
 
 -- Interface to cabal.
 
@@ -94,7 +93,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
               }
         ]
 
-  traverse validateModulePath candidateModules
+  pooledMapConcurrently validateModulePath candidateModules
 
 validateModulePath :: Module -> IO Module
 validateModulePath m = do
@@ -122,7 +121,7 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
   mods <- fmap fold . pooledMapConcurrently (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
   let modSet = foldMap (Set.singleton . name) mods
-  gs <- for mods $ \Module{..} -> case path of
+  gs <- pooledForConcurrently mods $ \Module{..} -> case path of
     ModuleFile modPath -> do
       allImps <- parseFileImports modPath
       let filteredImps =
