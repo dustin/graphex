@@ -21,28 +21,21 @@ import           Data.Set                                      (Set)
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
 import           Data.Traversable                              (for)
-import           System.Directory                              (doesFileExist,
-                                                                getDirectoryContents)
-import           System.FilePath                               (takeExtension,
-                                                                (<.>), (</>))
+import           System.Directory                              (doesFileExist, getDirectoryContents)
+import           System.FilePath                               (takeExtension, (<.>), (</>))
+import           UnliftIO.Async                                (pooledMapConcurrently)
 
 -- Interface to cabal.
 
 import qualified Distribution.ModuleName                       as Cabal
-import           Distribution.PackageDescription               (BuildInfo (..),
-                                                                Executable (..),
-                                                                Library (..),
-                                                                PackageDescription (..),
-                                                                TestSuite (..),
+import           Distribution.PackageDescription               (BuildInfo (..), Executable (..), Library (..),
+                                                                PackageDescription (..), TestSuite (..),
                                                                 unUnqualComponentName)
 import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import           Distribution.Verbosity                        (silent)
 
 #if MIN_VERSION_Cabal(3,6,0)
-import           Distribution.Utils.Path                       (PackageDir,
-                                                                SourceDir,
-                                                                SymbolicPath,
-                                                                getSymbolicPath)
+import           Distribution.Utils.Path                       (PackageDir, SourceDir, SymbolicPath, getSymbolicPath)
 #endif
 
 #if MIN_VERSION_Cabal(3,8,1)
@@ -126,7 +119,7 @@ data CabalDiscoverOpts = CabalDiscoverOpts
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
 discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
   fs <- getDirectoryContents "." -- XXX
-  mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
+  mods <- fmap fold . pooledMapConcurrently (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
   let modSet = foldMap (Set.singleton . name) mods
   gs <- for mods $ \Module{..} -> case path of
