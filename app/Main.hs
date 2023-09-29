@@ -37,6 +37,7 @@ data Command
     | FindLongest
     | Select Text
     | ToCSV Bool
+    | Cat (NonEmpty FilePath)
     deriving stock Show
 
 
@@ -80,7 +81,8 @@ graphOptions = GraphOptions
         command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
         command "longest" (info (pure FindLongest) (progDesc "Show the longest shortest path between two modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
-        command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi"))
+        command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi")),
+        command "cat" (info catCmd (progDesc "Concatenate multiple graphs"))
         ])
 
     where
@@ -90,6 +92,7 @@ graphOptions = GraphOptions
         whyCmd = Why <$> argument str (metavar "module") <*> argument str (metavar "module") <*> switch (long "all" <> help "Show all paths")
         allPathsCmd = AllPaths <$> argument str (metavar "module from") <*> argument str (metavar "module to")
         csvCmd = ToCSV <$> switch (long "no-header" <> short 'n' <> help "Omit CSV header")
+        catCmd = Cat <$> some1 (argument str (metavar "graph.json"))
         some1 = fmap NE.fromList . some
 
 printStrs :: Foldable f => f Text -> IO ()
@@ -120,6 +123,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
+        Cat files        -> BL.putStr . encode . graphToDep . fold =<< traverse getInput files
   CabalCmd CabalOptions{..} -> do
     mg <- discoverCabalModuleGraph CabalDiscoverOpts
       { toDiscover = mconcat
