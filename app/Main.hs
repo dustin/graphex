@@ -39,7 +39,7 @@ data Command
     deriving stock Show
 
 
-data Options = GraphCmd GraphOptions | CabalCmd CabalOptions
+data Options = GraphCmd GraphOptions | CabalCmd CabalOptions| CabalCmd2 CabalOptions2
   deriving stock Show
 
 data GraphOptions = GraphOptions {
@@ -52,6 +52,7 @@ options :: Parser Options
 options = hsubparser $ fold
   [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
   , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
+  , command "cabal2" (info (CabalCmd2 <$> cabalOptions2) (progDesc "Cabal operations"))
   ]
 
 graphOptions :: Parser GraphOptions
@@ -108,7 +109,8 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
-        CabalCmd cabalOpts -> runCabal cabalOpts
         Cat files        -> BL.putStr . encode . graphToDep . fold =<< traverse getInput files
+  CabalCmd cabalOpts -> runCabal cabalOpts
+  CabalCmd2 cabalOpts -> runCabal2 cabalOpts
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
