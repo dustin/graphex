@@ -28,5 +28,5 @@ fmt:
 .PHONY: fmt
 
 graph.json:
-	cabal run -v0 exe:graphex -- cabal > graph.json
+	cabal run -v0 exe:graphex -- cabal ${args} > graph.json
 .PHONY: graph.json

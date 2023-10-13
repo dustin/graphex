@@ -7,7 +7,11 @@ module Graphex.Cabal
   ( discoverCabalModules
   , discoverCabalModuleGraph
   , CabalDiscoverOpts (..)
-  , CabalModuleType (..)
+  , CabalDiscoverType (..)
+  , CabalUnit (..)
+  , CabalUnitType (..)
+  , Discovery (..)
+  , discoversUnit
   ) where
 
 import           Graphex.Core
@@ -16,25 +20,36 @@ import           Graphex.Parser
 import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
+import           Data.List.NonEmpty                            (NonEmpty)
 import           Data.Maybe                                    (maybeToList)
-import           Data.Set                                      (Set)
+import           Data.Semigroup.Foldable
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
-import           System.Directory                              (doesFileExist, getDirectoryContents)
-import           System.FilePath                               (takeExtension, (<.>), (</>))
-import           UnliftIO.Async                                (pooledForConcurrently, pooledMapConcurrently)
+import           System.Directory                              (doesFileExist,
+                                                                getDirectoryContents)
+import           System.FilePath                               (takeExtension,
+                                                                (<.>), (</>))
+import           UnliftIO.Async                                (pooledForConcurrently,
+                                                                pooledMapConcurrently)
 
 -- Interface to cabal.
 
 import qualified Distribution.ModuleName                       as Cabal
-import           Distribution.PackageDescription               (BuildInfo (..), Executable (..), Library (..),
-                                                                PackageDescription (..), TestSuite (..),
+import           Distribution.PackageDescription               (BuildInfo (..),
+                                                                Executable (..),
+                                                                Library (..),
+                                                                PackageDescription (..),
+                                                                TestSuite (..),
+                                                                libraryNameString,
                                                                 unUnqualComponentName)
 import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import           Distribution.Verbosity                        (silent)
 
 #if MIN_VERSION_Cabal(3,6,0)
-import           Distribution.Utils.Path                       (PackageDir, SourceDir, SymbolicPath, getSymbolicPath)
+import           Distribution.Utils.Path                       (PackageDir,
+                                                                SourceDir,
+                                                                SymbolicPath,
+                                                                getSymbolicPath)
 #endif
 
 #if MIN_VERSION_Cabal(3,8,1)
@@ -62,19 +77,20 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
   let PackageDescription{..} = flattenPackageDescription gpd
   let candidateModules = mconcat
         [ do
-            guard $ Set.member CabalLibraries toDiscover
             Library{..} <- mconcat [maybeToList library, subLibraries]
             srcDir <- hsSourceDirs libBuildInfo
             exMod <- exposedModules
+            let name = unUnqualComponentName <$> libraryNameString libName
+            guard $ Discovered == foldMap1 (`discoversUnit` CabalLibraryUnit name) toDiscover
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
               , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
         , do
-            guard $ Set.member CabalExecutables toDiscover
             Executable{..} <- executables
             srcDir <- hsSourceDirs buildInfo
             otherMod <- "Main" : buildInfo.otherModules
+            guard $ Discovered == foldMap1 (`discoversUnit` CabalExecutableUnit (unUnqualComponentName exeName)) toDiscover
             pure Module
               { name = fromString $
                 if otherMod == "Main"
@@ -83,10 +99,11 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
               , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
               }
         , do
-            guard $ Set.member CabalTests toDiscover
             TestSuite{..} <- testSuites
             srcDir <- hsSourceDirs testBuildInfo
             otherMod <- testBuildInfo.otherModules
+            guard $ Discovered == foldMap1 (`discoversUnit` CabalTestsUnit (unUnqualComponentName testName)) toDiscover
+
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components otherMod
               , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
@@ -104,14 +121,56 @@ validateModulePath m = do
     ModuleNoFile -> pure ModuleNoFile
   pure Module {name = m.name, path = path}
 
-data CabalModuleType =
-  CabalLibraries
-  | CabalExecutables
+data CabalUnitType =
+    CabalLibrary
+  | CabalExecutable
   | CabalTests
   deriving stock (Show, Eq, Ord)
 
+data CabalUnit =
+    CabalLibraryUnit (Maybe String)
+  | CabalExecutableUnit String
+  | CabalTestsUnit String
+  deriving stock (Show, Eq, Ord)
+
+data CabalDiscoverType =
+    CabalDiscoverAll CabalUnitType
+  | CabalDiscover CabalUnit
+  | CabalDontDiscoverAll CabalUnitType
+  | CabalDontDiscover CabalUnit
+  deriving stock (Show, Eq, Ord)
+
+data Discovery =
+    Discovered
+  | Hidden
+  | Passed
+  deriving stock (Show, Eq, Ord)
+
+instance Semigroup Discovery where
+  _ <> Discovered = Discovered
+  _ <> Hidden     = Hidden
+  x <> Passed     = x
+
+flipDiscover :: Discovery -> Discovery
+flipDiscover = \case
+  Passed -> Passed
+  Hidden -> Discovered
+  Discovered -> Hidden
+
+discoversUnit :: CabalDiscoverType -> CabalUnit -> Discovery
+discoversUnit = curry $ \case
+  (CabalDiscoverAll CabalLibrary, CabalLibraryUnit{}) -> Discovered
+  (CabalDiscoverAll CabalLibrary, _) -> Passed
+  (CabalDiscoverAll CabalExecutable, CabalExecutableUnit{}) -> Discovered
+  (CabalDiscoverAll CabalExecutable, _) -> Passed
+  (CabalDiscoverAll CabalTests, CabalTestsUnit{}) -> Discovered
+  (CabalDiscoverAll CabalTests, _) -> Passed
+  (CabalDiscover u1, u2) -> if u1 == u2 then Discovered else Passed
+  (CabalDontDiscoverAll ty, u) -> flipDiscover $ CabalDiscoverAll ty `discoversUnit` u
+  (CabalDontDiscover u1, u2) -> flipDiscover $ CabalDiscover u1 `discoversUnit` u2
+
 data CabalDiscoverOpts = CabalDiscoverOpts
-  { toDiscover      :: Set CabalModuleType
+  { toDiscover      :: NonEmpty CabalDiscoverType
   , includeExternal :: Bool
   } deriving stock (Show, Eq)
 
