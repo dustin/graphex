@@ -68,6 +68,9 @@ instance GHC.Generics.Generic Graphex.CSV.Edge
 instance GHC.Show.Show Graphex.CSV.Edge
 instance GHC.Classes.Eq Graphex.CSV.Edge
 
+module Graphex.Logger
+logit :: String -> IO ()
+
 module Graphex.LookingGlass
 data Node
 Node :: Text -> Maybe Text -> Node
@@ -126,18 +129,42 @@ module Graphex.Cabal
 discoverCabalModules :: CabalDiscoverOpts -> FilePath -> IO [Module]
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
 data CabalDiscoverOpts
-CabalDiscoverOpts :: Set CabalModuleType -> Bool -> CabalDiscoverOpts
-[toDiscover] :: CabalDiscoverOpts -> Set CabalModuleType
+CabalDiscoverOpts :: NonEmpty CabalDiscoverType -> Bool -> CabalDiscoverOpts
+[toDiscover] :: CabalDiscoverOpts -> NonEmpty CabalDiscoverType
 [includeExternal] :: CabalDiscoverOpts -> Bool
-data CabalModuleType
-CabalLibraries :: CabalModuleType
-CabalExecutables :: CabalModuleType
-CabalTests :: CabalModuleType
-instance GHC.Classes.Ord Graphex.Cabal.CabalModuleType
-instance GHC.Classes.Eq Graphex.Cabal.CabalModuleType
-instance GHC.Show.Show Graphex.Cabal.CabalModuleType
+data CabalDiscoverType
+CabalDiscoverAll :: CabalUnitType -> CabalDiscoverType
+CabalDiscover :: CabalUnit -> CabalDiscoverType
+CabalDontDiscoverAll :: CabalUnitType -> CabalDiscoverType
+CabalDontDiscover :: CabalUnit -> CabalDiscoverType
+data CabalUnit
+CabalLibraryUnit :: Maybe String -> CabalUnit
+CabalExecutableUnit :: String -> CabalUnit
+CabalTestsUnit :: String -> CabalUnit
+data CabalUnitType
+CabalLibrary :: CabalUnitType
+CabalExecutable :: CabalUnitType
+CabalTests :: CabalUnitType
+data Discovery
+Discovered :: Discovery
+Hidden :: Discovery
+Passed :: Discovery
+discoversUnit :: CabalDiscoverType -> CabalUnit -> Discovery
+instance GHC.Classes.Ord Graphex.Cabal.CabalUnitType
+instance GHC.Classes.Eq Graphex.Cabal.CabalUnitType
+instance GHC.Show.Show Graphex.Cabal.CabalUnitType
+instance GHC.Classes.Ord Graphex.Cabal.CabalUnit
+instance GHC.Classes.Eq Graphex.Cabal.CabalUnit
+instance GHC.Show.Show Graphex.Cabal.CabalUnit
+instance GHC.Classes.Ord Graphex.Cabal.CabalDiscoverType
+instance GHC.Classes.Eq Graphex.Cabal.CabalDiscoverType
+instance GHC.Show.Show Graphex.Cabal.CabalDiscoverType
+instance GHC.Classes.Ord Graphex.Cabal.Discovery
+instance GHC.Classes.Eq Graphex.Cabal.Discovery
+instance GHC.Show.Show Graphex.Cabal.Discovery
 instance GHC.Classes.Eq Graphex.Cabal.CabalDiscoverOpts
 instance GHC.Show.Show Graphex.Cabal.CabalDiscoverOpts
+instance GHC.Base.Semigroup Graphex.Cabal.Discovery
 
 module Graphex.Search
 

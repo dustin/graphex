@@ -1,0 +1,215 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-# LANGUAGE CPP                 #-}
+<span class="lineno">    2 </span>{-# LANGUAGE OverloadedRecordDot #-}
+<span class="lineno">    3 </span>{-# LANGUAGE OverloadedStrings   #-}
+<span class="lineno">    4 </span>
+<span class="lineno">    5 </span>-- Cribbed from graphmod's 'Graphmod.CabalSupport'
+<span class="lineno">    6 </span>module Graphex.Cabal
+<span class="lineno">    7 </span>  ( discoverCabalModules
+<span class="lineno">    8 </span>  , discoverCabalModuleGraph
+<span class="lineno">    9 </span>  , CabalDiscoverOpts (..)
+<span class="lineno">   10 </span>  , CabalDiscoverType (..)
+<span class="lineno">   11 </span>  , CabalUnit (..)
+<span class="lineno">   12 </span>  , CabalUnitType (..)
+<span class="lineno">   13 </span>  , Discovery (..)
+<span class="lineno">   14 </span>  , discoversUnit
+<span class="lineno">   15 </span>  ) where
+<span class="lineno">   16 </span>
+<span class="lineno">   17 </span>import           Graphex.Core
+<span class="lineno">   18 </span>import           Graphex.Parser
+<span class="lineno">   19 </span>
+<span class="lineno">   20 </span>import           Control.Monad                                 (guard)
+<span class="lineno">   21 </span>import           Data.Foldable                                 (fold)
+<span class="lineno">   22 </span>import           Data.List                                     (intersperse)
+<span class="lineno">   23 </span>import           Data.List.NonEmpty                            (NonEmpty)
+<span class="lineno">   24 </span>import           Data.Maybe                                    (maybeToList)
+<span class="lineno">   25 </span>import           Data.Semigroup.Foldable
+<span class="lineno">   26 </span>import qualified Data.Set                                      as Set
+<span class="lineno">   27 </span>import           Data.String                                   (fromString)
+<span class="lineno">   28 </span>import           System.Directory                              (doesFileExist,
+<span class="lineno">   29 </span>                                                                getDirectoryContents)
+<span class="lineno">   30 </span>import           System.FilePath                               (takeExtension,
+<span class="lineno">   31 </span>                                                                (&lt;.&gt;), (&lt;/&gt;))
+<span class="lineno">   32 </span>import           UnliftIO.Async                                (pooledForConcurrently,
+<span class="lineno">   33 </span>                                                                pooledMapConcurrently)
+<span class="lineno">   34 </span>
+<span class="lineno">   35 </span>-- Interface to cabal.
+<span class="lineno">   36 </span>
+<span class="lineno">   37 </span>import qualified Distribution.ModuleName                       as Cabal
+<span class="lineno">   38 </span>import           Distribution.PackageDescription               (BuildInfo (..),
+<span class="lineno">   39 </span>                                                                Executable (..),
+<span class="lineno">   40 </span>                                                                Library (..),
+<span class="lineno">   41 </span>                                                                PackageDescription (..),
+<span class="lineno">   42 </span>                                                                TestSuite (..),
+<span class="lineno">   43 </span>                                                                libraryNameString,
+<span class="lineno">   44 </span>                                                                unUnqualComponentName)
+<span class="lineno">   45 </span>import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
+<span class="lineno">   46 </span>import           Distribution.Verbosity                        (silent)
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>#if MIN_VERSION_Cabal(3,6,0)
+<span class="lineno">   49 </span>import           Distribution.Utils.Path                       (PackageDir,
+<span class="lineno">   50 </span>                                                                SourceDir,
+<span class="lineno">   51 </span>                                                                SymbolicPath,
+<span class="lineno">   52 </span>                                                                getSymbolicPath)
+<span class="lineno">   53 </span>#endif
+<span class="lineno">   54 </span>
+<span class="lineno">   55 </span>#if MIN_VERSION_Cabal(3,8,1)
+<span class="lineno">   56 </span>import           Distribution.Simple.PackageDescription        (readGenericPackageDescription)
+<span class="lineno">   57 </span>#elif MIN_VERSION_Cabal(2,2,0)
+<span class="lineno">   58 </span>import           Distribution.PackageDescription.Parsec        (readGenericPackageDescription)
+<span class="lineno">   59 </span>#else
+<span class="lineno">   60 </span>import           Distribution.PackageDescription.Parse         (readGenericPackageDescription)
+<span class="lineno">   61 </span>#endif
+<span class="lineno">   62 </span>
+<span class="lineno">   63 </span>-- Note that this isn't nested under the above #if because we need
+<span class="lineno">   64 </span>-- the backwards-compatible version to be available for all Cabal
+<span class="lineno">   65 </span>-- versions prior to 3.6
+<span class="lineno">   66 </span>#if MIN_VERSION_Cabal(3,6,0)
+<span class="lineno">   67 </span>sourceDirToFilePath :: SymbolicPath PackageDir SourceDir -&gt; FilePath
+<span class="lineno">   68 </span><span class="decl"><span class="istickedoff">sourceDirToFilePath = getSymbolicPath</span></span>
+<span class="lineno">   69 </span>#else
+<span class="lineno">   70 </span>sourceDirToFilePath :: FilePath -&gt; FilePath
+<span class="lineno">   71 </span>sourceDirToFilePath = id
+<span class="lineno">   72 </span>#endif
+<span class="lineno">   73 </span>
+<span class="lineno">   74 </span>discoverCabalModules :: CabalDiscoverOpts -&gt; FilePath -&gt; IO [Module]
+<span class="lineno">   75 </span><span class="decl"><span class="istickedoff">discoverCabalModules CabalDiscoverOpts{..} cabalFile = do</span>
+<span class="lineno">   76 </span><span class="spaces">  </span><span class="istickedoff">gpd &lt;- readGenericPackageDescription silent cabalFile</span>
+<span class="lineno">   77 </span><span class="spaces">  </span><span class="istickedoff">let PackageDescription{..} = flattenPackageDescription gpd</span>
+<span class="lineno">   78 </span><span class="spaces">  </span><span class="istickedoff">let candidateModules = mconcat</span>
+<span class="lineno">   79 </span><span class="spaces">        </span><span class="istickedoff">[ do</span>
+<span class="lineno">   80 </span><span class="spaces">            </span><span class="istickedoff">Library{..} &lt;- mconcat [maybeToList library, subLibraries]</span>
+<span class="lineno">   81 </span><span class="spaces">            </span><span class="istickedoff">srcDir &lt;- hsSourceDirs libBuildInfo</span>
+<span class="lineno">   82 </span><span class="spaces">            </span><span class="istickedoff">exMod &lt;- exposedModules</span>
+<span class="lineno">   83 </span><span class="spaces">            </span><span class="istickedoff">let name = unUnqualComponentName &lt;$&gt; libraryNameString libName</span>
+<span class="lineno">   84 </span><span class="spaces">            </span><span class="istickedoff">guard $ Discovered == foldMap1 (`discoversUnit` CabalLibraryUnit name) toDiscover</span>
+<span class="lineno">   85 </span><span class="spaces">            </span><span class="istickedoff">pure Module</span>
+<span class="lineno">   86 </span><span class="spaces">              </span><span class="istickedoff">{ name = fromString $ mconcat $ intersperse &quot;.&quot; $ Cabal.components exMod</span>
+<span class="lineno">   87 </span><span class="spaces">              </span><span class="istickedoff">, path = ModuleFile $ sourceDirToFilePath srcDir &lt;/&gt; Cabal.toFilePath exMod &lt;.&gt; &quot;.hs&quot;</span>
+<span class="lineno">   88 </span><span class="spaces">              </span><span class="istickedoff">}</span>
+<span class="lineno">   89 </span><span class="spaces">        </span><span class="istickedoff">, do</span>
+<span class="lineno">   90 </span><span class="spaces">            </span><span class="istickedoff">Executable{..} &lt;- executables</span>
+<span class="lineno">   91 </span><span class="spaces">            </span><span class="istickedoff">srcDir &lt;- hsSourceDirs buildInfo</span>
+<span class="lineno">   92 </span><span class="spaces">            </span><span class="istickedoff">otherMod &lt;- &quot;Main&quot; : buildInfo.otherModules</span>
+<span class="lineno">   93 </span><span class="spaces">            </span><span class="istickedoff">guard $ Discovered == foldMap1 (`discoversUnit` CabalExecutableUnit (unUnqualComponentName exeName)) toDiscover</span>
+<span class="lineno">   94 </span><span class="spaces">            </span><span class="istickedoff">pure Module</span>
+<span class="lineno">   95 </span><span class="spaces">              </span><span class="istickedoff">{ name = fromString $</span>
+<span class="lineno">   96 </span><span class="spaces">                </span><span class="istickedoff">if otherMod == &quot;Main&quot;</span>
+<span class="lineno">   97 </span><span class="spaces">                </span><span class="istickedoff">then unUnqualComponentName exeName ++ &quot;-Main&quot;</span>
+<span class="lineno">   98 </span><span class="spaces">                </span><span class="istickedoff">else mconcat $ intersperse &quot;.&quot; $ Cabal.components otherMod</span>
+<span class="lineno">   99 </span><span class="spaces">              </span><span class="istickedoff">, path = ModuleFile $ sourceDirToFilePath srcDir &lt;/&gt; Cabal.toFilePath otherMod &lt;.&gt; &quot;.hs&quot;</span>
+<span class="lineno">  100 </span><span class="spaces">              </span><span class="istickedoff">}</span>
+<span class="lineno">  101 </span><span class="spaces">        </span><span class="istickedoff">, do</span>
+<span class="lineno">  102 </span><span class="spaces">            </span><span class="istickedoff">TestSuite{..} &lt;- testSuites</span>
+<span class="lineno">  103 </span><span class="spaces">            </span><span class="istickedoff">srcDir &lt;- hsSourceDirs testBuildInfo</span>
+<span class="lineno">  104 </span><span class="spaces">            </span><span class="istickedoff">otherMod &lt;- testBuildInfo.otherModules</span>
+<span class="lineno">  105 </span><span class="spaces">            </span><span class="istickedoff">guard $ Discovered == foldMap1 (`discoversUnit` CabalTestsUnit (unUnqualComponentName testName)) toDiscover</span>
+<span class="lineno">  106 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">  107 </span><span class="spaces">            </span><span class="istickedoff">pure Module</span>
+<span class="lineno">  108 </span><span class="spaces">              </span><span class="istickedoff">{ name = fromString $ mconcat $ intersperse <span class="nottickedoff">&quot;.&quot;</span> $ Cabal.components otherMod</span>
+<span class="lineno">  109 </span><span class="spaces">              </span><span class="istickedoff">, path = ModuleFile $ sourceDirToFilePath srcDir &lt;/&gt; Cabal.toFilePath otherMod &lt;.&gt; &quot;.hs&quot;</span>
+<span class="lineno">  110 </span><span class="spaces">              </span><span class="istickedoff">}</span>
+<span class="lineno">  111 </span><span class="spaces">        </span><span class="istickedoff">]</span>
+<span class="lineno">  112 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">  113 </span><span class="spaces">  </span><span class="istickedoff">pooledMapConcurrently validateModulePath candidateModules</span></span>
+<span class="lineno">  114 </span>
+<span class="lineno">  115 </span>validateModulePath :: Module -&gt; IO Module
+<span class="lineno">  116 </span><span class="decl"><span class="istickedoff">validateModulePath m = do</span>
+<span class="lineno">  117 </span><span class="spaces">  </span><span class="istickedoff">path &lt;- case m.path of</span>
+<span class="lineno">  118 </span><span class="spaces">    </span><span class="istickedoff">ModuleFile fp -&gt; do</span>
+<span class="lineno">  119 </span><span class="spaces">      </span><span class="istickedoff">fileExists &lt;- doesFileExist fp</span>
+<span class="lineno">  120 </span><span class="spaces">      </span><span class="istickedoff">pure $ if fileExists then ModuleFile fp else ModuleNoFile</span>
+<span class="lineno">  121 </span><span class="spaces">    </span><span class="istickedoff">ModuleNoFile -&gt; <span class="nottickedoff">pure ModuleNoFile</span></span>
+<span class="lineno">  122 </span><span class="spaces">  </span><span class="istickedoff">pure Module {name = m.name, path = path}</span></span>
+<span class="lineno">  123 </span>
+<span class="lineno">  124 </span>data CabalUnitType =
+<span class="lineno">  125 </span>    CabalLibrary
+<span class="lineno">  126 </span>  | CabalExecutable
+<span class="lineno">  127 </span>  | CabalTests
+<span class="lineno">  128 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
+<span class="lineno">  129 </span>
+<span class="lineno">  130 </span>data CabalUnit =
+<span class="lineno">  131 </span>    CabalLibraryUnit (Maybe String)
+<span class="lineno">  132 </span>  | CabalExecutableUnit String
+<span class="lineno">  133 </span>  | CabalTestsUnit String
+<span class="lineno">  134 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
+<span class="lineno">  135 </span>
+<span class="lineno">  136 </span>data CabalDiscoverType =
+<span class="lineno">  137 </span>    CabalDiscoverAll CabalUnitType
+<span class="lineno">  138 </span>  | CabalDiscover CabalUnit
+<span class="lineno">  139 </span>  | CabalDontDiscoverAll CabalUnitType
+<span class="lineno">  140 </span>  | CabalDontDiscover CabalUnit
+<span class="lineno">  141 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
+<span class="lineno">  142 </span>
+<span class="lineno">  143 </span>data Discovery =
+<span class="lineno">  144 </span>    Discovered
+<span class="lineno">  145 </span>  | Hidden
+<span class="lineno">  146 </span>  | Passed
+<span class="lineno">  147 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
+<span class="lineno">  148 </span>
+<span class="lineno">  149 </span>instance <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Semigroup Discovery</span></span></span></span> where
+<span class="lineno">  150 </span>  <span class="decl"><span class="nottickedoff">_ &lt;&gt; Discovered = Discovered</span>
+<span class="lineno">  151 </span><span class="spaces">  </span><span class="nottickedoff">_ &lt;&gt; Hidden     = Hidden</span>
+<span class="lineno">  152 </span><span class="spaces">  </span><span class="nottickedoff">x &lt;&gt; Passed     = x</span></span>
+<span class="lineno">  153 </span>
+<span class="lineno">  154 </span>flipDiscover :: Discovery -&gt; Discovery
+<span class="lineno">  155 </span><span class="decl"><span class="nottickedoff">flipDiscover = \case</span>
+<span class="lineno">  156 </span><span class="spaces">  </span><span class="nottickedoff">Passed -&gt; Passed</span>
+<span class="lineno">  157 </span><span class="spaces">  </span><span class="nottickedoff">Hidden -&gt; Discovered</span>
+<span class="lineno">  158 </span><span class="spaces">  </span><span class="nottickedoff">Discovered -&gt; Hidden</span></span>
+<span class="lineno">  159 </span>
+<span class="lineno">  160 </span>discoversUnit :: CabalDiscoverType -&gt; CabalUnit -&gt; Discovery
+<span class="lineno">  161 </span><span class="decl"><span class="istickedoff">discoversUnit = curry $ \case</span>
+<span class="lineno">  162 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscoverAll CabalLibrary, CabalLibraryUnit{}) -&gt; Discovered</span>
+<span class="lineno">  163 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscoverAll CabalLibrary, _) -&gt; Passed</span>
+<span class="lineno">  164 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscoverAll CabalExecutable, CabalExecutableUnit{}) -&gt; Discovered</span>
+<span class="lineno">  165 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscoverAll CabalExecutable, _) -&gt; Passed</span>
+<span class="lineno">  166 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscoverAll CabalTests, CabalTestsUnit{}) -&gt; Discovered</span>
+<span class="lineno">  167 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscoverAll CabalTests, _) -&gt; Passed</span>
+<span class="lineno">  168 </span><span class="spaces">  </span><span class="istickedoff">(CabalDiscover u1, u2) -&gt; if u1 == u2 then Discovered else Passed</span>
+<span class="lineno">  169 </span><span class="spaces">  </span><span class="istickedoff">(CabalDontDiscoverAll ty, u) -&gt; <span class="nottickedoff">flipDiscover $ CabalDiscoverAll ty `discoversUnit` u</span></span>
+<span class="lineno">  170 </span><span class="spaces">  </span><span class="istickedoff">(CabalDontDiscover u1, u2) -&gt; <span class="nottickedoff">flipDiscover $ CabalDiscover u1 `discoversUnit` u2</span></span></span>
+<span class="lineno">  171 </span>
+<span class="lineno">  172 </span>data CabalDiscoverOpts = CabalDiscoverOpts
+<span class="lineno">  173 </span>  { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">toDiscover</span></span></span>      :: NonEmpty CabalDiscoverType
+<span class="lineno">  174 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">includeExternal</span></span></span> :: Bool
+<span class="lineno">  175 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
+<span class="lineno">  176 </span>
+<span class="lineno">  177 </span>discoverCabalModuleGraph :: CabalDiscoverOpts -&gt; IO ModuleGraph
+<span class="lineno">  178 </span><span class="decl"><span class="istickedoff">discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do</span>
+<span class="lineno">  179 </span><span class="spaces">  </span><span class="istickedoff">fs &lt;- getDirectoryContents &quot;.&quot; -- XXX</span>
+<span class="lineno">  180 </span><span class="spaces">  </span><span class="istickedoff">mods &lt;- fmap fold . pooledMapConcurrently (discoverCabalModules opts) . filter ((&quot;.cabal&quot; ==) . takeExtension) $ fs</span>
+<span class="lineno">  181 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">  182 </span><span class="spaces">  </span><span class="istickedoff">let modSet = foldMap (Set.singleton . name) mods</span>
+<span class="lineno">  183 </span><span class="spaces">  </span><span class="istickedoff">gs &lt;- pooledForConcurrently mods $ \Module{..} -&gt; case path of</span>
+<span class="lineno">  184 </span><span class="spaces">    </span><span class="istickedoff">ModuleFile modPath -&gt; do</span>
+<span class="lineno">  185 </span><span class="spaces">      </span><span class="istickedoff">allImps &lt;- parseFileImports modPath</span>
+<span class="lineno">  186 </span><span class="spaces">      </span><span class="istickedoff">let filteredImps =</span>
+<span class="lineno">  187 </span><span class="spaces">            </span><span class="istickedoff">if <span class="tickonlyfalse">includeExternal</span></span>
+<span class="lineno">  188 </span><span class="spaces">            </span><span class="istickedoff">then <span class="nottickedoff">allImps</span></span>
+<span class="lineno">  189 </span><span class="spaces">            </span><span class="istickedoff">else filter (\Import{..} -&gt; Set.member module_ modSet) allImps</span>
+<span class="lineno">  190 </span><span class="spaces">      </span><span class="istickedoff">pure $ mkModuleGraph name $ fmap module_ filteredImps</span>
+<span class="lineno">  191 </span><span class="spaces">    </span><span class="istickedoff">ModuleNoFile -&gt; <span class="nottickedoff">pure $ mkModuleGraph name mempty</span></span>
+<span class="lineno">  192 </span><span class="spaces">  </span><span class="istickedoff">pure $ fold gs</span></span>
+
+</pre>
+</body>
+</html>
