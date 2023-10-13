@@ -25,21 +25,31 @@ import           Data.Maybe                                    (maybeToList)
 import           Data.Semigroup.Foldable
 import qualified Data.Set                                      as Set
 import           Data.String                                   (fromString)
-import           System.Directory                              (doesFileExist, getDirectoryContents)
-import           System.FilePath                               (takeExtension, (<.>), (</>))
-import           UnliftIO.Async                                (pooledForConcurrently, pooledMapConcurrently)
+import           System.Directory                              (doesFileExist,
+                                                                getDirectoryContents)
+import           System.FilePath                               (takeExtension,
+                                                                (<.>), (</>))
+import           UnliftIO.Async                                (pooledForConcurrently,
+                                                                pooledMapConcurrently)
 
 -- Interface to cabal.
 
 import qualified Distribution.ModuleName                       as Cabal
-import           Distribution.PackageDescription               (BuildInfo (..), Executable (..), Library (..),
-                                                                PackageDescription (..), TestSuite (..),
-                                                                unUnqualComponentName, libraryNameString)
+import           Distribution.PackageDescription               (BuildInfo (..),
+                                                                Executable (..),
+                                                                Library (..),
+                                                                PackageDescription (..),
+                                                                TestSuite (..),
+                                                                libraryNameString,
+                                                                unUnqualComponentName)
 import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import           Distribution.Verbosity                        (silent)
 
 #if MIN_VERSION_Cabal(3,6,0)
-import           Distribution.Utils.Path                       (PackageDir, SourceDir, SymbolicPath, getSymbolicPath)
+import           Distribution.Utils.Path                       (PackageDir,
+                                                                SourceDir,
+                                                                SymbolicPath,
+                                                                getSymbolicPath)
 #endif
 
 #if MIN_VERSION_Cabal(3,8,1)

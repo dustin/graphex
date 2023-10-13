@@ -5,7 +5,7 @@ import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import           Data.List.NonEmpty   (NonEmpty (..), nonEmpty)
-import Data.Maybe (fromMaybe)
+import           Data.Maybe           (fromMaybe)
 import           Options.Applicative
 
 import           Graphex.Cabal
@@ -26,12 +26,12 @@ cabalOptions = do
   pure CabalOptions{..}
 
 data CabalOptions2 = CabalOptions2
-  { optToDiscover :: [CabalDiscoverType]
+  { optToDiscover       :: [CabalDiscoverType]
   , optIncludeExternal2 :: Bool
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a
-justWhen a True = Just a
+justWhen a True  = Just a
 justWhen _ False = Nothing
 
 cabalOptions2 :: Parser CabalOptions2

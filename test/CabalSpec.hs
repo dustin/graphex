@@ -43,12 +43,14 @@ exeModules =
   , Module "Main.Cabal" "app/Main/Cabal.hs"
   ]
 
+dummySublibModules :: [Module]
+dummySublibModules = [Module "DummySublibModule" "dummy-sublib/DummySublibModule.hs"]
 
 mkDiscoverCabalModulesUnit :: [Module] -> CabalDiscoverOpts -> IO ()
 mkDiscoverCabalModulesUnit (sort -> mods) opts = assertEqual "" mods . sort =<< discoverCabalModules opts "graphex.cabal"
 
 unit_libCabalModules :: IO ()
-unit_libCabalModules = mkDiscoverCabalModulesUnit libModules CabalDiscoverOpts
+unit_libCabalModules = mkDiscoverCabalModulesUnit (dummySublibModules ++ libModules) CabalDiscoverOpts
   { toDiscover = pure $ CabalDiscoverAll CabalLibrary
   , includeExternal = False
   }
@@ -62,6 +64,30 @@ unit_exeCabalModules = mkDiscoverCabalModulesUnit exeModules CabalDiscoverOpts
 unit_testCabalModules :: IO ()
 unit_testCabalModules = mkDiscoverCabalModulesUnit testModules CabalDiscoverOpts
   { toDiscover = pure $ CabalDiscoverAll CabalTests
+  , includeExternal = False
+  }
+
+unit_sublibCabalModules :: IO ()
+unit_sublibCabalModules = mkDiscoverCabalModulesUnit dummySublibModules CabalDiscoverOpts
+  { toDiscover = pure $ CabalDiscover (CabalLibraryUnit (Just "graphex-dummy-sublib"))
+  , includeExternal = False
+  }
+
+unit_defaultLibCabalModules :: IO ()
+unit_defaultLibCabalModules = mkDiscoverCabalModulesUnit libModules CabalDiscoverOpts
+  { toDiscover = pure $ CabalDiscover (CabalLibraryUnit Nothing)
+  , includeExternal = False
+  }
+
+unit_granularExeCabalModules :: IO ()
+unit_granularExeCabalModules = mkDiscoverCabalModulesUnit exeModules CabalDiscoverOpts
+  { toDiscover = pure $ CabalDiscover (CabalExecutableUnit "graphex")
+  , includeExternal = False
+  }
+
+unit_granularTestCabalModules :: IO ()
+unit_granularTestCabalModules = mkDiscoverCabalModulesUnit testModules CabalDiscoverOpts
+  { toDiscover = pure $ CabalDiscover (CabalTestsUnit "graphex-test")
   , includeExternal = False
   }
 

@@ -57,6 +57,10 @@ default-extensions:
   - LambdaCase
   - MultiWayIf
 
+internal-libraries:
+  graphex-dummy-sublib:
+    source-dirs: dummy-sublib
+
 executables:
   graphex:
     main:                Main.hs

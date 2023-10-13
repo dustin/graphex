@@ -1,8 +1,8 @@
 module Graphex.Logger (logit) where
 
+import           Data.Functor       ((<&>))
 import           Debug.Trace        (traceM)
 import           System.Environment (lookupEnv)
-import Data.Functor ((<&>))
 
 data Verbosity =
     Silent
