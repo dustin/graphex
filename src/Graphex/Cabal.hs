@@ -34,7 +34,7 @@ import           UnliftIO.Async                                (pooledForConcurr
 import qualified Distribution.ModuleName                       as Cabal
 import           Distribution.PackageDescription               (BuildInfo (..), Executable (..), Library (..),
                                                                 PackageDescription (..), TestSuite (..),
-                                                                unUnqualComponentName)
+                                                                unUnqualComponentName, libraryNameString)
 import           Distribution.PackageDescription.Configuration (flattenPackageDescription)
 import           Distribution.Verbosity                        (silent)
 
@@ -70,7 +70,8 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
             Library{..} <- mconcat [maybeToList library, subLibraries]
             srcDir <- hsSourceDirs libBuildInfo
             exMod <- exposedModules
-            guard $ Discovered == foldMap1 (`discoversUnit` CabalLibraryUnit Nothing) toDiscover -- TODO: Say which library
+            let name = unUnqualComponentName <$> libraryNameString libName
+            guard $ Discovered == foldMap1 (`discoversUnit` CabalLibraryUnit name) toDiscover
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
               , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
@@ -79,7 +80,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
             Executable{..} <- executables
             srcDir <- hsSourceDirs buildInfo
             otherMod <- "Main" : buildInfo.otherModules
-            guard $ Discovered == foldMap1 (`discoversUnit` CabalExecutableUnit "TODO: Say which exe") toDiscover
+            guard $ Discovered == foldMap1 (`discoversUnit` CabalExecutableUnit (unUnqualComponentName exeName)) toDiscover
             pure Module
               { name = fromString $
                 if otherMod == "Main"
@@ -91,7 +92,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
             TestSuite{..} <- testSuites
             srcDir <- hsSourceDirs testBuildInfo
             otherMod <- testBuildInfo.otherModules
-            guard $ Discovered == foldMap1 (`discoversUnit` CabalTestsUnit "TODO: Say which tests") toDiscover
+            guard $ Discovered == foldMap1 (`discoversUnit` CabalTestsUnit (unUnqualComponentName testName)) toDiscover
 
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components otherMod
