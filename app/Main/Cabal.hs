@@ -9,6 +9,7 @@ import           Options.Applicative
 import Control.Concurrent (getNumCapabilities)
 
 import           Graphex.Cabal
+import           Graphex.Core
 import           Graphex.Logger
 import           Graphex.LookingGlass
 
@@ -16,6 +17,7 @@ data CabalOptions = CabalOptions
   { optToDiscover      :: [CabalDiscoverType]
   , optIncludeExternal :: Bool
   , optNumJobs :: Maybe Int
+  , optPruneTo :: [ModuleName]
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a
@@ -43,6 +45,7 @@ cabalOptions = do
     ]
   optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
   optNumJobs <- optional (option auto (long "jobs" <> short 'j' <> help "Number of worker threads to use"))
+  optPruneTo <- many $ strOption (long "prune-to" <> help "Only discover import dependencies of the specified module(s)")
   pure CabalOptions{..}
 
 runCabal :: CabalOptions -> IO ()
@@ -53,6 +56,7 @@ runCabal CabalOptions{..} = do
   let discoverOpts = CabalDiscoverOpts
         { toDiscover = fromMaybe (pure $ CabalDiscover (CabalLibraryUnit Nothing)) $ nonEmpty optToDiscover
         , includeExternal = optIncludeExternal
+        , pruneTo = nonEmpty optPruneTo
         , ..
         }
   mg <- discoverCabalModuleGraph discoverOpts
