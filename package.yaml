@@ -36,6 +36,7 @@ dependencies:
 - tree-view
 - unliftio
 - semigroupoids
+- stm
 
 library:
   source-dirs: src

@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE TypeApplications    #-}
 
 -- Cribbed from graphmod's 'Graphmod.CabalSupport'
 module Graphex.Cabal
@@ -16,14 +17,20 @@ module Graphex.Cabal
 
 import           Graphex.Core
 import           Graphex.Parser
+import           Graphex.Queue
 
+import Control.Concurrent.STM.TVar
+import Control.Concurrent.STM (atomically)
+import Control.Concurrent.QSem
 import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
 import           Data.List.NonEmpty                            (NonEmpty)
-import           Data.Maybe                                    (maybeToList)
+import qualified           Data.List.NonEmpty                            as NE
+import           Data.Maybe                                    (maybeToList, mapMaybe)
 import           Data.Semigroup.Foldable
 import qualified Data.Set                                      as Set
+import qualified Data.Map.Strict                               as Map
 import           Data.String                                   (fromString)
 import           System.Directory                              (doesFileExist,
                                                                 getDirectoryContents)
@@ -173,6 +180,7 @@ data CabalDiscoverOpts = CabalDiscoverOpts
   { toDiscover      :: NonEmpty CabalDiscoverType
   , includeExternal :: Bool
   , numJobs :: Int
+  , pruneTo :: Maybe (NonEmpty ModuleName)
   } deriving stock (Show, Eq)
 
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
@@ -180,14 +188,30 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
   fs <- getDirectoryContents "."
   mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
-  let modSet = foldMap (Set.singleton . name) mods
-  gs <- pooledForConcurrentlyN numJobs mods $ \Module{..} -> case path of
-    ModuleFile modPath -> do
-      allImps <- parseFileImports modPath
-      let filteredImps =
-            if includeExternal
-            then allImps
-            else filter (\Import{..} -> Set.member module_ modSet) allImps
-      pure $ mkModuleGraph name $ fmap module_ filteredImps
-    ModuleNoFile -> pure $ mkModuleGraph name mempty
-  pure $ fold gs
+  let modMap = foldMap (\m@Module{..} -> Map.singleton name m) mods
+  case pruneTo of
+    Nothing -> do
+      gs <- pooledForConcurrentlyN numJobs mods $ \Module{..} -> case path of
+        ModuleFile modPath -> do
+          allImps <- parseFileImports modPath
+          let filteredImps = filter (\Import{..} -> Map.member module_ modMap) allImps
+          pure $ mkModuleGraph name $ fmap module_ (if includeExternal then allImps else filteredImps)
+        ModuleNoFile -> pure $ mkModuleGraph name mempty
+      pure $ fold gs
+    Just pruneModNames -> do
+      sem <- newQSem numJobs
+      graphRef <- newTVarIO @ModuleGraph mempty
+      let go seen todo = case qpop todo of
+            Nothing -> pure ()
+            Just (Module{..}, rest) ->  case path of
+              _ | Set.member name seen -> pure ()
+              ModuleFile modPath -> do
+                allImps <- parseFileImports modPath
+                let filteredImps = filter (\Import{..} -> Map.member module_ modMap) allImps
+                atomically $ modifyTVar' graphRef (\g -> mappend g $ mkModuleGraph name $ fmap module_ (if includeExternal then allImps else filteredImps))
+                let importedMods = mapMaybe (\Import{..} -> Map.lookup module_ modMap) allImps
+                go (Set.insert name seen) (qappendList rest importedMods)
+              ModuleNoFile -> pure ()
+      let pruneMods = mapMaybe (flip Map.lookup modMap) (NE.toList pruneModNames)
+      go mempty (qlist pruneMods)
+      readTVarIO graphRef
