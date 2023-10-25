@@ -29,8 +29,8 @@ import           System.Directory                              (doesFileExist,
                                                                 getDirectoryContents)
 import           System.FilePath                               (takeExtension,
                                                                 (<.>), (</>))
-import           UnliftIO.Async                                (pooledForConcurrently,
-                                                                pooledMapConcurrently)
+import           UnliftIO.Async                                (pooledForConcurrentlyN,
+                                                                pooledMapConcurrentlyN)
 
 -- Interface to cabal.
 
@@ -110,7 +110,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
               }
         ]
 
-  pooledMapConcurrently validateModulePath candidateModules
+  pooledMapConcurrentlyN numJobs validateModulePath candidateModules
 
 validateModulePath :: Module -> IO Module
 validateModulePath m = do
@@ -172,15 +172,16 @@ discoversUnit = curry $ \case
 data CabalDiscoverOpts = CabalDiscoverOpts
   { toDiscover      :: NonEmpty CabalDiscoverType
   , includeExternal :: Bool
+  , numJobs :: Int
   } deriving stock (Show, Eq)
 
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
 discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
-  fs <- getDirectoryContents "." -- XXX
-  mods <- fmap fold . pooledMapConcurrently (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
+  fs <- getDirectoryContents "."
+  mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
   let modSet = foldMap (Set.singleton . name) mods
-  gs <- pooledForConcurrently mods $ \Module{..} -> case path of
+  gs <- pooledForConcurrentlyN numJobs mods $ \Module{..} -> case path of
     ModuleFile modPath -> do
       allImps <- parseFileImports modPath
       let filteredImps =

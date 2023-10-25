@@ -2,18 +2,20 @@
 module Main.Cabal where
 
 import           Data.Aeson           (encode)
-import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
-import           Data.List.NonEmpty   (NonEmpty (..), nonEmpty)
+import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
 import           Options.Applicative
+import Control.Concurrent (getNumCapabilities)
 
 import           Graphex.Cabal
+import           Graphex.Logger
 import           Graphex.LookingGlass
 
 data CabalOptions = CabalOptions
   { optToDiscover      :: [CabalDiscoverType]
   , optIncludeExternal :: Bool
+  , optNumJobs :: Maybe Int
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a
@@ -40,13 +42,18 @@ cabalOptions = do
     , pure . CabalDontDiscover . CabalTestsUnit <$> strOption (long "no-discover-test" <> help "Don't discover specified test import dependencies")
     ]
   optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
+  optNumJobs <- optional (option auto (long "jobs" <> short 'j' <> help "Number of worker threads to use"))
   pure CabalOptions{..}
 
 runCabal :: CabalOptions -> IO ()
 runCabal CabalOptions{..} = do
+  numCapabilities <- getNumCapabilities
+  let numJobs =fromMaybe numCapabilities optNumJobs
+  logit $ unwords ["Discovering with num jobs = ", show numJobs]
   let discoverOpts = CabalDiscoverOpts
         { toDiscover = fromMaybe (pure $ CabalDiscover (CabalLibraryUnit Nothing)) $ nonEmpty optToDiscover
         , includeExternal = optIncludeExternal
+        , ..
         }
   mg <- discoverCabalModuleGraph discoverOpts
   BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg
