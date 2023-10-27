@@ -1,12 +1,12 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main.Cabal where
 
+import           Control.Concurrent   (getNumCapabilities)
 import           Data.Aeson           (encode)
 import qualified Data.ByteString.Lazy as BL
 import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
 import           Options.Applicative
-import Control.Concurrent (getNumCapabilities)
 
 import           Graphex.Cabal
 import           Graphex.Core
@@ -16,8 +16,8 @@ import           Graphex.LookingGlass
 data CabalOptions = CabalOptions
   { optToDiscover      :: [CabalDiscoverType]
   , optIncludeExternal :: Bool
-  , optNumJobs :: Maybe Int
-  , optPruneTo :: [ModuleName]
+  , optNumJobs         :: Maybe Int
+  , optPruneTo         :: [ModuleName]
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a

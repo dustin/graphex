@@ -16,28 +16,32 @@ module Graphex.Cabal
   ) where
 
 import           Graphex.Core
+import           Graphex.Logger
 import           Graphex.Parser
-import           Graphex.Queue
 
-import Control.Concurrent.STM.TVar
-import Control.Concurrent.STM (atomically)
-import Control.Concurrent.QSem
+import           Control.Concurrent.QSem
+import           Control.Concurrent.STM                        (atomically)
+import           Control.Concurrent.STM.TVar
 import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
 import           Data.List.NonEmpty                            (NonEmpty)
-import qualified           Data.List.NonEmpty                            as NE
-import           Data.Maybe                                    (maybeToList, mapMaybe)
+import qualified Data.List.NonEmpty                            as NE
+import qualified Data.Map.Strict                               as Map
+import           Data.Maybe                                    (mapMaybe,
+                                                                maybeToList)
 import           Data.Semigroup.Foldable
 import qualified Data.Set                                      as Set
-import qualified Data.Map.Strict                               as Map
 import           Data.String                                   (fromString)
+import qualified Data.Text                                     as T
 import           System.Directory                              (doesFileExist,
                                                                 getDirectoryContents)
 import           System.FilePath                               (takeExtension,
                                                                 (<.>), (</>))
-import           UnliftIO.Async                                (pooledForConcurrentlyN,
+import           UnliftIO.Async                                (mapConcurrently_,
+                                                                pooledForConcurrentlyN,
                                                                 pooledMapConcurrentlyN)
+import           UnliftIO.Exception                            (bracket_)
 
 -- Interface to cabal.
 
@@ -179,8 +183,8 @@ discoversUnit = curry $ \case
 data CabalDiscoverOpts = CabalDiscoverOpts
   { toDiscover      :: NonEmpty CabalDiscoverType
   , includeExternal :: Bool
-  , numJobs :: Int
-  , pruneTo :: Maybe (NonEmpty ModuleName)
+  , numJobs         :: Int
+  , pruneTo         :: Maybe (NonEmpty ModuleName)
   } deriving stock (Show, Eq)
 
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
@@ -201,17 +205,22 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
     Just pruneModNames -> do
       sem <- newQSem numJobs
       graphRef <- newTVarIO @ModuleGraph mempty
-      let go seen todo = case qpop todo of
-            Nothing -> pure ()
-            Just (Module{..}, rest) ->  case path of
-              _ | Set.member name seen -> pure ()
-              ModuleFile modPath -> do
-                allImps <- parseFileImports modPath
-                let filteredImps = filter (\Import{..} -> Map.member module_ modMap) allImps
-                atomically $ modifyTVar' graphRef (\g -> mappend g $ mkModuleGraph name $ fmap module_ (if includeExternal then allImps else filteredImps))
-                let importedMods = mapMaybe (\Import{..} -> Map.lookup module_ modMap) allImps
-                go (Set.insert name seen) (qappendList rest importedMods)
-              ModuleNoFile -> pure ()
+      seenRef <- newTVarIO @(Set.Set ModuleName) mempty
+      let go Module{..} = case path of
+            ModuleFile modPath -> do
+              importedMods <- bracket_ (waitQSem sem) (signalQSem sem) $ do
+                -- This might be right?? ..we need the recursion outside the bracket. But also need to respect seen..
+                seen <- (Set.member name) <$> readTVarIO seenRef
+                if seen then pure [] else do
+                  logit $ unwords ["Start parsing imports for", T.unpack $ unModuleName name]
+                  allImps <- parseFileImports modPath
+                  logit $ unwords ["Finished parsing imports for", T.unpack $ unModuleName name]
+                  let filteredImps = filter (\Import{..} -> Map.member module_ modMap) allImps
+                  atomically $ modifyTVar' graphRef (\g -> mappend g $ mkModuleGraph name $ fmap module_ (if includeExternal then allImps else filteredImps))
+                  atomically $ modifyTVar' seenRef (Set.insert name)
+                  pure $ mapMaybe (\Import{..} -> Map.lookup module_ modMap) allImps
+              mapConcurrently_ go importedMods
+            ModuleNoFile -> pure ()
       let pruneMods = mapMaybe (flip Map.lookup modMap) (NE.toList pruneModNames)
-      go mempty (qlist pruneMods)
+      mapConcurrently_ go pruneMods
       readTVarIO graphRef

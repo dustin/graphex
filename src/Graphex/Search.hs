@@ -2,11 +2,11 @@
 
 module Graphex.Search (bfsOn, bfsWith, dfsOn, dfsWith, findFirst, flood) where
 
-import           Data.List (find)
-import           Data.Set  (Set)
-import qualified Data.Set  as Set
+import           Data.List     (find)
+import           Data.Set      (Set)
+import qualified Data.Set      as Set
 
-import Graphex.Queue
+import           Graphex.Queue
 
 type SearchFunction r a = (a -> r) -> (a -> [a]) -> a -> [a]
 
