@@ -23,8 +23,8 @@ forall (f :: * -&gt; *) a b. Functor f =&gt; f a -&gt; (a -&gt; b) -&gt; f b
 </span><span id="line-15"></span><span>
 </span><span id="line-16"></span><span class="annot"><a href="Graphex.Logger.html#logit"><span class="hs-identifier hs-type">logit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
 </span><span id="line-17"></span><span id="logit"><span class="annot"><span class="annottext">logit :: String -&gt; IO ()
-</span><a href="Graphex.Logger.html#logit"><span class="hs-identifier hs-var hs-var">logit</span></a></span></span><span> </span><span id="local-6989586621679124583"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679124583"><span class="hs-identifier hs-var">str</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO Verbosity
+</span><a href="Graphex.Logger.html#logit"><span class="hs-identifier hs-var hs-var">logit</span></a></span></span><span> </span><span id="local-6989586621679124617"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679124617"><span class="hs-identifier hs-var">str</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">IO Verbosity
 </span><a href="Graphex.Logger.html#verbosityFromEnv"><span class="hs-identifier hs-var">verbosityFromEnv</span></a></span><span> </span><span class="annot"><span class="annottext">IO Verbosity -&gt; (Verbosity -&gt; IO ()) -&gt; IO ()
 forall a b. IO a -&gt; (a -&gt; IO b) -&gt; IO b
 forall (m :: * -&gt; *) a b. Monad m =&gt; m a -&gt; (a -&gt; m b) -&gt; m b
@@ -38,5 +38,5 @@ forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
 </span><a href="Graphex.Logger.html#Verbose"><span class="hs-identifier hs-var">Verbose</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO ()
 forall (f :: * -&gt; *). Applicative f =&gt; String -&gt; f ()
 </span><span class="hs-identifier hs-var">traceM</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679124583"><span class="hs-identifier hs-var">str</span></a></span><span>
+</span><a href="#local-6989586621679124617"><span class="hs-identifier hs-var">str</span></a></span><span>
 </span><span id="line-20"></span></pre></body></html>
