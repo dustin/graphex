@@ -220,6 +220,7 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
                   pure $ mapMaybe (\Import{..} -> Map.lookup module_ modMap) allImps
               mapConcurrently_ go importedMods
             ModuleNoFile -> pure ()
-      let pruneMods = fmap snd $ filter (keep . fst) (Map.toList modMap)
-      mapConcurrently_ go pruneMods
+      let pruneToMods = fmap snd $ filter (keep . fst) (Map.toList modMap)
+      logit $ unwords ["Pruning graph to transitive imports of:", show $ fmap (unModuleName . name) pruneToMods]
+      mapConcurrently_ go pruneToMods
       readTVarIO graphRef

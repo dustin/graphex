@@ -36,6 +36,8 @@ dependencies:
 - tree-view
 - unliftio
 - semigroupoids
+- semialign
+- these
 - regex-tdfa
 - stm
 

@@ -6,7 +6,9 @@ import           Data.Aeson           (encode)
 import qualified Data.ByteString.Lazy as BL
 import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
+import           Data.Semialign       (alignWith)
 import           Data.Text            (Text)
+import           Data.These           (mergeThese)
 import           Options.Applicative
 import           Text.Regex.TDFA
 
@@ -59,10 +61,11 @@ runCabal CabalOptions{..} = do
   logit $ unwords ["Discovering with num jobs = ", show numJobs]
 
   let pruneToExplicit = flip elem <$> nonEmpty optPruneTo
+  let pruneToRegex = (\patterns (ModuleName m) -> any (m =~) patterns) <$> nonEmpty optPruneToRegex
+  let pruneTo = alignWith (mergeThese (liftA2 (||))) pruneToExplicit pruneToRegex
   let discoverOpts = CabalDiscoverOpts
         { toDiscover = fromMaybe (pure $ CabalDiscover (CabalLibraryUnit Nothing)) $ nonEmpty optToDiscover
         , includeExternal = optIncludeExternal
-        , pruneTo = pruneToExplicit
         , ..
         }
   mg <- discoverCabalModuleGraph discoverOpts
