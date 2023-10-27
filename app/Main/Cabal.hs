@@ -7,6 +7,8 @@ import qualified Data.ByteString.Lazy as BL
 import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
 import           Options.Applicative
+import           Text.Regex.TDFA
+import Data.Text (Text)
 
 import           Graphex.Cabal
 import           Graphex.Core
@@ -18,6 +20,7 @@ data CabalOptions = CabalOptions
   , optIncludeExternal :: Bool
   , optNumJobs         :: Maybe Int
   , optPruneTo         :: [ModuleName]
+  , optPruneToRegex    :: [Text]
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a
@@ -46,6 +49,7 @@ cabalOptions = do
   optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
   optNumJobs <- optional (option auto (long "jobs" <> short 'j' <> help "Number of worker threads to use"))
   optPruneTo <- many $ strOption (long "prune-to" <> help "Only discover import dependencies of the specified module(s)")
+  optPruneToRegex <- many $ strOption (long "prune-to-regex" <> help "Only discover import dependencies of modules that match a regex")
   pure CabalOptions{..}
 
 runCabal :: CabalOptions -> IO ()
@@ -53,10 +57,12 @@ runCabal CabalOptions{..} = do
   numCapabilities <- getNumCapabilities
   let numJobs =fromMaybe numCapabilities optNumJobs
   logit $ unwords ["Discovering with num jobs = ", show numJobs]
+
+  let pruneToExplicit = flip elem <$> nonEmpty optPruneTo
   let discoverOpts = CabalDiscoverOpts
         { toDiscover = fromMaybe (pure $ CabalDiscover (CabalLibraryUnit Nothing)) $ nonEmpty optToDiscover
         , includeExternal = optIncludeExternal
-        , pruneTo = nonEmpty optPruneTo
+        , pruneTo = pruneToExplicit
         , ..
         }
   mg <- discoverCabalModuleGraph discoverOpts

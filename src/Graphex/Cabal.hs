@@ -26,7 +26,6 @@ import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
 import           Data.List.NonEmpty                            (NonEmpty)
-import qualified Data.List.NonEmpty                            as NE
 import qualified Data.Map.Strict                               as Map
 import           Data.Maybe                                    (mapMaybe,
                                                                 maybeToList)
@@ -184,8 +183,8 @@ data CabalDiscoverOpts = CabalDiscoverOpts
   { toDiscover      :: NonEmpty CabalDiscoverType
   , includeExternal :: Bool
   , numJobs         :: Int
-  , pruneTo         :: Maybe (NonEmpty ModuleName)
-  } deriving stock (Show, Eq)
+  , pruneTo         :: Maybe (ModuleName -> Bool)
+  }
 
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
 discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
@@ -202,7 +201,7 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
           pure $ mkModuleGraph name $ fmap module_ (if includeExternal then allImps else filteredImps)
         ModuleNoFile -> pure $ mkModuleGraph name mempty
       pure $ fold gs
-    Just pruneModNames -> do
+    Just keep -> do
       sem <- newQSem numJobs
       graphRef <- newTVarIO @ModuleGraph mempty
       seenRef <- newTVarIO @(Set.Set ModuleName) mempty
@@ -221,6 +220,6 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
                   pure $ mapMaybe (\Import{..} -> Map.lookup module_ modMap) allImps
               mapConcurrently_ go importedMods
             ModuleNoFile -> pure ()
-      let pruneMods = mapMaybe (flip Map.lookup modMap) (NE.toList pruneModNames)
+      let pruneMods = fmap snd $ filter (keep . fst) (Map.toList modMap)
       mapConcurrently_ go pruneMods
       readTVarIO graphRef
