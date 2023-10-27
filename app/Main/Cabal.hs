@@ -6,9 +6,9 @@ import           Data.Aeson           (encode)
 import qualified Data.ByteString.Lazy as BL
 import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
+import           Data.Text            (Text)
 import           Options.Applicative
 import           Text.Regex.TDFA
-import Data.Text (Text)
 
 import           Graphex.Cabal
 import           Graphex.Core
