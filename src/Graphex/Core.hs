@@ -33,6 +33,9 @@ setAttribute k attr val g@(Graph _ attrs) = g{attributes = Map.insertWith (<>) k
 getAttribute :: Ord a => a -> Text -> Graph a -> Maybe Text
 getAttribute nodeName aName = (Map.lookup aName <=< Map.lookup nodeName) . attributes
 
+graphNodes :: Graph a -> [a]
+graphNodes = Map.keys . unGraph
+
 -- Haskell
 data Import = Import
   { module_ :: ModuleName

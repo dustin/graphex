@@ -20,6 +20,7 @@ import           Options.Applicative  (Parser, argument, command,
                                        progDesc, short, showDefault,
                                        showHelpOnError, some, str, strOption,
                                        switch, value, (<**>))
+import           Text.Regex.TDFA
 
 import           Graphex
 import           Graphex.Core
@@ -28,7 +29,7 @@ import           Main.Cabal
 
 data Command
     = DirectDepsOn Text
-    | AllDepsOn (NonEmpty Text)
+    | AllDepsOn { useRegex :: Bool, patterns :: (NonEmpty Text) }
     | Why { fromModule :: Text, toModule :: Text, showAll :: Bool }
     | AllPaths Text Text
     | Rankings
@@ -72,7 +73,7 @@ graphOptions = GraphOptions
 
     where
         depsCmd = DirectDepsOn <$> argument str (metavar "module")
-        allDepsCmd = AllDepsOn <$> some1 (argument str (metavar "module"))
+        allDepsCmd = AllDepsOn <$> switch (short 'r' <> help "Use regex") <*> some1 (argument str (metavar "module"))
         selectCmd = Select <$> argument str (metavar "module")
         whyCmd = Why <$> argument str (metavar "module") <*> argument str (metavar "module") <*> switch (long "all" <> help "Show all paths")
         allPathsCmd = AllPaths <$> argument str (metavar "module from") <*> argument str (metavar "module to")
@@ -103,7 +104,11 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
             in printStrs $ fromMaybe (pure "No path found") $ renderWhy True <|> renderWhy False
         AllPaths from to -> BL.putStr . encode . graphToDep . (setAttribute from "note" "start" . setAttribute to "note" "end") $ allPathsTo graph from to
         DirectDepsOn m   -> printStrs $ directDepsOn graph m
-        AllDepsOn m      -> printStrs $ foldMap (allDepsOn graph) m
+        AllDepsOn{..}      -> do
+          let ms =
+                if | useRegex -> filter (\m -> any (m =~) patterns) (graphNodes graph)
+                   | otherwise -> NE.toList patterns
+          printStrs $ foldMap (allDepsOn graph) ms
         Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))

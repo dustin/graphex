@@ -36,6 +36,7 @@ dependencies:
 - tree-view
 - unliftio
 - semigroupoids
+- regex-tdfa
 
 library:
   source-dirs: src
