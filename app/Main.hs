@@ -59,7 +59,7 @@ options = hsubparser $ fold
 
 graphOptions :: Parser GraphOptions
 graphOptions = GraphOptions
-    <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "path to graph data")
+    <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "Path to graph data. Use - for stdin.")
     <*> switch (long "reverse" <> short 'r' <> help "reverse edges")
     <*> hsubparser (fold [
         command "deps" (info depsCmd (progDesc "Show all direct inbound dependencies to a module")),
