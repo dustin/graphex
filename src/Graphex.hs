@@ -1,15 +1,16 @@
 {-# LANGUAGE OverloadedRecordDot #-}
 module Graphex (
     -- * The Graph
-    Graph(..), getInput,
+    Graph(..), getInput, hGetInput,
     -- * Working from an individual node in the graph.
     directDepsOn, allDepsOn, why,
     -- * Working on the graph as a whole.
     reverseEdges,
     rankings, longest, allPathsTo, restrictTo, mapMaybeWithKey,
+    filterNodes,
     graphToDep, depToGraph, graphToTree) where
 
-import           Control.Monad               (ap)
+import           Control.Monad               (ap, guard)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
 import           Data.Aeson                  (eitherDecode)
 import           Data.Bifunctor              (first)
@@ -26,6 +27,7 @@ import           Data.Text                   (Text)
 import           Data.Tree                   (Tree)
 import qualified Data.Tree                   as Tree
 import           Data.Tuple                  (swap)
+import           System.IO                   (Handle)
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
@@ -52,6 +54,9 @@ graphToDep (Graph m attrs) = GraphDef {
 -- | Load a graph from a lookingglass JSON representation.
 getInput :: FilePath -> IO (Graph Text)
 getInput fn = either fail (pure . depToGraph) . eitherDecode =<< BL.readFile fn
+
+hGetInput :: Handle -> IO (Graph Text)
+hGetInput h = either fail (pure . depToGraph) . eitherDecode =<< BL.hGetContents h
 
 -- | Reverse all the arrows in the graphs.
 reverseEdges :: Ord a => Graph a -> Graph a
@@ -107,3 +112,14 @@ longest g = reverse . snd . maximumOn (length . snd) $ mapMaybeWithKey one g
     seen (head -> (k,l)) = maybe False (< l) . Map.lookup k
     maximumOn :: Ord b => (a -> b) -> [a] -> a
     maximumOn f = maximumBy (comparing f)
+
+filterNodes :: Ord a => (a -> Bool) -> Graph a -> Graph a
+filterNodes shouldRemove g =
+  let shouldKeep = not . shouldRemove
+      removeNodes (k, vs) = do
+        guard $ shouldKeep k
+        pure (k, Set.filter shouldKeep vs)
+  in Graph
+  { unGraph = Map.fromList $ mapMaybe removeNodes $ Map.toList $ unGraph g
+  , attributes = Map.filterWithKey (\k _ -> shouldKeep k) (attributes g)
+  }
