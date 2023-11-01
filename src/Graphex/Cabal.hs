@@ -1,9 +1,10 @@
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE StrictData          #-}
 {-# LANGUAGE TypeApplications    #-}
 
--- Cribbed from graphmod's 'Graphmod.CabalSupport'
+-- Originally cribbed from graphmod's 'Graphmod.CabalSupport'
 module Graphex.Cabal
   ( discoverCabalModules
   , discoverCabalModuleGraph
