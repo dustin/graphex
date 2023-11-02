@@ -209,7 +209,6 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
       let go Module{..} = case path of
             ModuleFile modPath -> do
               importedMods <- bracket_ (waitQSem sem) (signalQSem sem) $ do
-                -- This might be right?? ..we need the recursion outside the bracket. But also need to respect seen..
                 seen <- (Set.member name) <$> readTVarIO seenRef
                 if seen then pure [] else do
                   logit $ unwords ["Start parsing imports for", T.unpack $ unModuleName name]
