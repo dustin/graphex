@@ -57,7 +57,7 @@ cabalOptions = do
 runCabal :: CabalOptions -> IO ()
 runCabal CabalOptions{..} = do
   numCapabilities <- getNumCapabilities
-  let numJobs =fromMaybe numCapabilities optNumJobs
+  let numJobs = fromMaybe numCapabilities optNumJobs
   logit $ unwords ["Discovering with num jobs = ", show numJobs]
 
   let pruneToExplicit = flip elem <$> nonEmpty optPruneTo
