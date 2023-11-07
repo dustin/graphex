@@ -1,19 +1,28 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main.Cabal where
 
+import           Control.Concurrent   (getNumCapabilities)
 import           Data.Aeson           (encode)
-import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
-import           Data.List.NonEmpty   (NonEmpty (..), nonEmpty)
+import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
+import           Data.Semialign       (alignWith)
+import           Data.Text            (Text)
+import           Data.These           (mergeThese)
 import           Options.Applicative
+import           Text.Regex.TDFA
 
 import           Graphex.Cabal
+import           Graphex.Core
+import           Graphex.Logger
 import           Graphex.LookingGlass
 
 data CabalOptions = CabalOptions
   { optToDiscover      :: [CabalDiscoverType]
   , optIncludeExternal :: Bool
+  , optNumJobs         :: Maybe Int
+  , optPruneTo         :: [ModuleName]
+  , optPruneToRegex    :: [Text]
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a
@@ -40,13 +49,24 @@ cabalOptions = do
     , pure . CabalDontDiscover . CabalTestsUnit <$> strOption (long "no-discover-test" <> help "Don't discover specified test import dependencies")
     ]
   optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
+  optNumJobs <- optional (option auto (long "jobs" <> short 'j' <> help "Number of worker threads to use"))
+  optPruneTo <- many $ strOption (long "prune-to" <> help "Only discover import dependencies of the specified module(s)")
+  optPruneToRegex <- many $ strOption (long "prune-to-regex" <> help "Only discover import dependencies of modules that match a regex")
   pure CabalOptions{..}
 
 runCabal :: CabalOptions -> IO ()
 runCabal CabalOptions{..} = do
+  numCapabilities <- getNumCapabilities
+  let numJobs = fromMaybe numCapabilities optNumJobs
+  logit $ unwords ["Discovering with num jobs = ", show numJobs]
+
+  let pruneToExplicit = flip elem <$> nonEmpty optPruneTo
+  let pruneToRegex = (\patterns (ModuleName m) -> any (m =~) patterns) <$> nonEmpty optPruneToRegex
+  let pruneTo = alignWith (mergeThese (liftA2 (||))) pruneToExplicit pruneToRegex
   let discoverOpts = CabalDiscoverOpts
         { toDiscover = fromMaybe (pure $ CabalDiscover (CabalLibraryUnit Nothing)) $ nonEmpty optToDiscover
         , includeExternal = optIncludeExternal
+        , ..
         }
   mg <- discoverCabalModuleGraph discoverOpts
   BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg

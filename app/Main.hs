@@ -20,6 +20,7 @@ import           Options.Applicative  (Parser, argument, command,
                                        progDesc, short, showDefault,
                                        showHelpOnError, some, str, strOption,
                                        switch, value, (<**>))
+import           System.IO            (stdin)
 import           Text.Regex.TDFA
 
 import           Graphex
@@ -37,6 +38,7 @@ data Command
     | Select Text
     | ToCSV Bool
     | Cat (NonEmpty FilePath)
+    | Remove { useRegex :: Bool, patterns :: (NonEmpty Text) }
     deriving stock Show
 
 
@@ -57,7 +59,7 @@ options = hsubparser $ fold
 
 graphOptions :: Parser GraphOptions
 graphOptions = GraphOptions
-    <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "path to graph data")
+    <$> strOption (long "graph" <> short 'g' <> showDefault <> value "graph.json" <> help "Path to graph data. Use - for stdin.")
     <*> switch (long "reverse" <> short 'r' <> help "reverse edges")
     <*> hsubparser (fold [
         command "deps" (info depsCmd (progDesc "Show all direct inbound dependencies to a module")),
@@ -68,7 +70,8 @@ graphOptions = GraphOptions
         command "longest" (info (pure FindLongest) (progDesc "Show the longest shortest path between two modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
         command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi")),
-        command "cat" (info catCmd (progDesc "Concatenate multiple graphs"))
+        command "cat" (info catCmd (progDesc "Concatenate multiple graphs")),
+        command "remove" (info removeCmd (progDesc "Remove nodes from the graph"))
         ])
 
     where
@@ -79,6 +82,7 @@ graphOptions = GraphOptions
         allPathsCmd = AllPaths <$> argument str (metavar "module from") <*> argument str (metavar "module to")
         csvCmd = ToCSV <$> switch (long "no-header" <> short 'n' <> help "Omit CSV header")
         catCmd = Cat <$> some1 (argument str (metavar "graph.json"))
+        removeCmd = Remove <$> switch (short 'r' <> help "Use regex") <*> some1 (argument str (metavar "module"))
         some1 = fmap NE.fromList . some
 
 printStrs :: Foldable f => f Text -> IO ()
@@ -88,7 +92,8 @@ main :: IO ()
 main = customExecParser (prefs showHelpOnError) opts >>= \case
   GraphCmd GraphOptions{..} -> do
     let handleReverse = bool id reverseEdges optReverse
-    graph <- handleReverse <$> getInput optGraph
+    graph <- if | optGraph == "-" -> handleReverse <$> hGetInput stdin
+                | otherwise       -> handleReverse <$> getInput optGraph
     case optCommand of
         Why{..}      ->
           if showAll
@@ -114,6 +119,11 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
         Cat files        -> BL.putStr . encode . graphToDep . fold =<< traverse getInput files
+        Remove{..} -> do
+          let shouldRemove =
+                if | useRegex  -> \m -> any (m =~) patterns
+                   | otherwise -> (`elem` patterns)
+          BL.putStr $ encode $ graphToDep $ filterNodes shouldRemove graph
   CabalCmd cabalOpts -> runCabal cabalOpts
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

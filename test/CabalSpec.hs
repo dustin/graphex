@@ -25,6 +25,13 @@ libModules =
   , Module "Graphex.Parser" "src/Graphex/Parser.hs"
   , Module "Graphex.Search" "src/Graphex/Search.hs"
   , Module "Graphex.Logger" "src/Graphex/Logger.hs"
+  , Module "Graphex.Queue" "src/Graphex/Queue.hs"
+  ]
+
+searchModuleGraph :: ModuleGraph
+searchModuleGraph = mconcat
+  [ mkGraph "Graphex.Search" ["Graphex.Queue"]
+  , mkGraph "Graphex.Queue" []
   ]
 
 testModules :: [Module]
@@ -46,52 +53,69 @@ exeModules =
 dummySublibModules :: [Module]
 dummySublibModules = [Module "DummySublibModule" "dummy-sublib/DummySublibModule.hs"]
 
+defaultOpts :: CabalDiscoverOpts
+defaultOpts = CabalDiscoverOpts
+  { toDiscover = pure $ CabalDiscoverAll CabalLibrary
+  , includeExternal = False
+  , numJobs = 4
+  , pruneTo = Nothing
+  }
+
 mkDiscoverCabalModulesUnit :: [Module] -> CabalDiscoverOpts -> IO ()
 mkDiscoverCabalModulesUnit (sort -> mods) opts = assertEqual "" mods . sort =<< discoverCabalModules opts "graphex.cabal"
 
 unit_libCabalModules :: IO ()
-unit_libCabalModules = mkDiscoverCabalModulesUnit (dummySublibModules ++ libModules) CabalDiscoverOpts
+unit_libCabalModules = mkDiscoverCabalModulesUnit (dummySublibModules ++ libModules) defaultOpts
   { toDiscover = pure $ CabalDiscoverAll CabalLibrary
   , includeExternal = False
   }
 
 unit_exeCabalModules :: IO ()
-unit_exeCabalModules = mkDiscoverCabalModulesUnit exeModules CabalDiscoverOpts
+unit_exeCabalModules = mkDiscoverCabalModulesUnit exeModules defaultOpts
   { toDiscover = pure $ CabalDiscoverAll CabalExecutable
   , includeExternal = False
   }
 
 unit_testCabalModules :: IO ()
-unit_testCabalModules = mkDiscoverCabalModulesUnit testModules CabalDiscoverOpts
+unit_testCabalModules = mkDiscoverCabalModulesUnit testModules defaultOpts
   { toDiscover = pure $ CabalDiscoverAll CabalTests
   , includeExternal = False
   }
 
 unit_sublibCabalModules :: IO ()
-unit_sublibCabalModules = mkDiscoverCabalModulesUnit dummySublibModules CabalDiscoverOpts
+unit_sublibCabalModules = mkDiscoverCabalModulesUnit dummySublibModules defaultOpts
   { toDiscover = pure $ CabalDiscover (CabalLibraryUnit (Just "graphex-dummy-sublib"))
   , includeExternal = False
   }
 
 unit_defaultLibCabalModules :: IO ()
-unit_defaultLibCabalModules = mkDiscoverCabalModulesUnit libModules CabalDiscoverOpts
+unit_defaultLibCabalModules = mkDiscoverCabalModulesUnit libModules defaultOpts
   { toDiscover = pure $ CabalDiscover (CabalLibraryUnit Nothing)
   , includeExternal = False
   }
 
 unit_granularExeCabalModules :: IO ()
-unit_granularExeCabalModules = mkDiscoverCabalModulesUnit exeModules CabalDiscoverOpts
+unit_granularExeCabalModules = mkDiscoverCabalModulesUnit exeModules defaultOpts
   { toDiscover = pure $ CabalDiscover (CabalExecutableUnit "graphex")
   , includeExternal = False
   }
 
 unit_granularTestCabalModules :: IO ()
-unit_granularTestCabalModules = mkDiscoverCabalModulesUnit testModules CabalDiscoverOpts
+unit_granularTestCabalModules = mkDiscoverCabalModulesUnit testModules defaultOpts
   { toDiscover = pure $ CabalDiscover (CabalTestsUnit "graphex-test")
   , includeExternal = False
   }
 
 unit_discoverModules :: IO ()
 unit_discoverModules = do
-    g <- discoverCabalModuleGraph CabalDiscoverOpts{toDiscover = pure $ CabalDiscoverAll CabalLibrary, includeExternal = False}
+    g <- discoverCabalModuleGraph defaultOpts{toDiscover = pure $ CabalDiscoverAll CabalLibrary, includeExternal = False}
     assertBool (show g) . isJust $ why g "Graphex.Parser" "Graphex.Core"
+
+unit_pruneToSearch :: IO ()
+unit_pruneToSearch = do
+  g <- discoverCabalModuleGraph defaultOpts
+       { toDiscover = pure $ CabalDiscoverAll CabalLibrary
+       , includeExternal = False
+       , pruneTo = Just (== "Graphex.Search")
+       }
+  assertEqual "" g searchModuleGraph

@@ -1,5 +1,5 @@
 repl: graphex.cabal
-	cabal repl
+	cabal repl lib:graphex
 .PHONY: repl
 
 exe-repl: graphex.cabal

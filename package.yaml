@@ -36,7 +36,10 @@ dependencies:
 - tree-view
 - unliftio
 - semigroupoids
+- semialign
+- these
 - regex-tdfa
+- stm
 
 library:
   source-dirs: src

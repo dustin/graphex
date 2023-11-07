@@ -2,24 +2,11 @@
 
 module Graphex.Search (bfsOn, bfsWith, dfsOn, dfsWith, findFirst, flood) where
 
-import           Data.List (find)
-import           Data.Set  (Set)
-import qualified Data.Set  as Set
+import           Data.List     (find)
+import           Data.Set      (Set)
+import qualified Data.Set      as Set
 
--- | A functional queue.
-data Queue a = Queue [a] [a]
-
-qpop :: Queue a -> Maybe (a, Queue a)
-qpop (Queue (x:xs) r) = Just (x, if null xs then Queue (reverse r) [] else Queue xs r)
-qpop _                = Nothing
-
-qsingle :: a -> Queue a
-qsingle a = Queue [a] []
-
-qappendList :: Queue a -> [a] -> Queue  a
-qappendList (Queue [] []) xs = Queue xs []
-qappendList (Queue [] r) xs  = Queue (reverse r) (reverse xs)
-qappendList (Queue l r) xs   = Queue l (reverse xs <> r)
+import           Graphex.Queue
 
 type SearchFunction r a = (a -> r) -> (a -> [a]) -> a -> [a]
 
