@@ -1,0 +1,42 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>module Graphex.Logger (logit) where
+<span class="lineno">    2 </span>
+<span class="lineno">    3 </span>import           Data.Functor       ((&lt;&amp;&gt;))
+<span class="lineno">    4 </span>import           Debug.Trace        (traceM)
+<span class="lineno">    5 </span>import           System.Environment (lookupEnv)
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>data Verbosity =
+<span class="lineno">    8 </span>    Silent
+<span class="lineno">    9 </span>  | Verbose
+<span class="lineno">   10 </span>
+<span class="lineno">   11 </span>verbosityFromEnv :: IO Verbosity
+<span class="lineno">   12 </span><span class="decl"><span class="istickedoff">verbosityFromEnv = lookupEnv &quot;GRAPHEX_VERBOSITY&quot; &lt;&amp;&gt; \case</span>
+<span class="lineno">   13 </span><span class="spaces">  </span><span class="istickedoff">Nothing -&gt; Silent</span>
+<span class="lineno">   14 </span><span class="spaces">  </span><span class="istickedoff">Just{} -&gt; <span class="nottickedoff">Verbose</span></span></span>
+<span class="lineno">   15 </span>
+<span class="lineno">   16 </span>logit :: String -&gt; IO ()
+<span class="lineno">   17 </span><span class="decl"><span class="istickedoff">logit str = verbosityFromEnv &gt;&gt;= \case</span>
+<span class="lineno">   18 </span><span class="spaces">  </span><span class="istickedoff">Silent -&gt; pure <span class="nottickedoff">()</span></span>
+<span class="lineno">   19 </span><span class="spaces">  </span><span class="istickedoff">Verbose -&gt; <span class="nottickedoff">traceM str</span></span></span>
+
+</pre>
+</body>
+</html>

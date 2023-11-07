@@ -130,9 +130,11 @@ module Graphex.Cabal
 discoverCabalModules :: CabalDiscoverOpts -> FilePath -> IO [Module]
 discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
 data CabalDiscoverOpts
-CabalDiscoverOpts :: NonEmpty CabalDiscoverType -> Bool -> CabalDiscoverOpts
+CabalDiscoverOpts :: NonEmpty CabalDiscoverType -> Bool -> Int -> Maybe (ModuleName -> Bool) -> CabalDiscoverOpts
 [toDiscover] :: CabalDiscoverOpts -> NonEmpty CabalDiscoverType
 [includeExternal] :: CabalDiscoverOpts -> Bool
+[numJobs] :: CabalDiscoverOpts -> Int
+[pruneTo] :: CabalDiscoverOpts -> Maybe (ModuleName -> Bool)
 data CabalDiscoverType
 CabalDiscoverAll :: CabalUnitType -> CabalDiscoverType
 CabalDiscover :: CabalUnit -> CabalDiscoverType
@@ -163,9 +165,18 @@ instance GHC.Show.Show Graphex.Cabal.CabalDiscoverType
 instance GHC.Classes.Ord Graphex.Cabal.Discovery
 instance GHC.Classes.Eq Graphex.Cabal.Discovery
 instance GHC.Show.Show Graphex.Cabal.Discovery
-instance GHC.Classes.Eq Graphex.Cabal.CabalDiscoverOpts
-instance GHC.Show.Show Graphex.Cabal.CabalDiscoverOpts
 instance GHC.Base.Semigroup Graphex.Cabal.Discovery
+
+module Graphex.Queue
+
+-- | A functional queue.
+data Queue a
+Queue :: [a] -> [a] -> Queue a
+qpop :: Queue a -> Maybe (a, Queue a)
+qsingle :: a -> Queue a
+qempty :: Queue a
+qlist :: [a] -> Queue a
+qappendList :: Queue a -> [a] -> Queue a
 
 module Graphex.Search
 
@@ -202,6 +213,7 @@ Graph :: Map a (Set a) -> Map a (Map Text Text) -> Graph a
 
 -- | Load a graph from a lookingglass JSON representation.
 getInput :: FilePath -> IO (Graph Text)
+hGetInput :: Handle -> IO (Graph Text)
 
 -- | Find the direct list of things that are referencing this module.
 directDepsOn :: Ord a => Graph a -> a -> Set a
@@ -234,6 +246,7 @@ restrictTo :: Ord a => Graph a -> Set a -> Graph a
 
 -- | Visit each node in the graph and apply a function to it.
 mapMaybeWithKey :: (NFData a, NFData g) => (g -> Maybe a) -> Graph g -> [(g, a)]
+filterNodes :: Ord a => (a -> Bool) -> Graph a -> Graph a
 
 -- | Convert a graph back to our dependency file format.
 graphToDep :: Graph Text -> GraphDef
