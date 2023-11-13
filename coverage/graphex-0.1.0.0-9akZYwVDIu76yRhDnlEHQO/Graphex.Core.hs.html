@@ -61,35 +61,40 @@ span.spaces    { background: white }
 <span class="lineno">   42 </span>  , <span class="nottickedoff"><span class="decl"><span class="nottickedoff">package</span></span></span> :: Maybe Text
 <span class="lineno">   43 </span>  } deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>)
 <span class="lineno">   44 </span>
-<span class="lineno">   45 </span>newtype ModuleName = ModuleName { <span class="istickedoff"><span class="decl"><span class="istickedoff">unModuleName</span></span></span> :: Text }
+<span class="lineno">   45 </span>newtype ModuleName = ModuleName { <span class="nottickedoff"><span class="decl"><span class="nottickedoff">unModuleName</span></span></span> :: Text }
 <span class="lineno">   46 </span>  deriving newtype (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="istickedoff">IsString</span></span>)
 <span class="lineno">   47 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
 <span class="lineno">   48 </span>
 <span class="lineno">   49 </span>data ModulePath = ModuleNoFile | ModuleFile FilePath
 <span class="lineno">   50 </span>  deriving stock (<span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>, <span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>)
 <span class="lineno">   51 </span>
-<span class="lineno">   52 </span>instance IsString ModulePath where
-<span class="lineno">   53 </span>  <span class="decl"><span class="istickedoff">fromString = ModuleFile</span></span>
-<span class="lineno">   54 </span>
-<span class="lineno">   55 </span>data Module = Module
-<span class="lineno">   56 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">name</span></span></span> :: ModuleName
-<span class="lineno">   57 </span>  , <span class="istickedoff"><span class="decl"><span class="istickedoff">path</span></span></span> :: ModulePath
-<span class="lineno">   58 </span>  }
-<span class="lineno">   59 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
-<span class="lineno">   60 </span>
-<span class="lineno">   61 </span>type ModuleGraph = Graph ModuleName
-<span class="lineno">   62 </span>
-<span class="lineno">   63 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
-<span class="lineno">   64 </span><span class="decl"><span class="istickedoff">singletonModuleGraph = singletonGraph</span></span>
+<span class="lineno">   52 </span>moduleFilePath :: Module -&gt; Maybe FilePath
+<span class="lineno">   53 </span><span class="decl"><span class="nottickedoff">moduleFilePath Module{..} = case path of</span>
+<span class="lineno">   54 </span><span class="spaces">  </span><span class="nottickedoff">ModuleNoFile  -&gt; Nothing</span>
+<span class="lineno">   55 </span><span class="spaces">  </span><span class="nottickedoff">ModuleFile fp -&gt; Just fp</span></span>
+<span class="lineno">   56 </span>
+<span class="lineno">   57 </span>instance IsString ModulePath where
+<span class="lineno">   58 </span>  <span class="decl"><span class="istickedoff">fromString = ModuleFile</span></span>
+<span class="lineno">   59 </span>
+<span class="lineno">   60 </span>data Module = Module
+<span class="lineno">   61 </span>  { <span class="istickedoff"><span class="decl"><span class="istickedoff">name</span></span></span> :: ModuleName
+<span class="lineno">   62 </span>  , <span class="istickedoff"><span class="decl"><span class="istickedoff">path</span></span></span> :: ModulePath
+<span class="lineno">   63 </span>  }
+<span class="lineno">   64 </span>  deriving stock (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>, <span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
 <span class="lineno">   65 </span>
-<span class="lineno">   66 </span>mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
-<span class="lineno">   67 </span><span class="decl"><span class="istickedoff">mkModuleGraph = mkGraph</span></span>
-<span class="lineno">   68 </span>
-<span class="lineno">   69 </span>-- | Convert a Graph of type @a@ to a Graph of type @b@.
-<span class="lineno">   70 </span>-- This is like a functor, but it can't be a functor because of laws and stuff.
-<span class="lineno">   71 </span>convertGraph :: Ord b =&gt; (a -&gt; b) -&gt; Graph a -&gt; Graph b
-<span class="lineno">   72 </span><span class="decl"><span class="istickedoff">convertGraph f (Graph m attrs) = g{attributes = Map.mapKeys f attrs}</span>
-<span class="lineno">   73 </span><span class="spaces">    </span><span class="istickedoff">where g = foldMap (\(k, vs) -&gt; Graph (Map.singleton (f k) (Set.map f vs)) mempty) (Map.assocs m)</span></span>
+<span class="lineno">   66 </span>type ModuleGraph = Graph ModuleName
+<span class="lineno">   67 </span>
+<span class="lineno">   68 </span>singletonModuleGraph :: ModuleName -&gt; ModuleName -&gt; ModuleGraph
+<span class="lineno">   69 </span><span class="decl"><span class="istickedoff">singletonModuleGraph = singletonGraph</span></span>
+<span class="lineno">   70 </span>
+<span class="lineno">   71 </span>mkModuleGraph :: ModuleName -&gt; [ModuleName] -&gt; ModuleGraph
+<span class="lineno">   72 </span><span class="decl"><span class="istickedoff">mkModuleGraph = mkGraph</span></span>
+<span class="lineno">   73 </span>
+<span class="lineno">   74 </span>-- | Convert a Graph of type @a@ to a Graph of type @b@.
+<span class="lineno">   75 </span>-- This is like a functor, but it can't be a functor because of laws and stuff.
+<span class="lineno">   76 </span>convertGraph :: Ord b =&gt; (a -&gt; b) -&gt; Graph a -&gt; Graph b
+<span class="lineno">   77 </span><span class="decl"><span class="istickedoff">convertGraph f (Graph m attrs) = g{attributes = Map.mapKeys f attrs}</span>
+<span class="lineno">   78 </span><span class="spaces">    </span><span class="istickedoff">where g = foldMap (\(k, vs) -&gt; Graph (Map.singleton (f k) (Set.map f vs)) mempty) (Map.assocs m)</span></span>
 
 </pre>
 </body>

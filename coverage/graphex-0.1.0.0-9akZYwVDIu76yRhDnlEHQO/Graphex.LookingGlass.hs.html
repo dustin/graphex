@@ -72,11 +72,11 @@ span.spaces    { background: white }
 <span class="lineno">   53 </span>
 <span class="lineno">   54 </span>toLookingGlass
 <span class="lineno">   55 </span>  :: Text -- ^ title
-<span class="lineno">   56 </span>  -&gt; Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
-<span class="lineno">   57 </span>  -&gt; ModuleGraph
+<span class="lineno">   56 </span>  -&gt; Map Text Color -- ^ Optionally re-color any nodes (black default)
+<span class="lineno">   57 </span>  -&gt; Graph Text
 <span class="lineno">   58 </span>  -&gt; GraphDef
 <span class="lineno">   59 </span><span class="decl"><span class="istickedoff">toLookingGlass title colors Graph{..} =</span>
-<span class="lineno">   60 </span><span class="spaces">  </span><span class="istickedoff">let mkNodeId (ModuleName m) = m</span>
+<span class="lineno">   60 </span><span class="spaces">  </span><span class="istickedoff">let mkNodeId m = m</span>
 <span class="lineno">   61 </span><span class="spaces">      </span><span class="istickedoff">mkNode m =</span>
 <span class="lineno">   62 </span><span class="spaces">        </span><span class="istickedoff">( mkNodeId m</span>
 <span class="lineno">   63 </span><span class="spaces">        </span><span class="istickedoff">, Node</span>
@@ -87,7 +87,7 @@ span.spaces    { background: white }
 <span class="lineno">   68 </span><span class="spaces">  </span><span class="istickedoff">in GraphDef</span>
 <span class="lineno">   69 </span><span class="spaces">     </span><span class="istickedoff">{ nodes = Map.fromList $ fmap (\(m, _) -&gt; mkNode m) $ Map.toList unGraph</span>
 <span class="lineno">   70 </span><span class="spaces">     </span><span class="istickedoff">, edges = Map.toList unGraph &gt;&gt;= \(m, children) -&gt; fmap (\c -&gt; Edge{to = mkNodeId c, from = mkNodeId m}) $ Set.toList children</span>
-<span class="lineno">   71 </span><span class="spaces">     </span><span class="istickedoff">, attrs = Map.mapKeys unModuleName attributes</span>
+<span class="lineno">   71 </span><span class="spaces">     </span><span class="istickedoff">, attrs = attributes</span>
 <span class="lineno">   72 </span><span class="spaces">     </span><span class="istickedoff">, ..</span>
 <span class="lineno">   73 </span><span class="spaces">     </span><span class="istickedoff">}</span></span>
 

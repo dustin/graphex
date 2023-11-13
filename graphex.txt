@@ -27,6 +27,7 @@ ModuleName :: Text -> ModuleName
 data ModulePath
 ModuleNoFile :: ModulePath
 ModuleFile :: FilePath -> ModulePath
+moduleFilePath :: Module -> Maybe FilePath
 data Module
 Module :: ModuleName -> ModulePath -> Module
 [name] :: Module -> ModuleName
@@ -93,7 +94,7 @@ Color :: Text -> Color
 [unColor] :: Color -> Text
 red :: Color
 black :: Color
-toLookingGlass :: Text -> Map ModuleName Color -> ModuleGraph -> GraphDef
+toLookingGlass :: Text -> Map Text Color -> Graph Text -> GraphDef
 instance Data.Aeson.Types.ToJSON.ToJSON Graphex.LookingGlass.Node
 instance Data.Aeson.Types.FromJSON.FromJSON Graphex.LookingGlass.Node
 instance GHC.Generics.Generic Graphex.LookingGlass.Node
@@ -128,7 +129,7 @@ parseFileImports :: FilePath -> IO [Import]
 
 module Graphex.Cabal
 discoverCabalModules :: CabalDiscoverOpts -> FilePath -> IO [Module]
-discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
+discoverCabalModuleGraph :: CabalDiscoverOpts -> IO CabalGraph
 data CabalDiscoverOpts
 CabalDiscoverOpts :: NonEmpty CabalDiscoverType -> Bool -> Int -> Maybe (ModuleName -> Bool) -> CabalDiscoverOpts
 [toDiscover] :: CabalDiscoverOpts -> NonEmpty CabalDiscoverType
@@ -153,6 +154,11 @@ Discovered :: Discovery
 Hidden :: Discovery
 Passed :: Discovery
 discoversUnit :: CabalDiscoverType -> CabalUnit -> Discovery
+data CabalGraph
+CabalGraph :: ModuleGraph -> Map ModuleName Module -> CabalGraph
+[moduleGraph] :: CabalGraph -> ModuleGraph
+[modulesByName] :: CabalGraph -> Map ModuleName Module
+mkCabalFileGraph :: CabalGraph -> Graph FilePath
 instance GHC.Classes.Ord Graphex.Cabal.CabalUnitType
 instance GHC.Classes.Eq Graphex.Cabal.CabalUnitType
 instance GHC.Show.Show Graphex.Cabal.CabalUnitType
