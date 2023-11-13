@@ -5,7 +5,7 @@
 -- | Please see the README on GitHub at
 --   <a>https://github.com/dustin/graphex#readme</a>
 @package graphex
-@version 0.1.0.0
+@version 0.1.2.0
 
 module Graphex.Core
 data Graph a
