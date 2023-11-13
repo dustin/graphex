@@ -15,7 +15,9 @@ module Graphex.Parser where
 
 import           Data.Either          (rights)
 import           Data.String          (IsString)
+import           Data.Text            (Text)
 import qualified Data.Text            as T
+import qualified Data.Text.IO         as TIO
 import           Data.Void
 
 import           Replace.Megaparsec   (sepCap, streamEdit)
@@ -58,7 +60,7 @@ importsParser
   => m [Import]
 importsParser = rights <$> sepCap importParser
 
-removeBlockComments :: String -> String
+removeBlockComments :: Text -> Text
 removeBlockComments = streamEdit (blockCommentParser @Void) (\_ -> "")
 
 blockCommentParser
@@ -73,7 +75,7 @@ blockCommentParser = do
 
 parseFileImports :: FilePath -> IO [Import]
 parseFileImports fp = do
-  contents <- removeBlockComments <$> readFile fp
+  contents <- removeBlockComments <$> TIO.readFile fp
   case runParser (importsParser @Void) fp contents of
     Left err -> error $ unlines $ [mconcat ["Failed to parse ", fp, ":"], errorBundlePretty err]
     Right x -> pure x
