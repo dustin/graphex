@@ -44,7 +44,7 @@ instance Arbitrary Text where
 instance Arbitrary (Graph Text) where
     arbitrary = do
         -- We begin with some subset of keys in arbitrary order
-        somekeys <- shuffle =<< sublistOf someStrings
+        somekeys <- shuffle =<< sublistOf someStrings `suchThat` (not . null)
         attrs <- Map.fromList <$> listOf ((,) <$> elements somekeys <*> genAttrs)
         -- We build a graph of acyclic connections, ensuring that all keys are present
         Graph . (<> Map.fromList [(k, mempty) | k <- somekeys]) <$> foldM next mempty somekeys <*> pure attrs
