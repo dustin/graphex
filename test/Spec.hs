@@ -231,10 +231,10 @@ unit_fromJSON = do
     -- TODO:  This graph is backwards
     assertBool (show g) . isJust $ why g "Graphex.Core" "Graphex"
 
-prop_lookingGlass :: ModuleGraph -> Property
+prop_lookingGlass :: Graph Text -> Property
 prop_lookingGlass g =  (not.null) (unGraph g) ==>
     counterexample (show lg) $
-    g === convertGraph ModuleName (depToGraph lg)
+    g === depToGraph lg
     where
         lg = toLookingGlass "Jabberwocky" (Map.fromList [("alpha", red), ("delta", black)]) g
 
