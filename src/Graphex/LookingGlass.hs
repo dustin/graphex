@@ -53,11 +53,11 @@ black = "black"
 
 toLookingGlass
   :: Text -- ^ title
-  -> Map ModuleName Color -- ^ Optionally re-color any nodes (black default)
-  -> ModuleGraph
+  -> Map Text Color -- ^ Optionally re-color any nodes (black default)
+  -> Graph Text
   -> GraphDef
 toLookingGlass title colors Graph{..} =
-  let mkNodeId (ModuleName m) = m
+  let mkNodeId m = m
       mkNode m =
         ( mkNodeId m
         , Node
@@ -68,6 +68,6 @@ toLookingGlass title colors Graph{..} =
   in GraphDef
      { nodes = Map.fromList $ fmap (\(m, _) -> mkNode m) $ Map.toList unGraph
      , edges = Map.toList unGraph >>= \(m, children) -> fmap (\c -> Edge{to = mkNodeId c, from = mkNodeId m}) $ Set.toList children
-     , attrs = Map.mapKeys unModuleName attributes
+     , attrs = attributes
      , ..
      }

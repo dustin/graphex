@@ -4,10 +4,12 @@ module Main.Cabal where
 import           Control.Concurrent   (getNumCapabilities)
 import           Data.Aeson           (encode)
 import qualified Data.ByteString.Lazy as BL
+import           Data.Functor         ((<&>))
 import           Data.List.NonEmpty   (nonEmpty)
 import           Data.Maybe           (fromMaybe)
 import           Data.Semialign       (alignWith)
 import           Data.Text            (Text)
+import qualified Data.Text            as T
 import           Data.These           (mergeThese)
 import           Options.Applicative
 import           Text.Regex.TDFA
@@ -23,6 +25,7 @@ data CabalOptions = CabalOptions
   , optNumJobs         :: Maybe Int
   , optPruneTo         :: [ModuleName]
   , optPruneToRegex    :: [Text]
+  , optFileGraph       :: Bool
   } deriving stock Show
 
 justWhen :: a -> Bool -> Maybe a
@@ -52,6 +55,7 @@ cabalOptions = do
   optNumJobs <- optional (option auto (long "jobs" <> short 'j' <> help "Number of worker threads to use"))
   optPruneTo <- many $ strOption (long "prune-to" <> help "Only discover import dependencies of the specified module(s)")
   optPruneToRegex <- many $ strOption (long "prune-to-regex" <> help "Only discover import dependencies of modules that match a regex")
+  optFileGraph <- switch (long "paths" <> short 'p' <> help "Create a graph of file paths instead of modules names")
   pure CabalOptions{..}
 
 runCabal :: CabalOptions -> IO ()
@@ -68,5 +72,7 @@ runCabal CabalOptions{..} = do
         , includeExternal = optIncludeExternal
         , ..
         }
-  mg <- discoverCabalModuleGraph discoverOpts
+  mg <- discoverCabalModuleGraph discoverOpts <&> case optFileGraph of
+    True  -> convertGraph T.pack . mkCabalFileGraph
+    False -> convertGraph unModuleName . moduleGraph
   BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg

@@ -108,14 +108,14 @@ unit_granularTestCabalModules = mkDiscoverCabalModulesUnit testModules defaultOp
 
 unit_discoverModules :: IO ()
 unit_discoverModules = do
-    g <- discoverCabalModuleGraph defaultOpts{toDiscover = pure $ CabalDiscoverAll CabalLibrary, includeExternal = False}
-    assertBool (show g) . isJust $ why g "Graphex.Parser" "Graphex.Core"
+    CabalGraph{..} <- discoverCabalModuleGraph defaultOpts{toDiscover = pure $ CabalDiscoverAll CabalLibrary, includeExternal = False}
+    assertBool (show moduleGraph) . isJust $ why moduleGraph "Graphex.Parser" "Graphex.Core"
 
 unit_pruneToSearch :: IO ()
 unit_pruneToSearch = do
-  g <- discoverCabalModuleGraph defaultOpts
+  CabalGraph{..} <- discoverCabalModuleGraph defaultOpts
        { toDiscover = pure $ CabalDiscoverAll CabalLibrary
        , includeExternal = False
        , pruneTo = Just (== "Graphex.Search")
        }
-  assertEqual "" g searchModuleGraph
+  assertEqual "" moduleGraph searchModuleGraph

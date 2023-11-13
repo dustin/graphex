@@ -49,6 +49,11 @@ newtype ModuleName = ModuleName { unModuleName :: Text }
 data ModulePath = ModuleNoFile | ModuleFile FilePath
   deriving stock (Eq, Ord, Show)
 
+moduleFilePath :: Module -> Maybe FilePath
+moduleFilePath Module{..} = case path of
+  ModuleNoFile  -> Nothing
+  ModuleFile fp -> Just fp
+
 instance IsString ModulePath where
   fromString = ModuleFile
 

@@ -14,6 +14,8 @@ module Graphex.Cabal
   , CabalUnitType (..)
   , Discovery (..)
   , discoversUnit
+  , CabalGraph (..)
+  , mkCabalFileGraph
   ) where
 
 import           Graphex.Core
@@ -27,6 +29,7 @@ import           Control.Monad                                 (guard)
 import           Data.Foldable                                 (fold)
 import           Data.List                                     (intersperse)
 import           Data.List.NonEmpty                            (NonEmpty)
+import           Data.Map.Strict                               (Map)
 import qualified Data.Map.Strict                               as Map
 import           Data.Maybe                                    (mapMaybe,
                                                                 maybeToList)
@@ -187,13 +190,18 @@ data CabalDiscoverOpts = CabalDiscoverOpts
   , pruneTo         :: Maybe (ModuleName -> Bool)
   }
 
-discoverCabalModuleGraph :: CabalDiscoverOpts -> IO ModuleGraph
+data CabalGraph = CabalGraph
+  { moduleGraph   :: ModuleGraph
+  , modulesByName :: Map ModuleName Module
+  }
+
+discoverCabalModuleGraph :: CabalDiscoverOpts -> IO CabalGraph
 discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
   fs <- getDirectoryContents "."
   mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
 
   let modMap = foldMap (\m@Module{..} -> Map.singleton name m) mods
-  case pruneTo of
+  mg <- case pruneTo of
     Nothing -> do
       gs <- pooledForConcurrentlyN numJobs mods $ \Module{..} -> case path of
         ModuleFile modPath -> do
@@ -224,3 +232,19 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
       logit $ unwords ["Pruning graph to transitive imports of:", show $ fmap (unModuleName . name) pruneToMods]
       mapConcurrently_ go pruneToMods
       readTVarIO graphRef
+  pure CabalGraph
+    { moduleGraph = mg
+    , modulesByName = modMap
+    }
+
+mkCabalFileGraph :: CabalGraph -> Graph FilePath
+mkCabalFileGraph CabalGraph{..} =
+    Graph
+    { unGraph = Map.fromList $ flip mapMaybe (Map.toList $ unGraph moduleGraph) $ \(p, cs) -> do
+        p' <- Map.lookup p modulesByName >>= moduleFilePath
+        let cs' = Set.fromList $ mapMaybe (\c -> Map.lookup c modulesByName >>= moduleFilePath) $ Set.toList cs
+        Just (p', cs')
+    , attributes = Map.fromList $ flip mapMaybe (Map.toList $ attributes moduleGraph) $ \(n, as) -> do
+        n' <- Map.lookup n modulesByName >>= moduleFilePath
+        Just (n', as)
+    }
