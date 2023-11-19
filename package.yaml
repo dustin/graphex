@@ -45,6 +45,7 @@ library:
   source-dirs: src
   ghc-options:
     - -Wall
+    - -Werror=incomplete-patterns
 
 default-extensions:
   - OverloadedStrings
@@ -74,6 +75,7 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -Wall
+      - -Werror=incomplete-patterns
     dependencies:
     - graphex
 
@@ -85,6 +87,8 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Werror=incomplete-patterns
     dependencies:
     - graphex
     - HUnit

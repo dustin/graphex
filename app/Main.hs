@@ -1,25 +1,24 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
-import           Control.Applicative  ((<|>))
 import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
+import Control.Arrow (second)
+import Data.Monoid (Sum (..))
+import Data.Align
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
 import           Data.Foldable
 import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
+import qualified Data.Map as Map
+import Data.Tuple (swap)
 import           Data.Maybe           (fromMaybe)
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command,
-                                       customExecParser, fullDesc, help, helper,
-                                       hsubparser, info, long, metavar, prefs,
-                                       progDesc, short, showDefault,
-                                       showHelpOnError, some, str, strOption,
-                                       switch, value, (<**>))
+import           Options.Applicative
 import           System.IO            (stdin)
 import           Text.Regex.TDFA
 
@@ -42,7 +41,7 @@ data Command
     deriving stock Show
 
 
-data Options = GraphCmd GraphOptions | CabalCmd CabalOptions
+data Options = GraphCmd GraphOptions | CabalCmd CabalOptions | DiffCmd DiffOptions
   deriving stock Show
 
 data GraphOptions = GraphOptions {
@@ -55,6 +54,7 @@ options :: Parser Options
 options = hsubparser $ fold
   [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
   , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
+  , command "diff" (info (DiffCmd <$> diffOptions) (progDesc "Diff operations"))
   ]
 
 graphOptions :: Parser GraphOptions
@@ -84,6 +84,30 @@ graphOptions = GraphOptions
         catCmd = Cat <$> some1 (argument str (metavar "graph.json"))
         removeCmd = Remove <$> switch (short 'r' <> help "Use regex") <*> some1 (argument str (metavar "module"))
         some1 = fmap NE.fromList . some
+
+data DiffOptions = DiffOptions
+  { graph1 :: FilePath
+  , graph2 :: FilePath
+  , format :: DiffFormat
+  }
+  deriving stock (Show)
+
+data DiffFormat =
+    DiffText
+  | DiffHtml
+  deriving stock (Show)
+
+readDiffFormat :: ReadM DiffFormat
+readDiffFormat = eitherReader $ \case
+  "text" -> Right DiffText
+  "html" -> Right DiffHtml
+  x -> Left $ "Unrecognized diff format: " ++ x
+
+diffOptions :: Parser DiffOptions
+diffOptions = DiffOptions
+  <$> argument str (metavar "GRAPH")
+  <*> argument str (metavar "GRAPH")
+  <*> option readDiffFormat (long "format" <> short 'f')
 
 printStrs :: Foldable f => f Text -> IO ()
 printStrs = traverse_ TIO.putStrLn
@@ -125,5 +149,21 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
                    | otherwise -> (`elem` patterns)
           BL.putStr $ encode $ graphToDep $ filterNodes shouldRemove graph
   CabalCmd cabalOpts -> runCabal cabalOpts
+  DiffCmd DiffOptions{..} -> do
+    g1 <- getInput graph1
+    g2 <- getInput graph2
+    let g1rev = reverseEdges g1
+    let g2rev = reverseEdges g2
+    let ranks1 = Map.fromList $ fmap (second (Sum . negate) . swap) $ rankings g1
+    let ranks2 = Map.fromList $ fmap (second Sum . swap) $ rankings g2
+    let rankDiff = Map.filter (/= 0) $ Map.map getSum $ salign ranks1 ranks2
+    let ranks1rev = Map.fromList $ fmap (second (Sum . negate) . swap) $ rankings g1rev
+    let ranks2rev = Map.fromList $ fmap (second Sum . swap) $ rankings g2rev
+    let rankDiffRev = Map.filter (/= 0) $ Map.map getSum $ salign ranks1rev ranks2rev
+    putStrLn "Rank diff:"
+    print rankDiff
+    putStrLn "Reverse Rank diff:"
+    print rankDiffRev
+    pure ()
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")
