@@ -3,6 +3,7 @@ module Main where
 
 import           Data.Aeson           (encode)
 import           Data.Bool            (bool)
+import Data.List (sortOn)
 import Control.Arrow (second)
 import Data.Monoid (Sum (..))
 import Data.Align
@@ -161,7 +162,8 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
     let ranks2rev = Map.fromList $ fmap (second Sum . swap) $ rankings g2rev
     let rankDiffRev = Map.filter (/= 0) $ Map.map getSum $ salign ranks1rev ranks2rev
     putStrLn "Rank diff:"
-    print rankDiff
+    for_ (sortOn (abs . snd) $ Map.toList rankDiff) $ \(m, r) -> do
+      putStrLn $ show m <> "\t" <> show r
     putStrLn "Reverse Rank diff:"
     print rankDiffRev
     pure ()
