@@ -1,20 +1,20 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.Diff where
 
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Monoid (Sum(..))
-import Graphex.Core
-import Graphex
-import Data.Tuple (swap)
-import Control.Arrow (second)
-import Data.Semialign
-import Control.Parallel.Strategies (NFData)
+import           Control.Arrow               (second)
+import           Control.Parallel.Strategies (NFData)
+import           Data.Map                    (Map)
+import qualified Data.Map                    as Map
+import           Data.Monoid                 (Sum (..))
+import           Data.Semialign
+import           Data.Tuple                  (swap)
+import           Graphex
+import           Graphex.Core
 
 data Diff a = Diff
-  { nodes :: ~(Map a Int)
+  { nodes         :: ~(Map a Int)
   , reversedNodes :: ~(Map a Int)
-  , edges :: ~(Map a Int)
+  , edges         :: ~(Map a Int)
   , reversedEdges :: ~(Map a Int)
   }
 

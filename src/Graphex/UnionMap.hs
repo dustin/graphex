@@ -1,6 +1,6 @@
 module Graphex.UnionMap where
 
-import Data.Map.Strict
+import           Data.Map.Strict
 
 newtype UnionMap k v = UnionMap { unUnionMap :: (Map k v) }
   deriving stock (Foldable)

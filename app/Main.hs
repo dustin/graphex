@@ -1,24 +1,24 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
+import           Control.Arrow        (second)
 import           Data.Aeson           (encode)
+import           Data.Align
 import           Data.Bool            (bool)
-import Data.List (sortOn)
-import Control.Arrow (second)
-import Data.Monoid (Sum (..))
-import Data.Align
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
 import           Data.Foldable
+import           Data.List            (sortOn)
 import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
-import qualified Data.Map as Map
-import Data.Tuple (swap)
+import qualified Data.Map             as Map
 import           Data.Maybe           (fromMaybe)
+import           Data.Monoid          (Sum (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
+import           Data.Tuple           (swap)
 import           Options.Applicative
 import           System.IO            (stdin)
 import           Text.Regex.TDFA

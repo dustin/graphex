@@ -10,7 +10,6 @@ module Graphex (
     filterNodes,
     graphToDep, depToGraph, graphToTree) where
 
-import Data.Monoid (Sum(..))
 import           Control.Monad               (ap, guard)
 import           Control.Parallel.Strategies (NFData, parMap, rdeepseq)
 import           Data.Aeson                  (eitherDecode)
@@ -19,8 +18,10 @@ import qualified Data.ByteString.Lazy        as BL
 import           Data.Foldable               (maximumBy)
 import           Data.List                   (sortOn)
 import           Data.List.NonEmpty          (NonEmpty, nonEmpty)
+import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
 import           Data.Maybe                  (listToMaybe, mapMaybe)
+import           Data.Monoid                 (Sum (..))
 import           Data.Ord                    (Down (..), comparing)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
@@ -29,12 +30,12 @@ import           Data.Tree                   (Tree)
 import qualified Data.Tree                   as Tree
 import           Data.Tuple                  (swap)
 import           System.IO                   (Handle)
-import Data.Map (Map)
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
-import           Graphex.Search              (bfsOn, dfsWith, findFirst, flood, floodMap)
-import Graphex.UnionMap
+import           Graphex.Search              (bfsOn, dfsWith, findFirst, flood,
+                                              floodMap)
+import           Graphex.UnionMap
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph Text
