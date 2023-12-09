@@ -5,8 +5,6 @@ module Graphex.Search (bfsOn, bfsWith, dfsOn, dfsWith, findFirst, flood, floodMa
 import           Data.List     (find)
 import           Data.Set      (Set)
 import qualified Data.Set      as Set
-import Data.Map (Map)
-import qualified Data.Map as Map
 
 import           Graphex.Queue
 
@@ -58,13 +56,9 @@ flood nf = go mempty . Set.singleton
 -- | Flood fill a graph from a starting point and return all visited points.
 --
 -- NOTE: This will run forever on cyclic graphs!
-floodMap :: Monoid b => Ord a => (a -> b) -> (a -> Set a) -> a -> b
+floodMap :: Monoid b => Ord a => (a -> b) -> (a -> [a]) -> a -> b
 floodMap f nf = go mempty . qsingle
     where
         go bcc todo = case qpop todo of
           Nothing -> bcc
-          Just (curr, rest) -> go (bcc <> f curr) (qappendList rest (Set.toList $ nf curr))
-
--- | Flood fill a graph from a starting point and return all visited points.
-floodCount :: Monoid b => Ord a => (a -> Map a Int) -> (a -> Set a) -> a -> Map a Int
-floodCount f nf = mempty -- TODO
+          Just (curr, rest) -> go (bcc <> f curr) (qappendList rest (nf curr))

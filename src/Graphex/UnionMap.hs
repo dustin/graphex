@@ -1,8 +1,9 @@
 module Graphex.UnionMap where
 
-import Data.Map
+import Data.Map.Strict
 
 newtype UnionMap k v = UnionMap { unUnionMap :: (Map k v) }
+  deriving stock (Foldable)
 
 instance (Ord k, Semigroup v) => Semigroup (UnionMap k v) where
   UnionMap x <> UnionMap y = UnionMap $ unionWith (<>) x y

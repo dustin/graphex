@@ -33,7 +33,7 @@ data Command
     | AllDepsOn { useRegex :: Bool, patterns :: (NonEmpty Text) }
     | Why { fromModule :: Text, toModule :: Text, showAll :: Bool }
     | AllPaths Text Text
-    | Rankings
+    | Rankings { countEdges :: Bool }
     | FindLongest
     | Select Text
     | ToCSV Bool
@@ -67,7 +67,7 @@ graphOptions = GraphOptions
         command "all" (info allDepsCmd (progDesc "Show all dependencies to a module")),
         command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
         command "all-paths" (info allPathsCmd (progDesc "Show all ways a module depends on another module")),
-        command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
+        command "rank" (info (rankingsCmd) (progDesc "Show the most depended on modules")),
         command "longest" (info (pure FindLongest) (progDesc "Show the longest shortest path between two modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
         command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi")),
@@ -84,6 +84,7 @@ graphOptions = GraphOptions
         csvCmd = ToCSV <$> switch (long "no-header" <> short 'n' <> help "Omit CSV header")
         catCmd = Cat <$> some1 (argument str (metavar "graph.json"))
         removeCmd = Remove <$> switch (short 'r' <> help "Use regex") <*> some1 (argument str (metavar "module"))
+        rankingsCmd = Rankings <$> switch (short 'e' <> long "edges" <> help "Count edges instead of nodes")
         some1 = fmap NE.fromList . some
 
 data DiffOptions = DiffOptions
@@ -139,7 +140,9 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
                 if | useRegex -> filter (\m -> any (m =~) patterns) (graphNodes graph)
                    | otherwise -> NE.toList patterns
           printStrs $ foldMap (allDepsOn graph) ms
-        Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph
+        Rankings {..}         ->
+          let rs = if countEdges then edgeRankings graph else rankings graph
+          in printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) rs
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
