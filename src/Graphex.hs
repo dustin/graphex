@@ -3,10 +3,10 @@ module Graphex (
     -- * The Graph
     Graph(..), getInput, hGetInput,
     -- * Working from an individual node in the graph.
-    directDepsOn, allDepsOn, countDepsOn, why,
+    directDepsOn, allDepsOn, why,
     -- * Working on the graph as a whole.
     reverseEdges,
-    rankings, edgeRankings, longest, allPathsTo, restrictTo, mapMaybeWithKey,
+    rankings, longest, allPathsTo, restrictTo, mapMaybeWithKey,
     filterNodes,
     graphToDep, depToGraph, graphToTree) where
 
@@ -18,10 +18,8 @@ import qualified Data.ByteString.Lazy        as BL
 import           Data.Foldable               (maximumBy)
 import           Data.List                   (sortOn)
 import           Data.List.NonEmpty          (NonEmpty, nonEmpty)
-import           Data.Map                    (Map)
 import qualified Data.Map.Strict             as Map
 import           Data.Maybe                  (listToMaybe, mapMaybe)
-import           Data.Monoid                 (Sum (..))
 import           Data.Ord                    (Down (..), comparing)
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
@@ -33,9 +31,7 @@ import           System.IO                   (Handle)
 
 import           Graphex.Core                (Graph (..))
 import           Graphex.LookingGlass
-import           Graphex.Search              (bfsOn, dfsWith, findFirst, flood,
-                                              floodMap)
-import           Graphex.UnionMap
+import           Graphex.Search              (bfsOn, dfsWith, findFirst, flood)
 
 -- | Convert a dependency file to a graph.
 depToGraph :: GraphDef -> Graph Text
@@ -74,12 +70,6 @@ directDepsOn = flip (Map.findWithDefault mempty) . unGraph
 allDepsOn :: Ord a => Graph a -> a -> Set a
 allDepsOn = flood . directDepsOn
 
--- | Flood fill to find all transitive dependencies on a starting module, excluding the original key.
---
--- Counts each time any node has an edge touching it in the graph.
-countDepsOn :: Ord a => Graph a -> a -> Map a Int
-countDepsOn g a = Map.map getSum $ unUnionMap $ floodMap (UnionMap . flip Map.singleton (Sum 1)) (Set.toList . directDepsOn g) a
-
 -- | Find an example path between two modules.
 --
 -- This is a short path, but the important part is that it represents how connectivity works.
@@ -94,10 +84,6 @@ allPathsTo m from to = restrictTo m $ allDepsOn m from `Set.intersection` allDep
 -- | Count the number of transitive dependencies for each module.
 rankings :: (NFData a, Ord a) => Graph a -> [(Int, a)]
 rankings g = sortOn (first Down) . fmap swap $ mapMaybeWithKey (Just . length . allDepsOn g) g
-
--- | Count the number of transitive dependencies for each module.
-edgeRankings :: (NFData a, Ord a) => Graph a -> [(Int, a)]
-edgeRankings g = sortOn (first Down) . fmap swap $ mapMaybeWithKey (Just . sum . countDepsOn g) g
 
 -- | Visit each node in the graph and apply a function to it.
 mapMaybeWithKey :: (NFData a, NFData g) => (g -> Maybe a) -> Graph g -> [(g, a)]

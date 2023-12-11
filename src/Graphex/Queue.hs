@@ -1,4 +1,3 @@
-{-# LANGUAGE StrictData #-}
 module Graphex.Queue where
 
 -- | A functional queue.

@@ -1,30 +1,26 @@
+
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
-import           Control.Arrow        (second)
 import           Data.Aeson           (encode)
-import           Data.Align
 import           Data.Bool            (bool)
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Csv             as CSV
 import           Data.Foldable
-import           Data.List            (sortOn)
 import           Data.List.NonEmpty   (NonEmpty (..))
 import qualified Data.List.NonEmpty   as NE
-import qualified Data.Map             as Map
 import           Data.Maybe           (fromMaybe)
-import           Data.Monoid          (Sum (..))
 import           Data.Text            (Text)
 import qualified Data.Text            as T
 import qualified Data.Text.IO         as TIO
 import           Data.Tree.View       (drawTree)
-import           Data.Tuple           (swap)
 import           Options.Applicative
 import           System.IO            (stdin)
 import           Text.Regex.TDFA
 
 import           Graphex
 import           Graphex.Core
+import           Graphex.Diff
 import qualified Graphex.CSV
 import           Main.Cabal
 
@@ -33,7 +29,7 @@ data Command
     | AllDepsOn { useRegex :: Bool, patterns :: (NonEmpty Text) }
     | Why { fromModule :: Text, toModule :: Text, showAll :: Bool }
     | AllPaths Text Text
-    | Rankings { countEdges :: Bool }
+    | Rankings
     | FindLongest
     | Select Text
     | ToCSV Bool
@@ -67,7 +63,7 @@ graphOptions = GraphOptions
         command "all" (info allDepsCmd (progDesc "Show all dependencies to a module")),
         command "why" (info whyCmd (progDesc "Show why a module depends on another module")),
         command "all-paths" (info allPathsCmd (progDesc "Show all ways a module depends on another module")),
-        command "rank" (info (rankingsCmd) (progDesc "Show the most depended on modules")),
+        command "rank" (info (pure Rankings) (progDesc "Show the most depended on modules")),
         command "longest" (info (pure FindLongest) (progDesc "Show the longest shortest path between two modules")),
         command "select" (info selectCmd (progDesc "Select a subset of the graph from a starting module")),
         command "to-csv" (info csvCmd (progDesc "Convert to a CSV of edges compatible with SQLite and Gephi")),
@@ -84,13 +80,17 @@ graphOptions = GraphOptions
         csvCmd = ToCSV <$> switch (long "no-header" <> short 'n' <> help "Omit CSV header")
         catCmd = Cat <$> some1 (argument str (metavar "graph.json"))
         removeCmd = Remove <$> switch (short 'r' <> help "Use regex") <*> some1 (argument str (metavar "module"))
-        rankingsCmd = Rankings <$> switch (short 'e' <> long "edges" <> help "Count edges instead of nodes")
         some1 = fmap NE.fromList . some
 
+data DiffType =
+    DiffRanks
+  | DiffReverseRanks
+  deriving stock (Show)
 data DiffOptions = DiffOptions
   { graph1 :: FilePath
   , graph2 :: FilePath
   , format :: DiffFormat
+  , diffs  :: [DiffType]
   }
   deriving stock (Show)
 
@@ -140,9 +140,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
                 if | useRegex -> filter (\m -> any (m =~) patterns) (graphNodes graph)
                    | otherwise -> NE.toList patterns
           printStrs $ foldMap (allDepsOn graph) ms
-        Rankings {..}         ->
-          let rs = if countEdges then edgeRankings graph else rankings graph
-          in printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) rs
+        Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph
         FindLongest      -> printStrs $ longest graph
         Select m         -> BL.putStr $ encode (graphToDep (handleReverse (setAttribute m "note" "start" $ restrictTo graph (allDepsOn graph m))))
         ToCSV noHeader   -> BL.putStr $ (if noHeader then CSV.encode else CSV.encodeDefaultOrderedByName) $ Graphex.CSV.toEdges graph
@@ -156,19 +154,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
   DiffCmd DiffOptions{..} -> do
     g1 <- getInput graph1
     g2 <- getInput graph2
-    let g1rev = reverseEdges g1
-    let g2rev = reverseEdges g2
-    let ranks1 = Map.fromList $ fmap (second (Sum . negate) . swap) $ rankings g1
-    let ranks2 = Map.fromList $ fmap (second Sum . swap) $ rankings g2
-    let rankDiff = Map.filter (/= 0) $ Map.map getSum $ salign ranks1 ranks2
-    let ranks1rev = Map.fromList $ fmap (second (Sum . negate) . swap) $ rankings g1rev
-    let ranks2rev = Map.fromList $ fmap (second Sum . swap) $ rankings g2rev
-    let rankDiffRev = Map.filter (/= 0) $ Map.map getSum $ salign ranks1rev ranks2rev
-    putStrLn "Rank diff:"
-    for_ (sortOn (abs . snd) $ Map.toList rankDiff) $ \(m, r) -> do
-      putStrLn $ show m <> "\t" <> show r
-    putStrLn "Reverse Rank diff:"
-    print rankDiffRev
-    pure ()
+    let Diff{..} = diff g1 g2
+    print Diff{..}
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

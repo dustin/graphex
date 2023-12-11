@@ -1,6 +1,6 @@
 {-# LANGUAGE RankNTypes #-}
 
-module Graphex.Search (bfsOn, bfsWith, dfsOn, dfsWith, findFirst, flood, floodMap) where
+module Graphex.Search (bfsOn, bfsWith, dfsOn, dfsWith, findFirst, flood) where
 
 import           Data.List     (find)
 import           Data.Set      (Set)
@@ -52,13 +52,3 @@ flood nf = go mempty . Set.singleton
         go !s (flip Set.difference s -> todo)
             | Set.null todo = s
             | otherwise = go (s <> todo) (Set.unions $ Set.map nf todo)
-
--- | Flood fill a graph from a starting point and return all visited points.
---
--- NOTE: This will run forever on cyclic graphs!
-floodMap :: Monoid b => Ord a => (a -> b) -> (a -> [a]) -> a -> b
-floodMap f nf = go mempty . qsingle
-    where
-        go !bcc todo = case qpop todo of
-          Nothing           -> bcc
-          Just (curr, rest) -> go (bcc <> f curr) (qappendList rest (nf curr))

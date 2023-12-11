@@ -16,13 +16,7 @@ data Diff a = Diff
 
   , netReversedNodes :: ~Int
   , reversedNodes    :: ~(Map a Int)
-
-  , netEdges         :: ~Int
-  , edges            :: ~(Map a Int)
-
-  , netReversedEdges :: ~Int
-  , reversedEdges    :: ~(Map a Int)
-  }
+  } deriving stock (Show)
 
 diff :: NFData a => Ord a => Graph a -> Graph a -> Diff a
 diff g1 g2 = Diff{..}
@@ -36,12 +30,6 @@ diff g1 g2 = Diff{..}
     r1rev = rankings g1rev
     r2rev = rankings g2rev
 
-    er1 = edgeRankings g1
-    er2 = edgeRankings g2
-
-    er1rev = edgeRankings g1rev
-    er2rev = edgeRankings g2rev
-
     doDiff x y =
       let x' = Map.fromList $ fmap (second (Sum . negate) . swap) x
           y' = Map.fromList $ fmap (second Sum . swap) y
@@ -52,11 +40,3 @@ diff g1 g2 = Diff{..}
 
     reversedNodes = doDiff r1rev r2rev
     netReversedNodes = sum reversedNodes
-
-    edges = doDiff er1 er2
-    netEdges = sum edges
-
-    reversedEdges = doDiff er1rev er2rev
-    netReversedEdges = sum reversedEdges
-
-
