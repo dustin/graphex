@@ -59,6 +59,6 @@ flood nf = go mempty . Set.singleton
 floodMap :: Monoid b => Ord a => (a -> b) -> (a -> [a]) -> a -> b
 floodMap f nf = go mempty . qsingle
     where
-        go bcc todo = case qpop todo of
+        go !bcc todo = case qpop todo of
           Nothing           -> bcc
           Just (curr, rest) -> go (bcc <> f curr) (qappendList rest (nf curr))
