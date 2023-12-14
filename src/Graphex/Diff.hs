@@ -1,16 +1,18 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.Diff where
 
-import Prelude hiding (div)
 import           Control.Arrow               (second)
 import           Control.Parallel.Strategies (NFData)
+import           Data.List                   (sortOn)
 import           Data.Map                    (Map)
 import qualified Data.Map                    as Map
 import           Data.Monoid                 (Sum (..))
+import           Data.Ord                    (Down (..))
 import           Data.Semialign
+import           Data.Text                   (Text)
 import           Data.Tuple                  (swap)
-import    Text.Blaze.Html5
-import Data.Text (Text)
+import           Prelude                     hiding (div)
+import           Text.Blaze.Html5
 
 import           Graphex
 
@@ -52,7 +54,7 @@ diff2html Diff{..} = mconcat
     , details $ table $ mconcat
       [ tr $ mconcat
         [ th "Module", th "Change" ]
-      , flip foldMap (Map.toList nodes) $ \(m, net) ->
+      , flip foldMap (sortOn (Down . abs . snd) $ Map.toList nodes) $ \(m, net) ->
           tr $ mconcat
           [ td $ toHtml m, td $ toHtml net ]
       ]

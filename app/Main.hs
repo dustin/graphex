@@ -2,27 +2,27 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
-import           Data.Aeson           (encode)
-import           Data.Bool            (bool)
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Csv             as CSV
+import           Data.Aeson               (encode)
+import           Data.Bool                (bool)
+import qualified Data.ByteString.Lazy     as BL
+import qualified Data.Csv                 as CSV
 import           Data.Foldable
-import           Data.List.NonEmpty   (NonEmpty (..))
-import qualified Data.List.NonEmpty   as NE
-import           Data.Maybe           (fromMaybe)
-import           Data.Text            (Text)
-import qualified Data.Text            as T
-import qualified Data.Text.IO         as TIO
-import           Data.Tree.View       (drawTree)
+import           Data.List.NonEmpty       (NonEmpty (..))
+import qualified Data.List.NonEmpty       as NE
+import           Data.Maybe               (fromMaybe)
+import           Data.Text                (Text)
+import qualified Data.Text                as T
+import qualified Data.Text.IO             as TIO
+import           Data.Tree.View           (drawTree)
 import           Options.Applicative
-import           System.IO            (stdin)
+import           System.IO                (stdin)
+import           Text.Blaze.Renderer.Utf8 (renderMarkup)
 import           Text.Regex.TDFA
-import Text.Blaze.Renderer.Utf8 (renderMarkup)
-  
+
 import           Graphex
 import           Graphex.Core
-import           Graphex.Diff
 import qualified Graphex.CSV
+import           Graphex.Diff
 import           Main.Cabal
 
 data Command
