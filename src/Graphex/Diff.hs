@@ -1,6 +1,7 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.Diff where
 
+import Prelude hiding (div)
 import           Control.Arrow               (second)
 import           Control.Parallel.Strategies (NFData)
 import           Data.Map                    (Map)
@@ -8,6 +9,9 @@ import qualified Data.Map                    as Map
 import           Data.Monoid                 (Sum (..))
 import           Data.Semialign
 import           Data.Tuple                  (swap)
+import    Text.Blaze.Html5
+import Data.Text (Text)
+
 import           Graphex
 
 data Diff a = Diff
@@ -40,3 +44,17 @@ diff g1 g2 = Diff{..}
 
     reversedNodes = doDiff r1rev r2rev
     netReversedNodes = sum reversedNodes
+
+diff2html :: Diff Text -> Html
+diff2html Diff{..} = mconcat
+  [ div $ mconcat
+    [ "Net change in transitive import dependencies: ", toHtml netNodes
+    , details $ table $ mconcat
+      [ tr $ mconcat
+        [ th "Module", th "Change" ]
+      , flip foldMap (Map.toList nodes) $ \(m, net) ->
+          tr $ mconcat
+          [ td $ toHtml m, td $ toHtml net ]
+      ]
+    ]
+  ]

@@ -17,7 +17,8 @@ import           Data.Tree.View       (drawTree)
 import           Options.Applicative
 import           System.IO            (stdin)
 import           Text.Regex.TDFA
-
+import Text.Blaze.Renderer.Utf8 (renderMarkup)
+  
 import           Graphex
 import           Graphex.Core
 import           Graphex.Diff
@@ -90,7 +91,6 @@ data DiffOptions = DiffOptions
   { graph1 :: FilePath
   , graph2 :: FilePath
   , format :: DiffFormat
-  , diffs  :: [DiffType]
   }
   deriving stock (Show)
 
@@ -155,6 +155,6 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
     g1 <- getInput graph1
     g2 <- getInput graph2
     let Diff{..} = diff g1 g2
-    print Diff{..}
+    BL.putStr $ renderMarkup $ diff2html Diff{..}
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

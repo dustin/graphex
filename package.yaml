@@ -40,6 +40,8 @@ dependencies:
 - these
 - regex-tdfa
 - stm
+- blaze-markup
+- blaze-html
 
 library:
   source-dirs: src
