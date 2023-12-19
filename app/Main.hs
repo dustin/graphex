@@ -155,6 +155,9 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
     g1 <- getInput graph1
     g2 <- getInput graph2
     let Diff{..} = diff g1 g2
-    BL.putStr $ renderMarkup $ diff2html Diff{..}
+    case format of
+      DiffHtml -> BL.putStr $ renderMarkup $ diff2html Diff{..}
+      DiffText -> do
+        TIO.putStrLn $ diff2text Diff{..}
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

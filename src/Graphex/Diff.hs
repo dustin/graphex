@@ -10,7 +10,9 @@ import           Data.Monoid                 (Sum (..))
 import           Data.Ord                    (Down (..))
 import           Data.Semialign
 import           Data.Text                   (Text)
+import qualified Data.Text                   as T
 import           Data.Tuple                  (swap)
+import           Hable
 import           Prelude                     hiding (div)
 import           Text.Blaze.Html5
 
@@ -47,16 +49,42 @@ diff g1 g2 = Diff{..}
     reversedNodes = doDiff r1rev r2rev
     netReversedNodes = sum reversedNodes
 
+diffFoldFor :: Ord a => Monoid b => (Diff a -> Map a Int) -> Diff a -> ((a, Int) -> b) -> b
+diffFoldFor getter d = flip foldMap (sortOn (Down . abs . snd) $ Map.toList $ getter d)
+
 diff2html :: Diff Text -> Html
-diff2html Diff{..} = mconcat
+diff2html d = mconcat
   [ div $ mconcat
-    [ "Net change in transitive import dependencies: ", toHtml netNodes
+    [ "Net change in transitive import dependencies: ", toHtml (netNodes d)
     , details $ table $ mconcat
       [ tr $ mconcat
         [ th "Module", th "Change" ]
-      , flip foldMap (sortOn (Down . abs . snd) $ Map.toList nodes) $ \(m, net) ->
+      , diffFoldFor nodes d $ \(m, net) ->
+          tr $ mconcat
+          [ td $ toHtml m, td $ toHtml net ]
+      ]
+    ]
+  , div $ mconcat
+    [ "Net change in reverse transitive import dependencies: ", toHtml (netReversedNodes d)
+    , details $ table $ mconcat
+      [ tr $ mconcat
+        [ th "Module", th "Change" ]
+      , diffFoldFor reversedNodes d $ \(m, net) ->
           tr $ mconcat
           [ td $ toHtml m, td $ toHtml net ]
       ]
     ]
   ]
+
+diff2text :: Diff Text -> Text
+diff2text d = T.pack $ unlines
+  [ unwords ["Net change in transitive import dependencies:", show (netNodes d)]
+  , hable defaultConfig $ (diffHeader :) $ diffFoldFor nodes d $ \(m, net) ->
+      [[T.unpack m, show net]]
+  , unwords ["Net change in reverse transitive import dependencies:", show (netReversedNodes d)]
+  , hable defaultConfig $ (diffHeader :) $ diffFoldFor reversedNodes d $ \(m, net) ->
+      [[T.unpack m, show net]]
+  ]
+
+diffHeader :: [String]
+diffHeader = ["Module", "Change"]

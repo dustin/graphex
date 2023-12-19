@@ -42,6 +42,7 @@ dependencies:
 - stm
 - blaze-markup
 - blaze-html
+- hable
 
 library:
   source-dirs: src
