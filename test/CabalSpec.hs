@@ -26,6 +26,7 @@ libModules =
   , Module "Graphex.Search" "src/Graphex/Search.hs"
   , Module "Graphex.Logger" "src/Graphex/Logger.hs"
   , Module "Graphex.Queue" "src/Graphex/Queue.hs"
+  , Module "Graphex.Diff" "src/Graphex/Diff.hs"
   ]
 
 searchModuleGraph :: ModuleGraph
