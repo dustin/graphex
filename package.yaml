@@ -63,7 +63,9 @@ default-extensions:
 
 internal-libraries:
   graphex-dummy-sublib:
-    source-dirs: dummy-sublib
+    source-dirs:
+      - dummy-sublib
+      - dummy-sublib/test
 
 executables:
   graphex:
