@@ -31,7 +31,8 @@ import           Data.List                                     (intersperse)
 import           Data.List.NonEmpty                            (NonEmpty)
 import           Data.Map.Strict                               (Map)
 import qualified Data.Map.Strict                               as Map
-import           Data.Maybe                                    (mapMaybe,
+import           Data.Maybe                                    (catMaybes,
+                                                                mapMaybe,
                                                                 maybeToList)
 import           Data.Semigroup.Foldable
 import qualified Data.Set                                      as Set
@@ -98,7 +99,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
             guard $ Discovered == foldMap1 (`discoversUnit` CabalLibraryUnit name) toDiscover
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components exMod
-              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
+              , path = if exMod `elem` libBuildInfo.autogenModules then ModuleNoFile else ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath exMod <.> ".hs"
               }
         , do
             Executable{..} <- executables
@@ -110,7 +111,7 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
                 if otherMod == "Main"
                 then unUnqualComponentName exeName ++ "-Main"
                 else mconcat $ intersperse "." $ Cabal.components otherMod
-              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              , path = if otherMod `elem` buildInfo.autogenModules then ModuleNoFile else ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
               }
         , do
             TestSuite{..} <- testSuites
@@ -120,20 +121,23 @@ discoverCabalModules CabalDiscoverOpts{..} cabalFile = do
 
             pure Module
               { name = fromString $ mconcat $ intersperse "." $ Cabal.components otherMod
-              , path = ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
+              , path = if otherMod `elem` testBuildInfo.autogenModules then ModuleNoFile else ModuleFile $ sourceDirToFilePath srcDir </> Cabal.toFilePath otherMod <.> ".hs"
               }
         ]
 
-  pooledMapConcurrentlyN numJobs validateModulePath candidateModules
+  catMaybes <$> pooledMapConcurrentlyN numJobs validateModulePath candidateModules
 
-validateModulePath :: Module -> IO Module
+validateModulePath :: Module -> IO (Maybe Module)
 validateModulePath m = do
-  path <- case m.path of
+  let mkModule p = Module m.name p
+  case m.path of
     ModuleFile fp -> do
       fileExists <- doesFileExist fp
-      pure $ if fileExists then ModuleFile fp else ModuleNoFile
-    ModuleNoFile -> pure ModuleNoFile
-  pure Module {name = m.name, path = path}
+      -- If a discovered module has a filepath but doesn't exist, it means
+      -- that the unit had multiple source directories. We assume it will
+      -- exist in one of those directories.
+      pure $ if fileExists then Just $ mkModule $ ModuleFile fp else Nothing
+    ModuleNoFile -> pure $ Just $ mkModule ModuleNoFile
 
 data CabalUnitType =
     CabalLibrary
