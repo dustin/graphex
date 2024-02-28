@@ -2,6 +2,11 @@
 
 ## Unreleased changes
 
+## 0.1.2.1
+
+- Fix `graphex cabal` for units with multiple source directories.
+  - It would mistakenly treat some modules as having no file.
+
 ## 0.1.2.0
 
 - The graph edge direction has been standardized. `A -> B` means "A imports B."

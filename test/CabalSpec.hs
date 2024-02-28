@@ -51,7 +51,10 @@ exeModules =
   ]
 
 dummySublibModules :: [Module]
-dummySublibModules = [Module "DummySublibModule" "dummy-sublib/DummySublibModule.hs"]
+dummySublibModules =
+  [ Module "DummySublibModule" "dummy-sublib/DummySublibModule.hs"
+  , Module "DummyTest" "dummy-sublib/test/DummyTest.hs"
+  ]
 
 defaultOpts :: CabalDiscoverOpts
 defaultOpts = CabalDiscoverOpts

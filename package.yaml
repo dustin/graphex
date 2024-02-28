@@ -1,5 +1,5 @@
 name:                graphex
-version:             0.1.2.0
+version:             0.1.2.1
 github:              "dustin/graphex"
 license:             BSD3
 author:              "Dustin Sallings"
@@ -63,7 +63,9 @@ default-extensions:
 
 internal-libraries:
   graphex-dummy-sublib:
-    source-dirs: dummy-sublib
+    source-dirs:
+      - dummy-sublib
+      - dummy-sublib/test
 
 executables:
   graphex:
