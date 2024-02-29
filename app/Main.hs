@@ -1,4 +1,3 @@
-
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 

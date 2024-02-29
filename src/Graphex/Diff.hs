@@ -1,4 +1,3 @@
-{-# LANGUAGE StrictData #-}
 module Graphex.Diff where
 
 import           Control.Arrow               (second)
@@ -19,11 +18,11 @@ import           Text.Blaze.Html5
 import           Graphex
 
 data Diff a = Diff
-  { netNodes         :: ~Int
-  , nodes            :: ~(Map a Int)
+  { netNodes         :: Int
+  , nodes            :: Map a Int
 
-  , netReversedNodes :: ~Int
-  , reversedNodes    :: ~(Map a Int)
+  , netReversedNodes :: Int
+  , reversedNodes    :: Map a Int
   } deriving stock (Show)
 
 diff :: NFData a => Ord a => Graph a -> Graph a -> Diff a
