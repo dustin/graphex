@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 0.1.2.2
+
+- `graphex graph all` now fails when no modules match the query.
+
 ## 0.1.2.1
 
 - Fix `graphex cabal` for units with multiple source directories.
