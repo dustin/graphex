@@ -1,6 +1,7 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
+import           Control.Monad            (when)
 import           Data.Aeson               (encode)
 import           Data.Bool                (bool)
 import qualified Data.ByteString.Lazy     as BL
@@ -8,6 +9,7 @@ import qualified Data.Csv                 as CSV
 import           Data.Foldable
 import           Data.List.NonEmpty       (NonEmpty (..))
 import qualified Data.List.NonEmpty       as NE
+import qualified Data.Map                 as Map
 import           Data.Maybe               (fromMaybe)
 import           Data.Text                (Text)
 import qualified Data.Text                as T
@@ -137,7 +139,8 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
         AllDepsOn{..}      -> do
           let ms =
                 if | useRegex -> filter (\m -> any (m =~) patterns) (graphNodes graph)
-                   | otherwise -> NE.toList patterns
+                   | otherwise -> filter (flip Map.member (unGraph graph)) $ NE.toList patterns
+          when (null ms) $ error $ unwords ["No nodes in the graph match:", show patterns]
           printStrs $ foldMap (allDepsOn graph) ms
         Rankings         -> printStrs $ fmap (\(n,m) -> m <> " - " <> (T.pack . show) n) $ rankings graph
         FindLongest      -> printStrs $ longest graph
