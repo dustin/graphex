@@ -66,3 +66,6 @@ extra-deps: []
 # compiler-check: newer-minor
 nix:
   packages: [zlib]
+
+extra-deps:
+- hable-0.3.1

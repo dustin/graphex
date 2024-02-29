@@ -1,31 +1,27 @@
 {-# LANGUAGE ApplicativeDo #-}
 module Main where
 
-import           Control.Applicative  ((<|>))
-import           Data.Aeson           (encode)
-import           Data.Bool            (bool)
-import qualified Data.ByteString.Lazy as BL
-import qualified Data.Csv             as CSV
+import           Data.Aeson               (encode)
+import           Data.Bool                (bool)
+import qualified Data.ByteString.Lazy     as BL
+import qualified Data.Csv                 as CSV
 import           Data.Foldable
-import           Data.List.NonEmpty   (NonEmpty (..))
-import qualified Data.List.NonEmpty   as NE
-import           Data.Maybe           (fromMaybe)
-import           Data.Text            (Text)
-import qualified Data.Text            as T
-import qualified Data.Text.IO         as TIO
-import           Data.Tree.View       (drawTree)
-import           Options.Applicative  (Parser, argument, command,
-                                       customExecParser, fullDesc, help, helper,
-                                       hsubparser, info, long, metavar, prefs,
-                                       progDesc, short, showDefault,
-                                       showHelpOnError, some, str, strOption,
-                                       switch, value, (<**>))
-import           System.IO            (stdin)
+import           Data.List.NonEmpty       (NonEmpty (..))
+import qualified Data.List.NonEmpty       as NE
+import           Data.Maybe               (fromMaybe)
+import           Data.Text                (Text)
+import qualified Data.Text                as T
+import qualified Data.Text.IO             as TIO
+import           Data.Tree.View           (drawTree)
+import           Options.Applicative
+import           System.IO                (stdin)
+import           Text.Blaze.Renderer.Utf8 (renderMarkup)
 import           Text.Regex.TDFA
 
 import           Graphex
 import           Graphex.Core
 import qualified Graphex.CSV
+import           Graphex.Diff
 import           Main.Cabal
 
 data Command
@@ -42,7 +38,7 @@ data Command
     deriving stock Show
 
 
-data Options = GraphCmd GraphOptions | CabalCmd CabalOptions
+data Options = GraphCmd GraphOptions | CabalCmd CabalOptions | DiffCmd DiffOptions
   deriving stock Show
 
 data GraphOptions = GraphOptions {
@@ -55,6 +51,7 @@ options :: Parser Options
 options = hsubparser $ fold
   [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
   , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
+  , command "diff" (info (DiffCmd <$> diffOptions) (progDesc "Diff operations"))
   ]
 
 graphOptions :: Parser GraphOptions
@@ -84,6 +81,34 @@ graphOptions = GraphOptions
         catCmd = Cat <$> some1 (argument str (metavar "graph.json"))
         removeCmd = Remove <$> switch (short 'r' <> help "Use regex") <*> some1 (argument str (metavar "module"))
         some1 = fmap NE.fromList . some
+
+data DiffType =
+    DiffRanks
+  | DiffReverseRanks
+  deriving stock (Show)
+data DiffOptions = DiffOptions
+  { graph1 :: FilePath
+  , graph2 :: FilePath
+  , format :: DiffFormat
+  }
+  deriving stock (Show)
+
+data DiffFormat =
+    DiffText
+  | DiffHtml
+  deriving stock (Show)
+
+readDiffFormat :: ReadM DiffFormat
+readDiffFormat = eitherReader $ \case
+  "text" -> Right DiffText
+  "html" -> Right DiffHtml
+  x -> Left $ "Unrecognized diff format: " ++ x
+
+diffOptions :: Parser DiffOptions
+diffOptions = DiffOptions
+  <$> argument str (metavar "GRAPH")
+  <*> argument str (metavar "GRAPH")
+  <*> option readDiffFormat (long "format" <> short 'f')
 
 printStrs :: Foldable f => f Text -> IO ()
 printStrs = traverse_ TIO.putStrLn
@@ -125,5 +150,13 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
                    | otherwise -> (`elem` patterns)
           BL.putStr $ encode $ graphToDep $ filterNodes shouldRemove graph
   CabalCmd cabalOpts -> runCabal cabalOpts
+  DiffCmd DiffOptions{..} -> do
+    g1 <- getInput graph1
+    g2 <- getInput graph2
+    let Diff{..} = diff g1 g2
+    case format of
+      DiffHtml -> BL.putStr $ renderMarkup $ diff2html Diff{..}
+      DiffText -> do
+        TIO.putStrLn $ diff2text Diff{..}
   where
     opts = info (options <**> helper) ( fullDesc <> progDesc "Graph CLI tool.")

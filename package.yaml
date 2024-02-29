@@ -40,11 +40,15 @@ dependencies:
 - these
 - regex-tdfa
 - stm
+- blaze-markup
+- blaze-html
+- hable
 
 library:
   source-dirs: src
   ghc-options:
     - -Wall
+    - -Werror=incomplete-patterns
 
 default-extensions:
   - OverloadedStrings
@@ -53,6 +57,7 @@ default-extensions:
   - DerivingStrategies
   - DeriveAnyClass
   - DeriveGeneric
+  - DeriveFoldable
   - GeneralizedNewtypeDeriving
   - ViewPatterns
   - TupleSections
@@ -76,6 +81,7 @@ executables:
       - -rtsopts
       - -with-rtsopts=-N
       - -Wall
+      - -Werror=incomplete-patterns
     dependencies:
     - graphex
 
@@ -87,6 +93,8 @@ tests:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
+    - -Werror=incomplete-patterns
     dependencies:
     - graphex
     - HUnit
