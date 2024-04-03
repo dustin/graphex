@@ -85,7 +85,7 @@ span.spaces    { background: white }
 <span class="lineno">   66 </span><span class="spaces">          </span><span class="istickedoff">}</span>
 <span class="lineno">   67 </span><span class="spaces">        </span><span class="istickedoff">)</span>
 <span class="lineno">   68 </span><span class="spaces">  </span><span class="istickedoff">in GraphDef</span>
-<span class="lineno">   69 </span><span class="spaces">     </span><span class="istickedoff">{ nodes = Map.fromList $ fmap (\(m, _) -&gt; mkNode m) $ Map.toList unGraph</span>
+<span class="lineno">   69 </span><span class="spaces">     </span><span class="istickedoff">{ nodes = Map.fromList $ concatMap (\(m, children) -&gt; mkNode m : fmap mkNode (Set.toList children) ) $ Map.toList unGraph</span>
 <span class="lineno">   70 </span><span class="spaces">     </span><span class="istickedoff">, edges = Map.toList unGraph &gt;&gt;= \(m, children) -&gt; fmap (\c -&gt; Edge{to = mkNodeId c, from = mkNodeId m}) $ Set.toList children</span>
 <span class="lineno">   71 </span><span class="spaces">     </span><span class="istickedoff">, attrs = attributes</span>
 <span class="lineno">   72 </span><span class="spaces">     </span><span class="istickedoff">, ..</span>

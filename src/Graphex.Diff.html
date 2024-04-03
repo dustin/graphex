@@ -17,17 +17,17 @@
 </span><span id="line-17"></span><span>
 </span><span id="line-18"></span><span class="hs-keyword">import</span><span>           </span><span class="annot"><a href="Graphex.html"><span class="hs-identifier">Graphex</span></a></span><span>
 </span><span id="line-19"></span><span>
-</span><span id="line-20"></span><span class="hs-keyword">data</span><span> </span><span id="Diff"><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-var">Diff</span></a></span></span><span> </span><span id="local-6989586621679130360"><span class="annot"><a href="#local-6989586621679130360"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Diff"><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-var">Diff</span></a></span></span><span>
+</span><span id="line-20"></span><span class="hs-keyword">data</span><span> </span><span id="Diff"><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-var">Diff</span></a></span></span><span> </span><span id="local-6989586621679130381"><span class="annot"><a href="#local-6989586621679130381"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Diff"><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-var">Diff</span></a></span></span><span>
 </span><span id="line-21"></span><span>  </span><span class="hs-special">{</span><span> </span><span id="netNodes"><span class="annot"><span class="annottext">forall a. Diff a -&gt; Int
 </span><a href="Graphex.Diff.html#netNodes"><span class="hs-identifier hs-var hs-var">netNodes</span></a></span></span><span>         </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
 </span><span id="line-22"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="nodes"><span class="annot"><span class="annottext">forall a. Diff a -&gt; Map a Int
-</span><a href="Graphex.Diff.html#nodes"><span class="hs-identifier hs-var hs-var">nodes</span></a></span></span><span>            </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679130360"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><a href="Graphex.Diff.html#nodes"><span class="hs-identifier hs-var hs-var">nodes</span></a></span></span><span>            </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679130381"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
 </span><span id="line-23"></span><span>
 </span><span id="line-24"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="netReversedNodes"><span class="annot"><span class="annottext">forall a. Diff a -&gt; Int
 </span><a href="Graphex.Diff.html#netReversedNodes"><span class="hs-identifier hs-var hs-var">netReversedNodes</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
 </span><span id="line-25"></span><span>  </span><span class="hs-special">,</span><span> </span><span id="reversedNodes"><span class="annot"><span class="annottext">forall a. Diff a -&gt; Map a Int
-</span><a href="Graphex.Diff.html#reversedNodes"><span class="hs-identifier hs-var hs-var">reversedNodes</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679130360"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
-</span><span id="line-26"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679130500"><span id="local-6989586621679130509"><span id="local-6989586621679130513"><span class="annot"><span class="annottext">Int -&gt; Diff a -&gt; ShowS
+</span><a href="Graphex.Diff.html#reversedNodes"><span class="hs-identifier hs-var hs-var">reversedNodes</span></a></span></span><span>    </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679130381"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
+</span><span id="line-26"></span><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="annot"><span class="hs-keyword">stock</span></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679130521"><span id="local-6989586621679130530"><span id="local-6989586621679130534"><span class="annot"><span class="annottext">Int -&gt; Diff a -&gt; ShowS
 [Diff a] -&gt; ShowS
 Diff a -&gt; String
 (Int -&gt; Diff a -&gt; ShowS)
@@ -45,11 +45,11 @@ $cshowList :: forall a. Show a =&gt; [Diff a] -&gt; ShowS
 showList :: [Diff a] -&gt; ShowS
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-27"></span><span>
-</span><span id="line-28"></span><span id="local-6989586621679130373"><span class="annot"><a href="Graphex.Diff.html#diff"><span class="hs-identifier hs-type">diff</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679130373"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679130373"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130373"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130373"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130373"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-28"></span><span id="local-6989586621679130394"><span class="annot"><a href="Graphex.Diff.html#diff"><span class="hs-identifier hs-type">diff</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">NFData</span></span><span> </span><span class="annot"><a href="#local-6989586621679130394"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679130394"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130394"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Core.html#Graph"><span class="hs-identifier hs-type">Graph</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130394"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130394"><span class="hs-identifier hs-type">a</span></a></span></span><span>
 </span><span id="line-29"></span><span id="diff"><span class="annot"><span class="annottext">diff :: forall a. (NFData a, Ord a) =&gt; Graph a -&gt; Graph a -&gt; Diff a
-</span><a href="Graphex.Diff.html#diff"><span class="hs-identifier hs-var hs-var">diff</span></a></span></span><span> </span><span id="local-6989586621679130521"><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130521"><span class="hs-identifier hs-var">g1</span></a></span></span><span> </span><span id="local-6989586621679130522"><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130522"><span class="hs-identifier hs-var">g2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">Int
+</span><a href="Graphex.Diff.html#diff"><span class="hs-identifier hs-var hs-var">diff</span></a></span></span><span> </span><span id="local-6989586621679130542"><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679130542"><span class="hs-identifier hs-var">g1</span></a></span></span><span> </span><span id="local-6989586621679130543"><span class="annot"><span class="annottext">Graph a
+</span><a href="#local-6989586621679130543"><span class="hs-identifier hs-var">g2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span class="hs-special">{</span><span class="annot"><span class="annottext">Int
 Map a Int
 netNodes :: Int
 nodes :: Map a Int
@@ -61,45 +61,45 @@ reversedNodes :: Map a Int
 netReversedNodes :: Int
 </span><a href="Graphex.Diff.html#netNodes"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span><span class="hs-special">}</span><span>
 </span><span id="line-30"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-31"></span><span>    </span><span id="local-6989586621679130529"><span class="annot"><span class="annottext">g1rev :: Graph a
-</span><a href="#local-6989586621679130529"><span class="hs-identifier hs-var hs-var">g1rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; Graph a
+</span><span id="line-31"></span><span>    </span><span id="local-6989586621679130550"><span class="annot"><span class="annottext">g1rev :: Graph a
+</span><a href="#local-6989586621679130550"><span class="hs-identifier hs-var hs-var">g1rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; Graph a
 forall a. Ord a =&gt; Graph a -&gt; Graph a
 </span><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-var">reverseEdges</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130521"><span class="hs-identifier hs-var">g1</span></a></span><span>
-</span><span id="line-32"></span><span>    </span><span id="local-6989586621679130533"><span class="annot"><span class="annottext">g2rev :: Graph a
-</span><a href="#local-6989586621679130533"><span class="hs-identifier hs-var hs-var">g2rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; Graph a
+</span><a href="#local-6989586621679130542"><span class="hs-identifier hs-var">g1</span></a></span><span>
+</span><span id="line-32"></span><span>    </span><span id="local-6989586621679130554"><span class="annot"><span class="annottext">g2rev :: Graph a
+</span><a href="#local-6989586621679130554"><span class="hs-identifier hs-var hs-var">g2rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; Graph a
 forall a. Ord a =&gt; Graph a -&gt; Graph a
 </span><a href="Graphex.html#reverseEdges"><span class="hs-identifier hs-var">reverseEdges</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130522"><span class="hs-identifier hs-var">g2</span></a></span><span>
+</span><a href="#local-6989586621679130543"><span class="hs-identifier hs-var">g2</span></a></span><span>
 </span><span id="line-33"></span><span>
-</span><span id="line-34"></span><span>    </span><span id="local-6989586621679130537"><span class="annot"><span class="annottext">r1 :: [(Int, a)]
-</span><a href="#local-6989586621679130537"><span class="hs-identifier hs-var hs-var">r1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
+</span><span id="line-34"></span><span>    </span><span id="local-6989586621679130558"><span class="annot"><span class="annottext">r1 :: [(Int, a)]
+</span><a href="#local-6989586621679130558"><span class="hs-identifier hs-var hs-var">r1</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
 forall a. (NFData a, Ord a) =&gt; Graph a -&gt; [(Int, a)]
 </span><a href="Graphex.html#rankings"><span class="hs-identifier hs-var">rankings</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130521"><span class="hs-identifier hs-var">g1</span></a></span><span>
-</span><span id="line-35"></span><span>    </span><span id="local-6989586621679130542"><span class="annot"><span class="annottext">r2 :: [(Int, a)]
-</span><a href="#local-6989586621679130542"><span class="hs-identifier hs-var hs-var">r2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
+</span><a href="#local-6989586621679130542"><span class="hs-identifier hs-var">g1</span></a></span><span>
+</span><span id="line-35"></span><span>    </span><span id="local-6989586621679130563"><span class="annot"><span class="annottext">r2 :: [(Int, a)]
+</span><a href="#local-6989586621679130563"><span class="hs-identifier hs-var hs-var">r2</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
 forall a. (NFData a, Ord a) =&gt; Graph a -&gt; [(Int, a)]
 </span><a href="Graphex.html#rankings"><span class="hs-identifier hs-var">rankings</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130522"><span class="hs-identifier hs-var">g2</span></a></span><span>
+</span><a href="#local-6989586621679130543"><span class="hs-identifier hs-var">g2</span></a></span><span>
 </span><span id="line-36"></span><span>
-</span><span id="line-37"></span><span>    </span><span id="local-6989586621679130546"><span class="annot"><span class="annottext">r1rev :: [(Int, a)]
-</span><a href="#local-6989586621679130546"><span class="hs-identifier hs-var hs-var">r1rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
+</span><span id="line-37"></span><span>    </span><span id="local-6989586621679130567"><span class="annot"><span class="annottext">r1rev :: [(Int, a)]
+</span><a href="#local-6989586621679130567"><span class="hs-identifier hs-var hs-var">r1rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
 forall a. (NFData a, Ord a) =&gt; Graph a -&gt; [(Int, a)]
 </span><a href="Graphex.html#rankings"><span class="hs-identifier hs-var">rankings</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130529"><span class="hs-identifier hs-var">g1rev</span></a></span><span>
-</span><span id="line-38"></span><span>    </span><span id="local-6989586621679130550"><span class="annot"><span class="annottext">r2rev :: [(Int, a)]
-</span><a href="#local-6989586621679130550"><span class="hs-identifier hs-var hs-var">r2rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
+</span><a href="#local-6989586621679130550"><span class="hs-identifier hs-var">g1rev</span></a></span><span>
+</span><span id="line-38"></span><span>    </span><span id="local-6989586621679130571"><span class="annot"><span class="annottext">r2rev :: [(Int, a)]
+</span><a href="#local-6989586621679130571"><span class="hs-identifier hs-var hs-var">r2rev</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Graph a -&gt; [(Int, a)]
 forall a. (NFData a, Ord a) =&gt; Graph a -&gt; [(Int, a)]
 </span><a href="Graphex.html#rankings"><span class="hs-identifier hs-var">rankings</span></a></span><span> </span><span class="annot"><span class="annottext">Graph a
-</span><a href="#local-6989586621679130533"><span class="hs-identifier hs-var">g2rev</span></a></span><span>
+</span><a href="#local-6989586621679130554"><span class="hs-identifier hs-var">g2rev</span></a></span><span>
 </span><span id="line-39"></span><span>
-</span><span id="line-40"></span><span>    </span><span id="local-6989586621679130563"><span class="annot"><span class="annottext">doDiff :: [(a, k)] -&gt; [(a, k)] -&gt; Map k a
-</span><a href="#local-6989586621679130563"><span class="hs-identifier hs-var hs-var">doDiff</span></a></span></span><span> </span><span id="local-6989586621679130564"><span class="annot"><span class="annottext">[(a, k)]
-</span><a href="#local-6989586621679130564"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679130565"><span class="annot"><span class="annottext">[(a, k)]
-</span><a href="#local-6989586621679130565"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
-</span><span id="line-41"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679130573"><span class="annot"><span class="annottext">x' :: Map k (Sum a)
-</span><a href="#local-6989586621679130573"><span class="hs-identifier hs-var hs-var">x'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(k, Sum a)] -&gt; Map k (Sum a)
+</span><span id="line-40"></span><span>    </span><span id="local-6989586621679130584"><span class="annot"><span class="annottext">doDiff :: [(a, k)] -&gt; [(a, k)] -&gt; Map k a
+</span><a href="#local-6989586621679130584"><span class="hs-identifier hs-var hs-var">doDiff</span></a></span></span><span> </span><span id="local-6989586621679130585"><span class="annot"><span class="annottext">[(a, k)]
+</span><a href="#local-6989586621679130585"><span class="hs-identifier hs-var">x</span></a></span></span><span> </span><span id="local-6989586621679130586"><span class="annot"><span class="annottext">[(a, k)]
+</span><a href="#local-6989586621679130586"><span class="hs-identifier hs-var">y</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-41"></span><span>      </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679130594"><span class="annot"><span class="annottext">x' :: Map k (Sum a)
+</span><a href="#local-6989586621679130594"><span class="hs-identifier hs-var hs-var">x'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(k, Sum a)] -&gt; Map k (Sum a)
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(k, Sum a)] -&gt; Map k (Sum a)) -&gt; [(k, Sum a)] -&gt; Map k (Sum a)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -123,9 +123,9 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a, k) -&gt; (k, a)
 forall a b. (a, b) -&gt; (b, a)
 </span><span class="hs-identifier hs-var">swap</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(a, k)]
-</span><a href="#local-6989586621679130564"><span class="hs-identifier hs-var">x</span></a></span><span>
-</span><span id="line-42"></span><span>          </span><span id="local-6989586621679130581"><span class="annot"><span class="annottext">y' :: Map k (Sum a)
-</span><a href="#local-6989586621679130581"><span class="hs-identifier hs-var hs-var">y'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(k, Sum a)] -&gt; Map k (Sum a)
+</span><a href="#local-6989586621679130585"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-42"></span><span>          </span><span id="local-6989586621679130602"><span class="annot"><span class="annottext">y' :: Map k (Sum a)
+</span><a href="#local-6989586621679130602"><span class="hs-identifier hs-var hs-var">y'</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(k, Sum a)] -&gt; Map k (Sum a)
 forall k a. Ord k =&gt; [(k, a)] -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.fromList</span></span><span> </span><span class="annot"><span class="annottext">([(k, Sum a)] -&gt; Map k (Sum a)) -&gt; [(k, Sum a)] -&gt; Map k (Sum a)
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -145,7 +145,7 @@ forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
 </span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(a, k) -&gt; (k, a)
 forall a b. (a, b) -&gt; (b, a)
 </span><span class="hs-identifier hs-var">swap</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[(a, k)]
-</span><a href="#local-6989586621679130565"><span class="hs-identifier hs-var">y</span></a></span><span>
+</span><a href="#local-6989586621679130586"><span class="hs-identifier hs-var">y</span></a></span><span>
 </span><span id="line-43"></span><span>      </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">(a -&gt; Bool) -&gt; Map k a -&gt; Map k a
 forall a k. (a -&gt; Bool) -&gt; Map k a -&gt; Map k a
 </span><span class="hs-identifier hs-var">Map.filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; a -&gt; Bool
@@ -164,46 +164,46 @@ forall (f :: * -&gt; *) a.
 (Semialign f, Semigroup a) =&gt;
 f a -&gt; f a -&gt; f a
 </span><span class="hs-identifier hs-var">salign</span></span><span> </span><span class="annot"><span class="annottext">Map k (Sum a)
-</span><a href="#local-6989586621679130573"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="annot"><span class="annottext">Map k (Sum a)
-</span><a href="#local-6989586621679130581"><span class="hs-identifier hs-var">y'</span></a></span><span>
+</span><a href="#local-6989586621679130594"><span class="hs-identifier hs-var">x'</span></a></span><span> </span><span class="annot"><span class="annottext">Map k (Sum a)
+</span><a href="#local-6989586621679130602"><span class="hs-identifier hs-var">y'</span></a></span><span>
 </span><span id="line-44"></span><span>
-</span><span id="line-45"></span><span>    </span><span id="local-6989586621679130523"><span class="annot"><span class="annottext">nodes :: Map a Int
-</span><a href="#local-6989586621679130523"><span class="hs-identifier hs-var hs-var">nodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, a)] -&gt; [(Int, a)] -&gt; Map a Int
+</span><span id="line-45"></span><span>    </span><span id="local-6989586621679130544"><span class="annot"><span class="annottext">nodes :: Map a Int
+</span><a href="#local-6989586621679130544"><span class="hs-identifier hs-var hs-var">nodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, a)] -&gt; [(Int, a)] -&gt; Map a Int
 forall {k} {a}.
 (Ord k, Num a, Eq a) =&gt;
 [(a, k)] -&gt; [(a, k)] -&gt; Map k a
-</span><a href="#local-6989586621679130563"><span class="hs-identifier hs-var">doDiff</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
-</span><a href="#local-6989586621679130537"><span class="hs-identifier hs-var">r1</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
-</span><a href="#local-6989586621679130542"><span class="hs-identifier hs-var">r2</span></a></span><span>
-</span><span id="line-46"></span><span>    </span><span id="local-6989586621679130524"><span class="annot"><span class="annottext">netNodes :: Int
-</span><a href="#local-6989586621679130524"><span class="hs-identifier hs-var hs-var">netNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map a Int -&gt; Int
+</span><a href="#local-6989586621679130584"><span class="hs-identifier hs-var">doDiff</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
+</span><a href="#local-6989586621679130558"><span class="hs-identifier hs-var">r1</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
+</span><a href="#local-6989586621679130563"><span class="hs-identifier hs-var">r2</span></a></span><span>
+</span><span id="line-46"></span><span>    </span><span id="local-6989586621679130545"><span class="annot"><span class="annottext">netNodes :: Int
+</span><a href="#local-6989586621679130545"><span class="hs-identifier hs-var hs-var">netNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map a Int -&gt; Int
 forall a. Num a =&gt; Map a a -&gt; a
 forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
 </span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">Map a Int
-</span><a href="#local-6989586621679130523"><span class="hs-identifier hs-var">nodes</span></a></span><span>
+</span><a href="#local-6989586621679130544"><span class="hs-identifier hs-var">nodes</span></a></span><span>
 </span><span id="line-47"></span><span>
-</span><span id="line-48"></span><span>    </span><span id="local-6989586621679130525"><span class="annot"><span class="annottext">reversedNodes :: Map a Int
-</span><a href="#local-6989586621679130525"><span class="hs-identifier hs-var hs-var">reversedNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, a)] -&gt; [(Int, a)] -&gt; Map a Int
+</span><span id="line-48"></span><span>    </span><span id="local-6989586621679130546"><span class="annot"><span class="annottext">reversedNodes :: Map a Int
+</span><a href="#local-6989586621679130546"><span class="hs-identifier hs-var hs-var">reversedNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(Int, a)] -&gt; [(Int, a)] -&gt; Map a Int
 forall {k} {a}.
 (Ord k, Num a, Eq a) =&gt;
 [(a, k)] -&gt; [(a, k)] -&gt; Map k a
-</span><a href="#local-6989586621679130563"><span class="hs-identifier hs-var">doDiff</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
-</span><a href="#local-6989586621679130546"><span class="hs-identifier hs-var">r1rev</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
-</span><a href="#local-6989586621679130550"><span class="hs-identifier hs-var">r2rev</span></a></span><span>
-</span><span id="line-49"></span><span>    </span><span id="local-6989586621679130526"><span class="annot"><span class="annottext">netReversedNodes :: Int
-</span><a href="#local-6989586621679130526"><span class="hs-identifier hs-var hs-var">netReversedNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map a Int -&gt; Int
+</span><a href="#local-6989586621679130584"><span class="hs-identifier hs-var">doDiff</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
+</span><a href="#local-6989586621679130567"><span class="hs-identifier hs-var">r1rev</span></a></span><span> </span><span class="annot"><span class="annottext">[(Int, a)]
+</span><a href="#local-6989586621679130571"><span class="hs-identifier hs-var">r2rev</span></a></span><span>
+</span><span id="line-49"></span><span>    </span><span id="local-6989586621679130547"><span class="annot"><span class="annottext">netReversedNodes :: Int
+</span><a href="#local-6989586621679130547"><span class="hs-identifier hs-var hs-var">netReversedNodes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Map a Int -&gt; Int
 forall a. Num a =&gt; Map a a -&gt; a
 forall (t :: * -&gt; *) a. (Foldable t, Num a) =&gt; t a -&gt; a
 </span><span class="hs-identifier hs-var">sum</span></span><span> </span><span class="annot"><span class="annottext">Map a Int
-</span><a href="#local-6989586621679130525"><span class="hs-identifier hs-var">reversedNodes</span></a></span><span>
+</span><a href="#local-6989586621679130546"><span class="hs-identifier hs-var">reversedNodes</span></a></span><span>
 </span><span id="line-50"></span><span>
-</span><span id="line-51"></span><span id="local-6989586621679130418"><span id="local-6989586621679130419"><span class="annot"><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-type">diffFoldFor</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679130418"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monoid</span></span><span> </span><span class="annot"><a href="#local-6989586621679130419"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130418"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679130418"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130418"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679130418"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679130419"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679130419"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
+</span><span id="line-51"></span><span id="local-6989586621679130439"><span id="local-6989586621679130440"><span class="annot"><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-type">diffFoldFor</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Ord</span></span><span> </span><span class="annot"><a href="#local-6989586621679130439"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Monoid</span></span><span> </span><span class="annot"><a href="#local-6989586621679130440"><span class="hs-identifier hs-type">b</span></a></span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130439"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Map</span></span><span> </span><span class="annot"><a href="#local-6989586621679130439"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679130439"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="annot"><a href="#local-6989586621679130439"><span class="hs-identifier hs-type">a</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679130440"><span class="hs-identifier hs-type">b</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679130440"><span class="hs-identifier hs-type">b</span></a></span></span></span><span>
 </span><span id="line-52"></span><span id="diffFoldFor"><span class="annot"><span class="annottext">diffFoldFor :: forall a b.
 (Ord a, Monoid b) =&gt;
 (Diff a -&gt; Map a Int) -&gt; Diff a -&gt; ((a, Int) -&gt; b) -&gt; b
-</span><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-var hs-var">diffFoldFor</span></a></span></span><span> </span><span id="local-6989586621679130613"><span class="annot"><span class="annottext">Diff a -&gt; Map a Int
-</span><a href="#local-6989586621679130613"><span class="hs-identifier hs-var">getter</span></a></span></span><span> </span><span id="local-6989586621679130614"><span class="annot"><span class="annottext">Diff a
-</span><a href="#local-6989586621679130614"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(((a, Int) -&gt; b) -&gt; [(a, Int)] -&gt; b)
+</span><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-var hs-var">diffFoldFor</span></a></span></span><span> </span><span id="local-6989586621679130634"><span class="annot"><span class="annottext">Diff a -&gt; Map a Int
+</span><a href="#local-6989586621679130634"><span class="hs-identifier hs-var">getter</span></a></span></span><span> </span><span id="local-6989586621679130635"><span class="annot"><span class="annottext">Diff a
+</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(((a, Int) -&gt; b) -&gt; [(a, Int)] -&gt; b)
 -&gt; [(a, Int)] -&gt; ((a, Int) -&gt; b) -&gt; b
 forall a b c. (a -&gt; b -&gt; c) -&gt; b -&gt; a -&gt; c
 </span><span class="hs-identifier hs-var">flip</span></span><span> </span><span class="annot"><span class="annottext">((a, Int) -&gt; b) -&gt; [(a, Int)] -&gt; b
@@ -230,13 +230,13 @@ forall k a. Map k a -&gt; [(k, a)]
 </span><span class="hs-identifier hs-var">Map.toList</span></span><span> </span><span class="annot"><span class="annottext">(Map a Int -&gt; [(a, Int)]) -&gt; Map a Int -&gt; [(a, Int)]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Diff a -&gt; Map a Int
-</span><a href="#local-6989586621679130613"><span class="hs-identifier hs-var">getter</span></a></span><span> </span><span class="annot"><span class="annottext">Diff a
-</span><a href="#local-6989586621679130614"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679130634"><span class="hs-identifier hs-var">getter</span></a></span><span> </span><span class="annot"><span class="annottext">Diff a
+</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-53"></span><span>
 </span><span id="line-54"></span><span class="annot"><a href="Graphex.Diff.html#diff2html"><span class="hs-identifier hs-type">diff2html</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Html</span></span><span>
 </span><span id="line-55"></span><span id="diff2html"><span class="annot"><span class="annottext">diff2html :: Diff Text -&gt; Html
-</span><a href="Graphex.Diff.html#diff2html"><span class="hs-identifier hs-var hs-var">diff2html</span></a></span></span><span> </span><span id="local-6989586621679130622"><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130622"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Html] -&gt; Html
+</span><a href="Graphex.Diff.html#diff2html"><span class="hs-identifier hs-var hs-var">diff2html</span></a></span></span><span> </span><span id="local-6989586621679130643"><span class="annot"><span class="annottext">Diff Text
+</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Html] -&gt; Html
 forall a. Monoid a =&gt; [a] -&gt; a
 </span><span class="hs-identifier hs-var">mconcat</span></span><span>
 </span><span id="line-56"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
@@ -251,7 +251,7 @@ forall a. ToMarkup a =&gt; a -&gt; Html
 </span><span class="hs-identifier hs-var">toHtml</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Diff Text -&gt; Int
 forall a. Diff a -&gt; Int
 </span><a href="Graphex.Diff.html#netNodes"><span class="hs-identifier hs-var">netNodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130622"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-58"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
 </span><span class="hs-identifier hs-var">details</span></span><span> </span><span class="annot"><span class="annottext">(Html -&gt; Html) -&gt; Html -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -280,11 +280,11 @@ forall a b.
 </span><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-var">diffFoldFor</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text -&gt; Map Text Int
 forall a. Diff a -&gt; Map a Int
 </span><a href="Graphex.Diff.html#nodes"><span class="hs-identifier hs-var">nodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130622"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; Html) -&gt; Html) -&gt; ((Text, Int) -&gt; Html) -&gt; Html
+</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; Html) -&gt; Html) -&gt; ((Text, Int) -&gt; Html) -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130629"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130629"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130630"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130630"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130650"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679130650"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130651"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130651"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-62"></span><span>          </span><span class="annot"><span class="annottext">Html -&gt; Html
 </span><span class="hs-identifier hs-var">tr</span></span><span> </span><span class="annot"><span class="annottext">(Html -&gt; Html) -&gt; Html -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -297,13 +297,13 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Html
 forall a. ToMarkup a =&gt; a -&gt; Html
 </span><span class="hs-identifier hs-var">toHtml</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130629"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
+</span><a href="#local-6989586621679130650"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
 </span><span class="hs-identifier hs-var">td</span></span><span> </span><span class="annot"><span class="annottext">(Html -&gt; Html) -&gt; Html -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Html
 forall a. ToMarkup a =&gt; a -&gt; Html
 </span><span class="hs-identifier hs-var">toHtml</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130630"><span class="hs-identifier hs-var">net</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679130651"><span class="hs-identifier hs-var">net</span></a></span><span> </span><span class="hs-special">]</span><span>
 </span><span id="line-64"></span><span>      </span><span class="hs-special">]</span><span>
 </span><span id="line-65"></span><span>    </span><span class="hs-special">]</span><span>
 </span><span id="line-66"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
@@ -318,7 +318,7 @@ forall a. ToMarkup a =&gt; a -&gt; Html
 </span><span class="hs-identifier hs-var">toHtml</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Diff Text -&gt; Int
 forall a. Diff a -&gt; Int
 </span><a href="Graphex.Diff.html#netReversedNodes"><span class="hs-identifier hs-var">netReversedNodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130622"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-68"></span><span>    </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
 </span><span class="hs-identifier hs-var">details</span></span><span> </span><span class="annot"><span class="annottext">(Html -&gt; Html) -&gt; Html -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -347,11 +347,11 @@ forall a b.
 </span><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-var">diffFoldFor</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text -&gt; Map Text Int
 forall a. Diff a -&gt; Map a Int
 </span><a href="Graphex.Diff.html#reversedNodes"><span class="hs-identifier hs-var">reversedNodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130622"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; Html) -&gt; Html) -&gt; ((Text, Int) -&gt; Html) -&gt; Html
+</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; Html) -&gt; Html) -&gt; ((Text, Int) -&gt; Html) -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130632"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130632"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130633"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130633"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130653"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679130653"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130654"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130654"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-72"></span><span>          </span><span class="annot"><span class="annottext">Html -&gt; Html
 </span><span class="hs-identifier hs-var">tr</span></span><span> </span><span class="annot"><span class="annottext">(Html -&gt; Html) -&gt; Html -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
@@ -364,21 +364,21 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Text -&gt; Html
 forall a. ToMarkup a =&gt; a -&gt; Html
 </span><span class="hs-identifier hs-var">toHtml</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130632"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
+</span><a href="#local-6989586621679130653"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Html -&gt; Html
 </span><span class="hs-identifier hs-var">td</span></span><span> </span><span class="annot"><span class="annottext">(Html -&gt; Html) -&gt; Html -&gt; Html
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Html
 forall a. ToMarkup a =&gt; a -&gt; Html
 </span><span class="hs-identifier hs-var">toHtml</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130633"><span class="hs-identifier hs-var">net</span></a></span><span> </span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679130654"><span class="hs-identifier hs-var">net</span></a></span><span> </span><span class="hs-special">]</span><span>
 </span><span id="line-74"></span><span>      </span><span class="hs-special">]</span><span>
 </span><span id="line-75"></span><span>    </span><span class="hs-special">]</span><span>
 </span><span id="line-76"></span><span>  </span><span class="hs-special">]</span><span>
 </span><span id="line-77"></span><span>
 </span><span id="line-78"></span><span class="annot"><a href="Graphex.Diff.html#diff2text"><span class="hs-identifier hs-type">diff2text</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Graphex.Diff.html#Diff"><span class="hs-identifier hs-type">Diff</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Text</span></span><span>
 </span><span id="line-79"></span><span id="diff2text"><span class="annot"><span class="annottext">diff2text :: Diff Text -&gt; Text
-</span><a href="Graphex.Diff.html#diff2text"><span class="hs-identifier hs-var hs-var">diff2text</span></a></span></span><span> </span><span id="local-6989586621679130635"><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
+</span><a href="Graphex.Diff.html#diff2text"><span class="hs-identifier hs-var hs-var">diff2text</span></a></span></span><span> </span><span id="local-6989586621679130656"><span class="annot"><span class="annottext">Diff Text
+</span><a href="#local-6989586621679130656"><span class="hs-identifier hs-var">d</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; Text
 </span><span class="hs-identifier hs-var">T.pack</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Text) -&gt; String -&gt; Text
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
@@ -390,7 +390,7 @@ forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Diff Text -&gt; Int
 forall a. Diff a -&gt; Int
 </span><a href="Graphex.Diff.html#netNodes"><span class="hs-identifier hs-var">netNodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679130656"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
 </span><span id="line-81"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Config UnicodeStyle -&gt; [[String]] -&gt; String
 forall style. Config style -&gt; [[String]] -&gt; String
 </span><span class="hs-identifier hs-var">hable</span></span><span> </span><span class="annot"><span class="annottext">Config UnicodeStyle
@@ -409,18 +409,18 @@ forall a b.
 </span><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-var">diffFoldFor</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text -&gt; Map Text Int
 forall a. Diff a -&gt; Map a Int
 </span><a href="Graphex.Diff.html#nodes"><span class="hs-identifier hs-var">nodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; [[String]]) -&gt; [[String]])
+</span><a href="#local-6989586621679130656"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; [[String]]) -&gt; [[String]])
 -&gt; ((Text, Int) -&gt; [[String]]) -&gt; [[String]]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130643"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130644"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130644"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130664"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679130664"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130665"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130665"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-82"></span><span>      </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; String
 </span><span class="hs-identifier hs-var">T.unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130643"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+</span><a href="#local-6989586621679130664"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130644"><span class="hs-identifier hs-var">net</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679130665"><span class="hs-identifier hs-var">net</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
 </span><span id="line-83"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">[String] -&gt; String
 </span><span class="hs-identifier hs-var">unwords</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Net change in reverse transitive import dependencies:&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
@@ -428,7 +428,7 @@ forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Diff Text -&gt; Int
 forall a. Diff a -&gt; Int
 </span><a href="Graphex.Diff.html#netReversedNodes"><span class="hs-identifier hs-var">netReversedNodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679130656"><span class="hs-identifier hs-var">d</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
 </span><span id="line-84"></span><span>  </span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Config UnicodeStyle -&gt; [[String]] -&gt; String
 forall style. Config style -&gt; [[String]] -&gt; String
 </span><span class="hs-identifier hs-var">hable</span></span><span> </span><span class="annot"><span class="annottext">Config UnicodeStyle
@@ -447,18 +447,18 @@ forall a b.
 </span><a href="Graphex.Diff.html#diffFoldFor"><span class="hs-identifier hs-var">diffFoldFor</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text -&gt; Map Text Int
 forall a. Diff a -&gt; Map a Int
 </span><a href="Graphex.Diff.html#reversedNodes"><span class="hs-identifier hs-var">reversedNodes</span></a></span><span> </span><span class="annot"><span class="annottext">Diff Text
-</span><a href="#local-6989586621679130635"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; [[String]]) -&gt; [[String]])
+</span><a href="#local-6989586621679130656"><span class="hs-identifier hs-var">d</span></a></span><span> </span><span class="annot"><span class="annottext">(((Text, Int) -&gt; [[String]]) -&gt; [[String]])
 -&gt; ((Text, Int) -&gt; [[String]]) -&gt; [[String]]
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130646"><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130646"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130647"><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130647"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679130667"><span class="annot"><span class="annottext">Text
+</span><a href="#local-6989586621679130667"><span class="hs-identifier hs-var">m</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679130668"><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679130668"><span class="hs-identifier hs-var">net</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-85"></span><span>      </span><span class="hs-special">[</span><span class="hs-special">[</span><span class="annot"><span class="annottext">Text -&gt; String
 </span><span class="hs-identifier hs-var">T.unpack</span></span><span> </span><span class="annot"><span class="annottext">Text
-</span><a href="#local-6989586621679130646"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
+</span><a href="#local-6989586621679130667"><span class="hs-identifier hs-var">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Int -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679130647"><span class="hs-identifier hs-var">net</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><a href="#local-6989586621679130668"><span class="hs-identifier hs-var">net</span></a></span><span class="hs-special">]</span><span class="hs-special">]</span><span>
 </span><span id="line-86"></span><span>  </span><span class="hs-special">]</span><span>
 </span><span id="line-87"></span><span>
 </span><span id="line-88"></span><span class="annot"><a href="Graphex.Diff.html#diffHeader"><span class="hs-identifier hs-type">diffHeader</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
