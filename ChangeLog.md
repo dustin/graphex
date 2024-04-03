@@ -8,6 +8,9 @@
 
 - Fix `graphex cabal` for units with multiple source directories.
   - It would mistakenly treat some modules as having no file.
+- Looking Glass conversion had a bug where nodes that only appeared as children wouldn't get `nodes`.
+  - This caused querying a `graphex cabal --include-external` graph to fail due to `Data.Map.!` crashes
+    during conversion from Looking Glass.
 
 ## 0.1.2.0
 

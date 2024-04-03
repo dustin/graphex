@@ -66,7 +66,7 @@ toLookingGlass title colors Graph{..} =
           }
         )
   in GraphDef
-     { nodes = Map.fromList $ fmap (\(m, _) -> mkNode m) $ Map.toList unGraph
+     { nodes = Map.fromList $ concatMap (\(m, children) -> mkNode m : fmap mkNode (Set.toList children) ) $ Map.toList unGraph
      , edges = Map.toList unGraph >>= \(m, children) -> fmap (\c -> Edge{to = mkNodeId c, from = mkNodeId m}) $ Set.toList children
      , attrs = attributes
      , ..
