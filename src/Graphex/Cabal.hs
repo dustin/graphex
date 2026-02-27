@@ -8,6 +8,7 @@
 module Graphex.Cabal
   ( discoverCabalModules
   , discoverCabalModuleGraph
+  , buildModuleGraph
   , CabalDiscoverOpts (..)
   , CabalDiscoverType (..)
   , CabalUnit (..)
@@ -199,11 +200,10 @@ data CabalGraph = CabalGraph
   , modulesByName :: Map ModuleName Module
   }
 
-discoverCabalModuleGraph :: CabalDiscoverOpts -> IO CabalGraph
-discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
-  fs <- getDirectoryContents "."
-  mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
-
+-- | Build a module graph from a list of discovered modules.
+-- Shared between Cabal and Hpack discovery paths.
+buildModuleGraph :: Int -> Bool -> Maybe (ModuleName -> Bool) -> [Module] -> IO CabalGraph
+buildModuleGraph numJobs includeExternal pruneTo mods = do
   let modMap = foldMap (\m@Module{..} -> Map.singleton name m) mods
   mg <- case pruneTo of
     Nothing -> do
@@ -240,6 +240,12 @@ discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
     { moduleGraph = mg
     , modulesByName = modMap
     }
+
+discoverCabalModuleGraph :: CabalDiscoverOpts -> IO CabalGraph
+discoverCabalModuleGraph opts@CabalDiscoverOpts{..} = do
+  fs <- getDirectoryContents "."
+  mods <- fmap fold . traverse (discoverCabalModules opts) . filter ((".cabal" ==) . takeExtension) $ fs
+  buildModuleGraph numJobs includeExternal pruneTo mods
 
 mkCabalFileGraph :: CabalGraph -> Graph FilePath
 mkCabalFileGraph CabalGraph{..} =

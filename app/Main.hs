@@ -25,6 +25,7 @@ import           Graphex.Core
 import qualified Graphex.CSV
 import           Graphex.Diff
 import           Main.Cabal
+import           Main.Hpack
 
 data Command
     = DirectDepsOn Text
@@ -40,7 +41,7 @@ data Command
     deriving stock Show
 
 
-data Options = GraphCmd GraphOptions | CabalCmd CabalOptions | DiffCmd DiffOptions
+data Options = GraphCmd GraphOptions | CabalCmd CabalOptions | HpackCmd HpackOptions | DiffCmd DiffOptions
   deriving stock Show
 
 data GraphOptions = GraphOptions {
@@ -53,6 +54,7 @@ options :: Parser Options
 options = hsubparser $ fold
   [ command "graph" (info (GraphCmd <$> graphOptions) (progDesc "Graph operations"))
   , command "cabal" (info (CabalCmd <$> cabalOptions) (progDesc "Cabal operations"))
+  , command "hpack" (info (HpackCmd <$> hpackOptions) (progDesc "Hpack (package.yaml) operations"))
   , command "diff" (info (DiffCmd <$> diffOptions) (progDesc "Diff operations"))
   ]
 
@@ -153,6 +155,7 @@ main = customExecParser (prefs showHelpOnError) opts >>= \case
                    | otherwise -> (`elem` patterns)
           BL.putStr $ encode $ graphToDep $ filterNodes shouldRemove graph
   CabalCmd cabalOpts -> runCabal cabalOpts
+  HpackCmd hpackOpts -> runHpack hpackOpts
   DiffCmd DiffOptions{..} -> do
     g1 <- getInput graph1
     g2 <- getInput graph2
