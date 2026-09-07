@@ -1,6 +1,7 @@
 {-# LANGUAGE StrictData #-}
 module Graphex.Core where
 
+import           Control.DeepSeq (NFData)
 import           Control.Monad   ((<=<))
 import           Data.Map        (Map)
 import qualified Data.Map.Strict as Map
@@ -8,6 +9,7 @@ import           Data.Set        (Set)
 import qualified Data.Set        as Set
 import           Data.String     (IsString (..))
 import           Data.Text       (Text)
+import           GHC.Generics    (Generic)
 
 data Graph a = Graph {
   unGraph    :: Map a (Set a),
@@ -40,10 +42,12 @@ graphNodes = Map.keys . unGraph
 data Import = Import
   { module_ :: ModuleName
   , package :: Maybe Text
-  } deriving stock (Show, Eq)
+  }
+  deriving stock (Show, Eq, Generic)
+  deriving anyclass (NFData)
 
 newtype ModuleName = ModuleName { unModuleName :: Text }
-  deriving newtype (Eq, Ord, IsString)
+  deriving newtype (Eq, Ord, IsString, NFData)
   deriving stock (Show)
 
 data ModulePath = ModuleNoFile | ModuleFile FilePath

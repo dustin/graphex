@@ -43,6 +43,7 @@ dependencies:
 - blaze-markup
 - blaze-html
 - hable
+- deepseq
 
 library:
   source-dirs: src
@@ -80,6 +81,7 @@ executables:
       - -threaded
       - -rtsopts
       - -with-rtsopts=-N
+      - -O2
       - -Wall
       - -Werror=incomplete-patterns
     dependencies:
@@ -105,3 +107,18 @@ tests:
     - checkers
     build-tools:
     - tasty-discover
+
+
+benchmarks:
+  my-project-benchmark:
+    main: Main.hs
+    source-dirs: bench
+    dependencies:
+      - graphex
+      - tasty-bench
+      - managed
+    ghc-options:
+      - -O2
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
