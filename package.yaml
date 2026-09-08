@@ -116,6 +116,7 @@ benchmarks:
     dependencies:
       - graphex
       - tasty-bench
+      - temporary
       - managed
     ghc-options:
       - -O2
