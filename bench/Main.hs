@@ -14,6 +14,7 @@ main = runManaged $ do
   parseFileImportsBench <- traverse (uncurry mkFileImportBench)
     [ ("Large top-level", mkLargeTopLevel)
     , ("Large comment", mkLargeComment)
+    , ("Just alotta imports", mkAlottaImports)
     ]
 
   liftIO $ defaultMain
@@ -47,7 +48,7 @@ alottaImports = ("import " <>) <$> do
   pure [c1, c2, c3]
 
 mkLargeTopLevel :: MonadIO m => FilePath -> m ()
-mkLargeTopLevel = flip mkFile $ 
+mkLargeTopLevel = flip mkFile
   [ pure ["module LargeTopLevel where"]
   , pure alottaImports
   , lines <$> readFile "bench/data/beegfunc"
@@ -55,13 +56,19 @@ mkLargeTopLevel = flip mkFile $
   where
 
 mkLargeComment :: MonadIO m => FilePath -> m ()
-mkLargeComment = flip mkFile $
+mkLargeComment = flip mkFile
   [ pure ["module LargeComment where"]
   , pure ["{-"]
   , lines <$> readFile "bench/data/beegfunc"
   , pure ["-}"]
   , pure alottaImports
   ]
-         
+
+mkAlottaImports :: MonadIO m => FilePath -> m ()
+mkAlottaImports = flip mkFile
+  [ pure ["module AlottaImports where"]
+  , pure alottaImports
+  ]
+
 managed2 :: MonadManaged m => (forall r. (a -> b -> IO r) -> IO r) -> m (a, b)
 managed2 k = managed (k . curry)
