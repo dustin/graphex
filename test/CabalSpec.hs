@@ -21,6 +21,7 @@ libModules =
   , Module "Graphex.Cabal" "src/Graphex/Cabal.hs"
   , Module "Graphex.Core" "src/Graphex/Core.hs"
   , Module "Graphex.CSV" "src/Graphex/CSV.hs"
+  , Module "Graphex.Hpack" "src/Graphex/Hpack.hs"
   , Module "Graphex.LookingGlass" "src/Graphex/LookingGlass.hs"
   , Module "Graphex.Parser" "src/Graphex/Parser.hs"
   , Module "Graphex.Search" "src/Graphex/Search.hs"
@@ -38,6 +39,7 @@ searchModuleGraph = mconcat
 testModules :: [Module]
 testModules =
   [ Module "CabalSpec" "test/CabalSpec.hs"
+  , Module "HpackSpec" "test/HpackSpec.hs"
   , Module "ImportParserSpec" "test/ImportParserSpec.hs"
   , Module "Paths_graphex" ModuleNoFile
   , Module "Spec"  "test/Spec.hs"
@@ -49,6 +51,7 @@ exeModules =
   [ Module "Paths_graphex" ModuleNoFile
   , Module "graphex-Main" "app/Main.hs"
   , Module "Main.Cabal" "app/Main/Cabal.hs"
+  , Module "Main.Hpack" "app/Main/Hpack.hs"
   ]
 
 dummySublibModules :: [Module]

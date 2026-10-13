@@ -1,0 +1,80 @@
+{-# LANGUAGE ApplicativeDo #-}
+module Main.Hpack where
+
+import           Control.Concurrent   (getNumCapabilities)
+import           Data.Aeson           (encode)
+import qualified Data.ByteString.Lazy as BL
+import           Data.Functor         ((<&>))
+import           Data.List.NonEmpty   (nonEmpty)
+import           Data.Maybe           (fromMaybe)
+import           Data.Semialign       (alignWith)
+import           Data.Text            (Text)
+import qualified Data.Text            as T
+import           Data.These           (mergeThese)
+import           Options.Applicative
+import           Text.Regex.TDFA
+
+import           Graphex.Cabal        (CabalDiscoverType (..), CabalGraph (..),
+                                       CabalUnit (..), CabalUnitType (..),
+                                       mkCabalFileGraph)
+import           Graphex.Core
+import           Graphex.Hpack
+import           Graphex.Logger
+import           Graphex.LookingGlass
+
+data HpackOptions = HpackOptions
+  { optToDiscover      :: [CabalDiscoverType]
+  , optIncludeExternal :: Bool
+  , optNumJobs         :: Maybe Int
+  , optPruneTo         :: [ModuleName]
+  , optPruneToRegex    :: [Text]
+  , optFileGraph       :: Bool
+  , optPackageYaml     :: FilePath
+  } deriving stock Show
+
+hpackOptions :: Parser HpackOptions
+hpackOptions = do
+  optToDiscover <- fmap mconcat $ many $ asum
+    [ flag' [CabalDiscoverAll CabalLibrary, CabalDiscoverAll CabalExecutable, CabalDiscoverAll CabalTests] (long "discover-all" <> help "Discover all import dependencies")
+    , flag' (pure $ CabalDiscoverAll CabalLibrary) (long "discover-all-libs" <> help "Discover all library import dependencies")
+    , flag' (pure $ CabalDiscoverAll CabalExecutable) (long "discover-all-exes" <> help "Discover all executable import dependencies")
+    , flag' (pure $ CabalDiscoverAll CabalTests) (long "discover-all-tests" <> help "Discover all test import dependencies")
+    , flag' (pure $ CabalDontDiscoverAll CabalLibrary) (long "no-discover-all-libs" <> help "Discover no library import dependencies")
+    , flag' (pure $ CabalDontDiscoverAll CabalExecutable) (long "no-discover-all-exes" <> help "Discover no executable import dependencies")
+    , flag' (pure $ CabalDontDiscoverAll CabalTests) (long "no-discover-all-tests" <> help "Discover no test import dependencies")
+    , flag' (pure $ CabalDiscover (CabalLibraryUnit Nothing)) (long "discover-lib" <> help "Discover the default library import dependencies")
+    , flag' (pure $ CabalDontDiscover (CabalLibraryUnit Nothing)) (long "no-discover-lib" <> help "Don't discover the default library import dependencies")
+    , pure . CabalDiscover . CabalLibraryUnit . Just <$> strOption (long "discover-sublib" <> help "Discover specified sublibrary import dependencies")
+    , pure . CabalDontDiscover . CabalLibraryUnit . Just <$> strOption (long "no-discover-sublib" <> help "Don't discover specified sublibrary import dependencies")
+    , pure . CabalDiscover . CabalExecutableUnit <$> strOption (long "discover-exe" <> help "Discover specified executable import dependencies")
+    , pure . CabalDontDiscover . CabalExecutableUnit <$> strOption (long "no-discover-exe" <> help "Don't discover specified executable import dependencies")
+    , pure . CabalDiscover . CabalTestsUnit <$> strOption (long "discover-test" <> help "Discover specified test import dependencies")
+    , pure . CabalDontDiscover . CabalTestsUnit <$> strOption (long "no-discover-test" <> help "Don't discover specified test import dependencies")
+    ]
+  optIncludeExternal <- switch (long "include-external" <> help "Include external import dependencies")
+  optNumJobs <- optional (option auto (long "jobs" <> short 'j' <> help "Number of worker threads to use"))
+  optPruneTo <- many $ strOption (long "prune-to" <> help "Only discover import dependencies of the specified module(s)")
+  optPruneToRegex <- many $ strOption (long "prune-to-regex" <> help "Only discover import dependencies of modules that match a regex")
+  optFileGraph <- switch (long "paths" <> short 'p' <> help "Create a graph of file paths instead of modules names")
+  optPackageYaml <- strOption (long "package-yaml" <> value "package.yaml" <> showDefault <> help "Path to package.yaml")
+  pure HpackOptions{..}
+
+runHpack :: HpackOptions -> IO ()
+runHpack HpackOptions{..} = do
+  numCapabilities <- getNumCapabilities
+  let numJobs = fromMaybe numCapabilities optNumJobs
+  logit $ unwords ["Discovering with num jobs = ", show numJobs]
+
+  let pruneToExplicit = flip elem <$> nonEmpty optPruneTo
+  let pruneToRegex = (\patterns (ModuleName m) -> any (m =~) patterns) <$> nonEmpty optPruneToRegex
+  let pruneTo = alignWith (mergeThese (liftA2 (||))) pruneToExplicit pruneToRegex
+  let discoverOpts = HpackDiscoverOpts
+        { hpackToDiscover = fromMaybe (pure $ CabalDiscover (CabalLibraryUnit Nothing)) $ nonEmpty optToDiscover
+        , hpackIncludeExternal = optIncludeExternal
+        , hpackNumJobs = numJobs
+        , hpackPruneTo = pruneTo
+        }
+  mg <- discoverHpackModuleGraph discoverOpts optPackageYaml <&> case optFileGraph of
+    True  -> convertGraph T.pack . mkCabalFileGraph
+    False -> convertGraph unModuleName . moduleGraph
+  BL.putStr $ encode $ toLookingGlass "Internal Package Dependencies" mempty mg
