@@ -1,3 +1,6 @@
+bench-repl: graphex.cabal
+	cabal repl benchmarks
+
 repl: graphex.cabal
 	cabal repl lib:graphex
 .PHONY: repl
