@@ -1,0 +1,4 @@
+packages: .
+
+if os(darwin)
+  import: cabal.project.freeze.aarch64-apple-darwin
